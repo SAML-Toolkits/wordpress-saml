@@ -1,0 +1,13 @@
+This 'certs' folder must never be published.
+
+Alternatives:
+
+1. Using the .htaccess if the AllowOveride at your Apache Server is active
+
+2. Add a Directoy at your Apache server:
+
+<Directory /<path-to-onelogin-saml-sso-plugin>/php/certs
+    Order deny,allow
+    deny from all
+    Options -Indexes
+</Directory>
