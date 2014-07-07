@@ -43,7 +43,7 @@
 		$idp_fields = array (
 			'onelogin_saml_idp_entityid' => __('IdP Entity Id') . ' *',
 			'onelogin_saml_idp_sso' => __('Single Sign On Service Url') . ' *',
-			'onelogin_saml_idp_slo' => __('Single Log Oout Service Url'),
+			'onelogin_saml_idp_slo' => __('Single Log Out Service Url'),
 			'onelogin_saml_idp_x509cert' => __('X.509 Certificate')
 		);
 		foreach ($idp_fields as $name => $description) {
