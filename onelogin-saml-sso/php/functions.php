@@ -197,7 +197,7 @@ function initialize_saml() {
 	} catch (Exception $e) {
 		echo '<br>'.__("The Onelogin SSO/SAML plugin is not correctly configured.").'<br>';
 		print_r($e->getMessage());
-		echo '<br>'.__("If you are the administrator").', <a href="'.get_site_url().'/wp-login.php?nosaml">'.__("access using your wordpress credentials").'</a> '.__("and fix the problem");
+		echo '<br>'.__("If you are the administrator").', <a href="'.get_site_url().'/wp-login.php?normal">'.__("access using your wordpress credentials").'</a> '.__("and fix the problem");
 		exit();
 	}
 
