@@ -274,7 +274,6 @@ class preventEmailChange
             ?>
             <script>
                 jQuery(document).ready(function ($) {
-		    alert('hola');
                     if ($('input[name=email]').length) {
                         $('input[name=email]').attr("disabled", "disabled");
                     }
