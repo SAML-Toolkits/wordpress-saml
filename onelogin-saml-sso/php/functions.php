@@ -88,7 +88,7 @@ function saml_acs() {
 	} else {
 		$userdata = array();
 		$userdata['user_login'] = wp_slash($username);
-		$userdata['user_email'] = wp_slash($email);			
+		$userdata['user_email'] = wp_slash($email);
 	}
 
 	if (!empty($attrs)) {
@@ -169,8 +169,8 @@ function saml_acs() {
 		}
 	}
 
-	require_once(ABSPATH . WPINC . '/registration.php');
-	require_once(ABSPATH . WPINC . '/pluggable.php');
+	require_once ABSPATH . WPINC . '/registration.php';
+	require_once ABSPATH . WPINC . '/pluggable.php';
 
 	$matcher = get_option('onelogin_saml_account_matcher');
 
@@ -240,8 +240,8 @@ function saml_sls() {
 }
 
 function initialize_saml() {
-	require_once(dirname(__FILE__).'/_toolkit_loader.php');
-	require(dirname(__FILE__).'/settings.php');
+	require_once plugin_dir_path(__FILE__).'_toolkit_loader.php';
+	require plugin_dir_path(__FILE__).'settings.php';
 
 	try {
 		$auth = new Onelogin_Saml2_Auth($settings);

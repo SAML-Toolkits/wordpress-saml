@@ -8,7 +8,7 @@ if (!current_user_can('delete_plugins')) {
      exit();
 }
 
-require_once "_toolkit_loader.php";
+require_once plugin_dir_path(__FILE__).'_toolkit_loader.php';
 
 echo '<h1>OneLogin SSO/SAML Settings validation</h1>';
 
@@ -39,8 +39,8 @@ if ($slo) {
 	echo '<br>'.__("Single Log Out is disabled. If you log out from Wordpress your session at the IdP keeps alive.").'<br>';
 }
 
-$fileSystemKeyExists = file_exists(dirname(__FILE__).'/certs/sp.key');
-$fileSystemCertExists = file_exists(dirname(__FILE__).'/certs/sp.crt');
+$fileSystemKeyExists = file_exists(plugin_dir_path(__FILE__).'certs/sp.key');
+$fileSystemCertExists = file_exists(plugin_dir_path(__FILE__).'certs/sp.crt');
 if ($fileSystemKeyExists) {
 	$privatekey_url = plugins_url('php/certs/sp.key', dirname(__FILE__));
 	echo '<br>'.__("There is a private key stored at the filesystem. Protect the 'certs' path. Nobody should be allowed to access:").'<br>'.$privatekey_url.'<br>';

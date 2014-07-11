@@ -8,8 +8,8 @@ Version: 2.0.0
 Author URI: http://www.onelogin.com
 */
 
-require_once(dirname(dirname(dirname(dirname(__FILE__)))) . '/wp-load.php');
-require_once(ABSPATH . '/wp-content/plugins/onelogin-saml-sso/php/functions.php');
+require_once dirname(dirname(dirname(dirname(__FILE__)))) . '/wp-load.php';
+require_once plugin_dir_path(__FILE__)."php/functions.php";
 
 if (isset($_GET['acs'])) {
 	saml_acs();
@@ -19,7 +19,7 @@ else if (isset($_GET['sls'])) {
 }
 
 // add menu option for configuration
-require_once(ABSPATH . '/wp-content/plugins/onelogin-saml-sso/php/configuration.php');
+require_once plugin_dir_path(__FILE__)."php/configuration.php";
 add_action('admin_menu', 'onelogin_saml_configuration');
 
 // plugin hooks into authenticator system
