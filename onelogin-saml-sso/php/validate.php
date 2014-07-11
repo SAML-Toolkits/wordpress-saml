@@ -1,6 +1,8 @@
 <?php
 
-require_once "settings.php";
+require_once(dirname(dirname(dirname(dirname(dirname(__FILE__))))) . '/wp-load.php');
+
+require plugin_dir_path(__FILE__).'settings.php';
 
 if (!current_user_can('delete_plugins')) {
      header("HTTP/1.0 403 Forbidden");

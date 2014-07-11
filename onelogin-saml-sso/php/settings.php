@@ -1,8 +1,5 @@
 <?php
 
-require_once(dirname(dirname(dirname(dirname(dirname(__FILE__))))) . '/wp-load.php');
-
-
 $opt['strict'] = get_option('onelogin_saml_advanced_settings_strict_mode', 'on');
 $opt['debug'] = get_option('onelogin_saml_advanced_settings_debug', 'on');
 $opt['sp_entity_id'] = get_option('onelogin_saml_advanced_settings_sp_entity_id', 'php-saml');
