@@ -258,7 +258,7 @@ function initialize_saml() {
 // Prevent that the user change the email when the 'email' field is used as 'matcher'
 class preventEmailChange
 {
-    function __construct($protect)
+    function __construct()
     {
 	$matcher = get_option('onelogin_saml_account_matcher');
 	if ($matcher == 'email') {
