@@ -44,7 +44,7 @@ function saml_sso() {
 function saml_slo() {
 	setcookie('saml_login', 0, time() - 3600, SITECOOKIEPATH );
 	$auth = initialize_saml();
-	$auth->logout(get_site_url().'/wp-content/plugins/onelogin-saml-sso/onelogin_saml.php?sls');
+	$auth->logout(plugins_url('onelogin_saml.php?sls', dirname(__FILE__)));
 }
 
 

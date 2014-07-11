@@ -42,7 +42,7 @@ if ($slo) {
 $fileSystemKeyExists = file_exists(dirname(__FILE__).'/certs/sp.key');
 $fileSystemCertExists = file_exists(dirname(__FILE__).'/certs/sp.crt');
 if ($fileSystemKeyExists) {
-	$privatekey_url = get_site_url() . '/wp-content/plugins/onelogin-saml-sso/php/certs/sp.key';
+	$privatekey_url = plugins_url('php/certs/sp.key', dirname(__FILE__));
 	echo '<br>'.__("There is a private key stored at the filesystem. Protect the 'certs' path. Nobody should be allowed to access:").'<br>'.$privatekey_url.'<br>';
 }
 

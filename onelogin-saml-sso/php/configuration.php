@@ -6,11 +6,11 @@
 			<div class="wrap">
 				<?php screen_icon(); ?>
 				<div class="alignright">
-					<a href="<?php echo get_site_url().'/wp-content/plugins/onelogin-saml-sso/php/metadata.php'; ?>" target="blank"><?php echo __("Go to the metadata of this SP");?></a>
+					<a href="<?php echo plugins_url('php/metadata.php', dirname(__FILE__)); ?>" target="blank"><?php echo __("Go to the metadata of this SP");?></a>
 				</div>
 				<h2><?php echo esc_html( $title ); ?></h2>
 				<div class="alignright">
-					<a href="<?php echo get_site_url().'/wp-content/plugins/onelogin-saml-sso/php/validate.php'; ?>" target="blank"><?php echo __("Once configured, validate here your OneLogin SSO/SAML Settings");?></a>
+					<a href="<?php echo plugins_url('php/validate.php', dirname(__FILE__)); ?>" target="blank"><?php echo __("Once configured, validate here your OneLogin SSO/SAML Settings");?></a>
 				</div>
 				<form action="options.php" method="post">
 

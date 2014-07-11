@@ -23,10 +23,10 @@ $settings = array (
     'sp' => array (
         'entityId' => (!empty($opt['sp_entity_id'])? $opt['sp_entity_id'] : 'php-saml'),
         'assertionConsumerService' => array (
-            'url' => get_site_url() . '/wp-content/plugins/onelogin-saml-sso/onelogin_saml.php?acs',
+            'url' => plugins_url('onelogin_saml.php?acs', dirname(__FILE__))
         ),
         'singleLogoutService' => array (
-            'url' => get_site_url() . '/wp-content/plugins/onelogin-saml-sso/onelogin_saml.php?sls',
+            'url' => plugins_url('onelogin_saml.php?acs', dirname(__FILE__))
         ),
         'NameIDFormat' => 'urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress',
         'x509cert' => get_option('onelogin_saml_advanced_settings_sp_x509cert'),
