@@ -1,6 +1,34 @@
 <?php
 
-function saml_sso() {	
+function saml_lostpassword() {
+	$target = get_option('onelogin_saml_customize_links_lost_password');
+	if (!empty($target)) {
+		wp_redirect($target);
+		return false;
+	}
+}
+
+function saml_user_register() {
+	$target = get_option('onelogin_saml_customize_links_user_registration');
+	if (!empty($target)) {
+    	wp_redirect($target);
+    	return false;
+    }
+}
+
+function saml_sso() {
+        $slo = get_option('onelogin_saml_slo');	
+
+	if (!$slo) {
+		if (isset($_GET['action']) && $_GET['action']  == 'logout') {
+			wp_logout();
+			return false;
+		} else if (isset($_GET['loggedout']) && $_GET['loggedout']) {
+			setcookie('saml_login', 0, time() - 3600, SITECOOKIEPATH );
+			return false;
+		}
+	}
+
 	if (is_user_logged_in()) {
 		return true;
 	}
@@ -78,14 +106,19 @@ function saml_acs() {
 
 		if (!empty($roleMapping) && isset($attrs[$roleMapping])){
 			$adminsRole = explode(',', get_option('onelogin_saml_role_mapping_administrator'));
-			$editorsRole = explode(',', get_option('onelogin_saml_role_mapping_administrator'));
+			$editorsRole = explode(',', get_option('onelogin_saml_role_mapping_editor'));
 			$authorsRole = explode(',', get_option('onelogin_saml_role_mapping_author'));
 			$contributorsRole = explode(',', get_option('onelogin_saml_role_mapping_contributor'));
 			$subscribersRole = explode(',', get_option('onelogin_saml_role_mapping_subscriber'));
 
 			$role = 0;
+
 			foreach ($attrs[$roleMapping] as $samlRole) {
-				if (in_array($samlRole, $adminsRole)) {
+				$samlRole = trim($samlRole);
+				if (empty($samlRole)) {
+					break;	
+				}
+				else if (in_array($samlRole, $adminsRole)) {
 					if ($role < 5) {
 						$role = 5;
 					}
@@ -127,6 +160,8 @@ function saml_acs() {
 					$userdata['role'] = 'contributor';
 					break;
 				case 1:
+				case 0:
+				default:
 					$userdata['role'] = 'subscriber';		
 					break;
 
@@ -175,8 +210,24 @@ function saml_acs() {
 		setcookie('saml_login', 1, time() + YEAR_IN_SECONDS, SITECOOKIEPATH );
 		do_action('wp_login', $user_id);
 	}
+
+	$forcelogin = get_option('onelogin_saml_forcelogin');
+	$slo = get_option('onelogin_saml_slo');
+
 	if (isset($_REQUEST['RelayState'])) {
-		wp_redirect($_REQUEST['RelayState']);
+		if (!empty($_REQUEST['RelayState']) && !$slo && !$forcelogin && $_REQUEST['RelayState'] == '/wp-login.php') {
+			wp_redirect(home_url());
+		} else {
+			if (strpos($_REQUEST['RelayState'], 'redirect_to') !== false) {
+				$urlinfo = parse_url($_REQUEST['RelayState']);
+				$parameters = array();
+				parse_str($urlinfo['query'], $parameters);
+				$target = urldecode($parameters['redirect_to']);
+				wp_redirect(urldecode($parameters['redirect_to']));
+			}  else {
+				wp_redirect($_REQUEST['RelayState']);
+			}
+		}
 	} else {
 		wp_redirect(home_url());
 	}
@@ -207,10 +258,10 @@ function initialize_saml() {
 // Prevent that the user change the email when the 'email' field is used as 'matcher'
 class preventEmailChange
 {
-
-    function __construct()
+    function __construct($protect)
     {
-    	if (get_option('onelogin_saml_account_matcher') == 'email') {
+	$matcher = get_option('onelogin_saml_account_matcher');
+	if ($matcher == 'email') {
         	add_action('admin_footer', array($this, 'disable_userprofile_fields'));
         }
     }
@@ -218,12 +269,12 @@ class preventEmailChange
     function disable_userprofile_fields()
     {
         global $pagenow;
-
         if ($pagenow == 'profile.php' && !current_user_can( 'manage_options' )) {
 
             ?>
             <script>
                 jQuery(document).ready(function ($) {
+		    alert('hola');
                     if ($('input[name=email]').length) {
                         $('input[name=email]').attr("disabled", "disabled");
                     }
@@ -234,4 +285,5 @@ class preventEmailChange
         }
     }
 }
+
 $preventEmailChange = new preventEmailChange();

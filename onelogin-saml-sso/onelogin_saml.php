@@ -8,7 +8,6 @@ Version: 2.0.0
 Author URI: http://www.onelogin.com
 */
 
-
 require_once(dirname(dirname(dirname(dirname(__FILE__)))) . '/wp-load.php');
 require_once(ABSPATH . '/wp-content/plugins/onelogin-saml-sso/php/functions.php');
 
@@ -34,13 +33,13 @@ if (!isset($_GET['normal']) && !isset($_POST['wp-submit']) && strpos($_SERVER['S
 }
 
 if (isset($_COOKIE['saml_login'])) {
-    if (get_option('onelogin_saml_slo')) {    
+    if (get_option('onelogin_saml_slo')) { 
 		add_action('wp_logout', 'saml_slo', 1);
     }
 }
 
-
-// Disable those functionalities.
-add_action('lost_password', 'disable_functions');
-add_action('retrieve_password', 'disable_functions');
-add_action('password_reset', 'disable_functions');
+add_action('lost_password', 'saml_lostpassword', 1);
+add_action('retrieve_password', 'saml_lostpassword' , 1);
+add_action('password_reset', 'saml_lostpassword', 1);
+add_action('user_register', 'saml_user_register', 1);
+add_action('register_form', 'saml_user_register', 1);

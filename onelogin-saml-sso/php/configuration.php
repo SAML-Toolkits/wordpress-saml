@@ -79,7 +79,7 @@
 			add_settings_field($name, $description, "plugin_setting_string_$name", $option_group, 'attr_mapping');
 		}
 
-		add_settings_section('role_mapping', 'ROLE MAPPING', 'plugin_section_role_mapping_text', $option_group);		
+		add_settings_section('role_mapping', 'ROLE MAPPING', 'plugin_section_role_mapping_text', $option_group);
 		$mapping_fields = array (
 			'onelogin_saml_role_mapping_administrator' => __('Administrator'),
 			'onelogin_saml_role_mapping_editor' => __('Editor'),
@@ -91,6 +91,16 @@
 			register_setting($option_group, $name);
 			add_settings_field($name, $description, "plugin_setting_string_$name", $option_group, 'role_mapping');
 		}
+
+
+		add_settings_section('customize_links', 'CUSTOMIZE LINKS', 'plugin_section_customize_links_text', $option_group);
+
+		register_setting($option_group, 'onelogin_saml_customize_links_user_registration');
+		add_settings_field('onelogin_saml_customize_links_user_registration', __('User Registration'), "plugin_setting_string_onelogin_saml_customize_links_user_registration", $option_group, 'customize_links');
+
+		register_setting($option_group, 'onelogin_saml_customize_links_lost_password');
+		add_settings_field('onelogin_saml_customize_links_lost_password', __('Lost Password'), "plugin_setting_string_onelogin_saml_customize_links_lost_password", $option_group, 'customize_links');
+
 
 		add_settings_section('advanced_settings', 'ADVANCED SETTINGS', 'plugin_section_advanced_settings_text', $option_group);
 
@@ -238,6 +248,16 @@
 			  value= "'.get_option('onelogin_saml_role_mapping_subscriber').'" size="30">';
 	}
 
+	function plugin_setting_string_onelogin_saml_customize_links_user_registration() {
+		echo '<input type="text" name="onelogin_saml_customize_links_user_registration" id="onelogin_saml_customize_links_user_registration"
+			  value= "'.get_option('onelogin_saml_customize_links_user_registration').'" size="80">';
+	}
+
+	function plugin_setting_string_onelogin_saml_customize_links_lost_password() {
+		echo '<input type="text" name="onelogin_saml_customize_links_lost_password" id="onelogin_saml_customize_links_lost_password"
+			  value= "'.get_option('onelogin_saml_customize_links_lost_password').'" size="80">';
+	}	
+
 	function plugin_setting_boolean_onelogin_saml_advanced_settings_debug() {
 		$value = get_option('onelogin_saml_advanced_settings_debug');
 		echo '<input type="checkbox" name="onelogin_saml_advanced_settings_debug" id="onelogin_saml_advanced_settings_debug"
@@ -337,6 +357,10 @@
 
 	function plugin_section_role_mapping_text() {
 		echo "<p>".__("The IdP can use it's own roles. Set in this section the mapping between IdP and Wordpress roles. Accepts multiple valued comma separated. Example: admin,owner,superuser")."</p>";
+	}
+
+	function plugin_section_customize_links_text() {
+		echo "<p>".__("When we enable the SAML SSO to be integrated with a IdP some Wordpress links as 'user registration' or 'lost password' have no sense. Set here new urls in order to redirect the user to those url when executing those actions")."</p>";
 	}
 
 	function plugin_section_advanced_settings_text() {
