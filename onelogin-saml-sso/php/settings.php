@@ -1,5 +1,11 @@
 <?php
 
+// Make sure we don't expose any info if called directly
+if ( !function_exists( 'add_action' ) ) {
+    echo 'Hi there!  I\'m just a plugin, not much I can do when called directly.';
+    exit;
+}
+
 $opt['strict'] = get_option('onelogin_saml_advanced_settings_strict_mode', 'on');
 $opt['debug'] = get_option('onelogin_saml_advanced_settings_debug', 'on');
 $opt['sp_entity_id'] = get_option('onelogin_saml_advanced_settings_sp_entity_id', 'php-saml');
@@ -20,10 +26,10 @@ $settings = array (
     'sp' => array (
         'entityId' => (!empty($opt['sp_entity_id'])? $opt['sp_entity_id'] : 'php-saml'),
         'assertionConsumerService' => array (
-            'url' => plugins_url('onelogin_saml.php?acs', dirname(__FILE__))
+            'url' => get_site_url().'/wp-login.php?saml_acs'
         ),
         'singleLogoutService' => array (
-            'url' => plugins_url('onelogin_saml.php?acs', dirname(__FILE__))
+            'url' => get_site_url().'/wp-login.php?saml_sls'
         ),
         'NameIDFormat' => 'urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress',
         'x509cert' => get_option('onelogin_saml_advanced_settings_sp_x509cert'),

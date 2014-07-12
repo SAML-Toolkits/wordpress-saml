@@ -28,4 +28,12 @@ This SAML plugin eliminates passwords and allows you to authenticate WordPress u
 = 2.0.0 =
 * Based on the new php toolkit, added many functionalities: JIT, SLO.
 
+= 2.1.0 =
+ * Reimplement the plugin architecture (was an independent plugin, now depends on wordpress).
+ * Update the php-saml toolkit
+ * Improve the i18n support
+ * Improve base url and pase path
+ * Override user registration or reset password links to link 3rd party (like IdP) urls.
+ * Fix bug when role attribute carry a space as attribute
+
 `<?php code(); // goes in backticks ?>`

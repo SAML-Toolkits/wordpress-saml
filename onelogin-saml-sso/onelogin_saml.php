@@ -8,24 +8,29 @@ Version: 2.0.0
 Author URI: http://www.onelogin.com
 */
 
-require_once dirname(dirname(dirname(dirname(__FILE__)))) . '/wp-load.php';
-require_once plugin_dir_path(__FILE__)."php/functions.php";
+// Make sure we don't expose any info if called directly
+if ( !function_exists( 'add_action' ) ) {
+	echo 'Hi there!  I\'m just a plugin, not much I can do when called directly.';
+	exit;
+}
 
-if (isset($_GET['acs'])) {
-	saml_acs();
-}
-else if (isset($_GET['sls'])) {
-	saml_sls();
-}
+require_once plugin_dir_path(__FILE__)."php/functions.php";
+require_once plugin_dir_path(__FILE__)."php/configuration.php";
+
+
+// Check if exists SAML Messages
+add_action('init', 'saml_checker', 1);
+
+// Localization
+add_action( 'init', 'saml_load_translations');
 
 // add menu option for configuration
-require_once plugin_dir_path(__FILE__)."php/configuration.php";
 add_action('admin_menu', 'onelogin_saml_configuration');
 
 // plugin hooks into authenticator system
-if (!isset($_GET['normal']) && !isset($_POST['wp-submit']) && strpos($_SERVER['SCRIPT_NAME'], 'php/metadata.php') === FALSE) {
+if ((!isset($_GET['normal']) || !isset($_GET['saml_metadata']) || !isset($_GET['saml_validate_config'])) && !isset($_POST['wp-submit']) && strpos($_SERVER['SCRIPT_NAME'], 'php/metadata.php') === FALSE) {
 	if (get_option('onelogin_saml_forcelogin')) {
-		add_action('init', 'saml_sso');
+		add_action('init', 'saml_sso', 1);
 	}
 	else if (!isset($_GET['loggedout'])){
 		add_action('wp_authenticate', 'saml_sso', 1);

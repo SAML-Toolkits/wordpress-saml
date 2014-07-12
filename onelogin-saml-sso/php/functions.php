@@ -1,5 +1,32 @@
 <?php
 
+// Make sure we don't expose any info if called directly
+if ( !function_exists( 'add_action' ) ) {
+	echo 'Hi there!  I\'m just a plugin, not much I can do when called directly.';
+	exit;
+}
+
+function saml_checker() {
+	if (isset($_GET['saml_acs'])) {
+		saml_acs();
+	}
+	else if (isset($_GET['saml_sls'])) {
+		saml_sls();
+	} else if (isset($_GET['saml_metadata'])) {
+		saml_metadata();
+	} else if (isset($_GET['saml_validate_config'])) {
+		saml_validate_config();
+	}
+}
+
+function saml_load_translations() {
+	$domain = 'onelogin-saml-sso';
+	$mo_file = plugin_dir_path(dirname(__FILE__)) . 'lang/'.get_locale() . '/' . $domain  . '.mo';
+
+	load_textdomain($domain, $mo_file ); 
+	load_plugin_textdomain($domain, false, dirname( plugin_basename( __FILE__ ) ) . '/lang/'. get_locale() . '/' ); 
+}
+
 function saml_lostpassword() {
 	$target = get_option('onelogin_saml_customize_links_lost_password');
 	if (!empty($target)) {
@@ -55,7 +82,7 @@ function saml_acs() {
 
 	$errors = $auth->getErrors();
 	if (!empty($errors)) {
-		echo __("<br>There was at least one error processing the SAML Response").': ';
+		echo '<br>'.__("There was at least one error processing the SAML Response").': ';
 		echo implode("<br>", $errors);
 		echo '<br>'.__("Contact the administrator");
 		exit();
@@ -168,10 +195,7 @@ function saml_acs() {
 			}
 		}
 	}
-
-	require_once ABSPATH . WPINC . '/registration.php';
-	require_once ABSPATH . WPINC . '/pluggable.php';
-
+	
 	$matcher = get_option('onelogin_saml_account_matcher');
 
 	if (empty($matcher) || $matcher == 'username') {
@@ -215,7 +239,7 @@ function saml_acs() {
 	$slo = get_option('onelogin_saml_slo');
 
 	if (isset($_REQUEST['RelayState'])) {
-		if (!empty($_REQUEST['RelayState']) && !$slo && !$forcelogin && $_REQUEST['RelayState'] == '/wp-login.php') {
+		if (!empty($_REQUEST['RelayState']) && !$slo && (substr($_REQUEST['RelayState'], -strlen('/wp-login.php')) === '/wp-login.php')) {
 			wp_redirect(home_url());
 		} else {
 			if (strpos($_REQUEST['RelayState'], 'redirect_to') !== false) {
@@ -239,6 +263,24 @@ function saml_sls() {
 	wp_redirect(home_url());
 }
 
+function saml_metadata() {
+	$auth = initialize_saml();
+	$settings = $auth->getSettings();
+	$metadata = $settings->getSPMetadata();
+	
+	header('Content-Type: text/xml');
+	echo $metadata;
+	exit();
+}
+
+
+function saml_validate_config() {
+	require_once plugin_dir_path(__FILE__).'_toolkit_loader.php';
+	require plugin_dir_path(__FILE__).'settings.php';
+	require_once plugin_dir_path(__FILE__)."validate.php";
+	exit();
+}
+
 function initialize_saml() {
 	require_once plugin_dir_path(__FILE__).'_toolkit_loader.php';
 	require plugin_dir_path(__FILE__).'settings.php';
@@ -246,9 +288,9 @@ function initialize_saml() {
 	try {
 		$auth = new Onelogin_Saml2_Auth($settings);
 	} catch (Exception $e) {
-		echo '<br>'.__("The Onelogin SSO/SAML plugin is not correctly configured.").'<br>';
+		echo '<br>'.__("The Onelogin SSO/SAML plugin is not correctly configured.", 'onelogin-saml-sso').'<br>';
 		print_r($e->getMessage());
-		echo '<br>'.__("If you are the administrator").', <a href="'.get_site_url().'/wp-login.php?normal">'.__("access using your wordpress credentials").'</a> '.__("and fix the problem");
+		echo '<br>'.__("If you are the administrator", 'onelogin-saml-sso').', <a href="'.get_site_url().'/wp-login.php?normal">'.__("access using your wordpress credentials", 'onelogin-saml-sso').'</a> '.__("and fix the problem", 'onelogin-saml-sso');
 		exit();
 	}
 
