@@ -39,6 +39,12 @@ class OneLogin_Saml2_Response
     public $encrypted = false;
 
     /**
+    * After validation, if it fail this var has the cause of the problem
+    * @var string
+    */
+    private $_error;
+
+    /**
      * Constructs the SAML Response object.
      *
      * @param OneLogin_Saml2_Settings $settings Settings.
@@ -72,6 +78,7 @@ class OneLogin_Saml2_Response
     */
     public function isValid($requestId = null)
     {
+        $this->_error = null;
         try {
             // Check SAML version
             if ($this->document->documentElement->getAttribute('Version') != '2.0') {
@@ -108,7 +115,6 @@ class OneLogin_Saml2_Response
 
                 $res = OneLogin_Saml2_Utils::validateXML($this->document, 'saml-schema-protocol-2.0.xsd', $this->_settings->isDebugActive());
                 if (!$res instanceof DOMDocument) {
-                    print_r($res);
                     throw new Exception("Invalid SAML Response. Not match the saml-schema-protocol-2.0.xsd");
                 }
 
@@ -257,9 +263,10 @@ class OneLogin_Saml2_Response
             }
             return true;
         } catch (Exception $e) {
+            $this->_error = $e->getMessage();
             $debug = $this->_settings->isDebugActive();
             if ($debug) {
-                echo $e->getMessage();
+                echo $this->_error;
             }
             return false;
         }
@@ -446,7 +453,7 @@ class OneLogin_Saml2_Response
 
             $attributeValues = array();
             foreach ($entry->childNodes as $childNode) {
-                if ($childNode->nodeType == XML_ELEMENT_NODE && $childNode->tagName === 'saml:AttributeValue') {
+                if ($childNode->nodeType == XML_ELEMENT_NODE && $childNode->tagName === $childNode->prefix.':AttributeValue') {
                     $attributeValues[] = $childNode->nodeValue;
                 }
             }
@@ -597,6 +604,14 @@ class OneLogin_Saml2_Response
         } else {
             return $decrypt->ownerDocument;
         }
-        
+    }
+
+    /* After execute a validation process, if fails this method returns the cause
+     *
+     * @return string Cause 
+     */
+    public function getError()
+    {
+        return $this->_error;
     }
 }
