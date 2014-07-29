@@ -7,16 +7,16 @@ if ( !function_exists( 'add_action' ) ) {
 }
 
 	function onelogin_saml_configuration_render() {
-		$title = "OneLogin SSO/SAML Settings";
+		$title = __("OneLogin SSO/SAML Settings", 'onelogin-saml-sso');
 		?>
 			<div class="wrap">
 				<?php screen_icon(); ?>
 				<div class="alignright">
-					<a href="<?php echo get_site_url().'/wp-login.php?saml_metadata'; ?>" target="blank"><?php echo __("Go to the metadata of this SP");?></a>
+					<a href="<?php echo get_site_url().'/wp-login.php?saml_metadata'; ?>" target="blank"><?php echo __("Go to the metadata of this SP", 'onelogin-saml-sso');?></a>
 				</div>
 				<h2><?php echo esc_html( $title ); ?></h2>
 				<div class="alignright">
-					<a href="<?php echo get_site_url().'/wp-login.php?saml_validate_config'; ?>" target="blank"><?php echo __("Once configured, validate here your OneLogin SSO/SAML Settings");?></a>
+					<a href="<?php echo get_site_url().'/wp-login.php?saml_validate_config'; ?>" target="blank"><?php echo __("Once configured, validate here your OneLogin SSO/SAML Settings", 'onelogin-saml-sso');?></a>
 				</div>
 				<form action="options.php" method="post">
 
