@@ -36,4 +36,7 @@ This SAML plugin eliminates passwords and allows you to authenticate WordPress u
  * Override user registration or reset password links to link 3rd party (like IdP) urls.
  * Fix bug when role attribute carry a space as attribute
 
+= 2.1.1 =
+ * Fix bug introduced in the reimplementation
+
 `<?php code(); // goes in backticks ?>`

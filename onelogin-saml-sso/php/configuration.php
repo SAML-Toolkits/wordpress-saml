@@ -12,7 +12,7 @@ if ( !function_exists( 'add_action' ) ) {
 			<div class="wrap">
 				<?php screen_icon(); ?>
 				<div class="alignright">
-					<a href="<?php echo get_site_url().'/wp-login.php?saml_metadata_config'; ?>" target="blank"><?php echo __("Go to the metadata of this SP");?></a>
+					<a href="<?php echo get_site_url().'/wp-login.php?saml_metadata'; ?>" target="blank"><?php echo __("Go to the metadata of this SP");?></a>
 				</div>
 				<h2><?php echo esc_html( $title ); ?></h2>
 				<div class="alignright">

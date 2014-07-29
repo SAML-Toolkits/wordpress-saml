@@ -28,11 +28,11 @@ add_action( 'init', 'saml_load_translations');
 add_action('admin_menu', 'onelogin_saml_configuration');
 
 // plugin hooks into authenticator system
-if ((!isset($_GET['normal']) || !isset($_GET['saml_metadata']) || !isset($_GET['saml_validate_config'])) && !isset($_POST['wp-submit']) && strpos($_SERVER['SCRIPT_NAME'], 'php/metadata.php') === FALSE) {
+if ((!isset($_GET['normal']) && !isset($_GET['saml_metadata']) && !isset($_GET['saml_validate_config'])) && !isset($_POST['wp-submit'])) {
 	if (get_option('onelogin_saml_forcelogin')) {
 		add_action('init', 'saml_sso', 1);
 	}
-	else if (!isset($_GET['loggedout'])){
+	else if (!isset($_GET['loggedout'])) {
 		add_action('wp_authenticate', 'saml_sso', 1);
 	}
 }

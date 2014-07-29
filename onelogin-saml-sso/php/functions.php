@@ -24,7 +24,7 @@ function saml_load_translations() {
 	$mo_file = plugin_dir_path(dirname(__FILE__)) . 'lang/'.get_locale() . '/' . $domain  . '.mo';
 
 	load_textdomain($domain, $mo_file ); 
-	load_plugin_textdomain($domain, false, dirname( plugin_basename( __FILE__ ) ) . '/lang/'. get_locale() . '/' ); 
+	load_plugin_textdomain($domain, false, dirname( plugin_basename( __FILE__ ) ) . '/lang/'. get_locale() . '/' );
 }
 
 function saml_lostpassword() {
@@ -44,7 +44,7 @@ function saml_user_register() {
 }
 
 function saml_sso() {
-        $slo = get_option('onelogin_saml_slo');	
+	$slo = get_option('onelogin_saml_slo');	
 
 	if (!$slo) {
 		if (isset($_GET['action']) && $_GET['action']  == 'logout') {
@@ -71,7 +71,7 @@ function saml_sso() {
 function saml_slo() {
 	setcookie('saml_login', 0, time() - 3600, SITECOOKIEPATH );
 	$auth = initialize_saml();
-	$auth->logout(plugins_url('onelogin_saml.php?sls', dirname(__FILE__)));
+	$auth->logout(get_site_url());
 }
 
 
@@ -235,11 +235,8 @@ function saml_acs() {
 		do_action('wp_login', $user_id);
 	}
 
-	$forcelogin = get_option('onelogin_saml_forcelogin');
-	$slo = get_option('onelogin_saml_slo');
-
 	if (isset($_REQUEST['RelayState'])) {
-		if (!empty($_REQUEST['RelayState']) && !$slo && (substr($_REQUEST['RelayState'], -strlen('/wp-login.php')) === '/wp-login.php')) {
+		if (!empty($_REQUEST['RelayState']) && (substr($_REQUEST['RelayState'], -strlen('/wp-login.php')) === '/wp-login.php')) {
 			wp_redirect(home_url());
 		} else {
 			if (strpos($_REQUEST['RelayState'], 'redirect_to') !== false) {
@@ -275,6 +272,7 @@ function saml_metadata() {
 
 
 function saml_validate_config() {
+	saml_load_translations();
 	require_once plugin_dir_path(__FILE__).'_toolkit_loader.php';
 	require plugin_dir_path(__FILE__).'settings.php';
 	require_once plugin_dir_path(__FILE__)."validate.php";
