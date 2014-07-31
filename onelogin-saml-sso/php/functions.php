@@ -252,12 +252,14 @@ function saml_acs() {
 	} else {
 		wp_redirect(home_url());
 	}
+	exit();
 }
 
 function saml_sls() {
 	$auth = initialize_saml();
 	$auth->processSLO();
 	wp_redirect(home_url());
+	exit();
 }
 
 function saml_metadata() {
