@@ -211,11 +211,8 @@ function saml_acs() {
 		do_action('wp_login', $user_id);
 	}
 
-	$forcelogin = get_option('onelogin_saml_forcelogin');
-	$slo = get_option('onelogin_saml_slo');
-
 	if (isset($_REQUEST['RelayState'])) {
-		if (!empty($_REQUEST['RelayState']) && !$slo && !$forcelogin && $_REQUEST['RelayState'] == '/wp-login.php') {
+		if (!empty($_REQUEST['RelayState']) && (substr($_REQUEST['RelayState'], -strlen('/wp-login.php')) === '/wp-login.php')) {
 			wp_redirect(home_url());
 		} else {
 			if (strpos($_REQUEST['RelayState'], 'redirect_to') !== false) {

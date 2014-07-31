@@ -28,7 +28,7 @@ require_once plugin_dir_path(__FILE__)."php/configuration.php";
 add_action('admin_menu', 'onelogin_saml_configuration');
 
 // plugin hooks into authenticator system
-if (!isset($_GET['normal']) || !isset($_POST['wp-submit']) || strpos($_SERVER['SCRIPT_NAME'], 'php/metadata.php') === FALSE) {
+if (!isset($_GET['normal']) && !isset($_POST['wp-submit']) && strpos($_SERVER['SCRIPT_NAME'], 'php/metadata.php') === FALSE) {
 	if (get_option('onelogin_saml_forcelogin')) {
 		add_action('init', 'saml_sso');
 	}

@@ -127,10 +127,10 @@
 			add_settings_field($name, $description, "plugin_setting_boolean_$name", $option_group, 'advanced_settings');
 		}
 
-		register_setting($option_group, 'onelogin_saml_advanced_settings_sp_x509cert', 'onelogin-saml-sso');
+		register_setting($option_group, 'onelogin_saml_advanced_settings_sp_x509cert');
 		add_settings_field('onelogin_saml_advanced_settings_sp_x509cert', __('Service Provider X.509 Certificate', 'onelogin-saml-sso'), "plugin_setting_string_onelogin_saml_advanced_settings_sp_x509cert", $option_group, 'advanced_settings');
 
-		register_setting($option_group, 'onelogin_saml_advanced_settings_sp_privatekey', 'onelogin-saml-sso');
+		register_setting($option_group, 'onelogin_saml_advanced_settings_sp_privatekey');
 		add_settings_field('onelogin_saml_advanced_settings_sp_privatekey', __('Service Provider Private Key', 'onelogin-saml-sso'), "plugin_setting_string_onelogin_saml_advanced_settings_sp_privatekey", $option_group, 'advanced_settings');
 	}
 
@@ -142,7 +142,7 @@
 
 	function plugin_setting_string_onelogin_saml_idp_sso() {
 		echo '<input type="text" name="onelogin_saml_idp_sso" id="onelogin_saml_idp_sso"
-			  value= "'.get_option('onelogin_saml_idp_sso', 'onelogin-saml-sso').'" size="80">'.
+			  value= "'.get_option('onelogin_saml_idp_sso').'" size="80">'.
 			  '<p class="description">'.__('SSO endpoint info of the IdP. URL target of the IdP where the SP will send the Authentication Request. ("SAML 2.0 Endpoint (HTTP)")', 'onelogin-saml-sso').'</p>';
 	}
 
@@ -154,7 +154,7 @@
 
 	function plugin_setting_string_onelogin_saml_idp_x509cert() {
 		echo '<textarea name="onelogin_saml_idp_x509cert" id="onelogin_saml_idp_x509cert" style="width:600px; height:220px; font-size:12px; font-family:courier,arial,sans-serif;">';
-		echo get_option('onelogin_saml_idp_x509cert', 'onelogin-saml-sso');
+		echo get_option('onelogin_saml_idp_x509cert');
 		echo '</textarea>';
 		echo '<p class="description">'.__('Public x509 certificate of the IdP.  ("X.509 certificate")', 'onelogin-saml-sso');
 	}
