@@ -17,7 +17,7 @@ function saml_user_register() {
 }
 
 function saml_sso() {
-        $slo = get_option('onelogin_saml_slo');	
+	$slo = get_option('onelogin_saml_slo');	
 
 	if (!$slo) {
 		if (isset($_GET['action']) && $_GET['action']  == 'logout') {
@@ -44,7 +44,7 @@ function saml_sso() {
 function saml_slo() {
 	setcookie('saml_login', 0, time() - 3600, SITECOOKIEPATH );
 	$auth = initialize_saml();
-	$auth->logout(plugins_url('onelogin_saml.php?sls', dirname(__FILE__)));
+	$auth->logout(get_site_url());
 }
 
 
@@ -55,9 +55,9 @@ function saml_acs() {
 
 	$errors = $auth->getErrors();
 	if (!empty($errors)) {
-		echo __("<br>There was at least one error processing the SAML Response").': ';
+		echo '<br>'.__("There was at least one error processing the SAML Response", 'onelogin-saml-sso').': ';
 		echo implode("<br>", $errors);
-		echo '<br>'.__("Contact the administrator");
+		echo '<br>'.__("Contact the administrator", 'onelogin-saml-sso');
 		exit();
 	}
 
@@ -79,11 +79,11 @@ function saml_acs() {
 	}
 
 	if (empty($username)) {
-		echo __("The username could not be retrieved from the IdP and is required");
+		echo __("The username could not be retrieved from the IdP and is required", 'onelogin-saml-sso');
 		exit();
 	}
 	else if (empty($email)) {
-		echo __("The email could not be retrieved from the IdP and is required");
+		echo __("The email could not be retrieved from the IdP and is required", 'onelogin-saml-sso');
 		exit();	
 	} else {
 		$userdata = array();
@@ -190,13 +190,13 @@ function saml_acs() {
 		}
 	} else if (get_option('onelogin_saml_autocreate')) {
 		if (!validate_username($username)) {
-			echo __("The username provided by the IdP"). ' "'. $username. '" '. __("is not valid and can't create the user at wordpress");
+			echo __("The username provided by the IdP", 'onelogin-saml-sso'). ' "'. $username. '" '. __("is not valid and can't create the user at wordpress", 'onelogin-saml-sso');
 			return false;			
 		}
 		$userdata['user_pass'] = '@@@nopass@@@';
 		$user_id = wp_insert_user($userdata);
 	} else {
-		echo __("User provided by the IdP "). ' "'. $matcherValue. '" '. __("not exists in wordpress and auto-provisioning is disabled.");
+		echo __("User provided by the IdP ", 'onelogin-saml-sso'). ' "'. $matcherValue. '" '. __("not exists in wordpress and auto-provisioning is disabled.", 'onelogin-saml-sso');
 		return false;
 	}
 
@@ -231,12 +231,14 @@ function saml_acs() {
 	} else {
 		wp_redirect(home_url());
 	}
+	exit();
 }
 
 function saml_sls() {
 	$auth = initialize_saml();
 	$auth->processSLO();
 	wp_redirect(home_url());
+	exit();
 }
 
 function initialize_saml() {
@@ -246,9 +248,9 @@ function initialize_saml() {
 	try {
 		$auth = new Onelogin_Saml2_Auth($settings);
 	} catch (Exception $e) {
-		echo '<br>'.__("The Onelogin SSO/SAML plugin is not correctly configured.").'<br>';
+		echo '<br>'.__("The Onelogin SSO/SAML plugin is not correctly configured.", 'onelogin-saml-sso').'<br>';
 		print_r($e->getMessage());
-		echo '<br>'.__("If you are the administrator").', <a href="'.get_site_url().'/wp-login.php?normal">'.__("access using your wordpress credentials").'</a> '.__("and fix the problem");
+		echo '<br>'.__("If you are the administrator", 'onelogin-saml-sso').', <a href="'.get_site_url().'/wp-login.php?normal">'.__("access using your wordpress credentials", 'onelogin-saml-sso').'</a> '.__("and fix the problem", 'onelogin-saml-sso');
 		exit();
 	}
 

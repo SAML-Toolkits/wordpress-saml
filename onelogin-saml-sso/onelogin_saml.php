@@ -11,6 +11,11 @@ Author URI: http://www.onelogin.com
 require_once dirname(dirname(dirname(dirname(__FILE__)))) . '/wp-load.php';
 require_once plugin_dir_path(__FILE__)."php/functions.php";
 
+$domain = 'onelogin-saml-sso';
+$mo_file = plugin_dir_path(__FILE__) . 'lang/'.get_locale() . '/' . $domain . '.mo';
+load_textdomain($domain, $mo_file );
+load_plugin_textdomain($domain, false, dirname( plugin_basename( __FILE__ ) ) . '/lang/'. get_locale() . '/' );
+
 if (isset($_GET['acs'])) {
 	saml_acs();
 }
@@ -23,7 +28,7 @@ require_once plugin_dir_path(__FILE__)."php/configuration.php";
 add_action('admin_menu', 'onelogin_saml_configuration');
 
 // plugin hooks into authenticator system
-if (!isset($_GET['normal']) && !isset($_POST['wp-submit']) && strpos($_SERVER['SCRIPT_NAME'], 'php/metadata.php') === FALSE) {
+if (!isset($_GET['normal']) || !isset($_POST['wp-submit']) || strpos($_SERVER['SCRIPT_NAME'], 'php/metadata.php') === FALSE) {
 	if (get_option('onelogin_saml_forcelogin')) {
 		add_action('init', 'saml_sso');
 	}
