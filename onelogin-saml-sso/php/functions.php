@@ -138,60 +138,86 @@ function saml_acs() {
 			$contributorsRole = explode(',', get_option('onelogin_saml_role_mapping_contributor'));
 			$subscribersRole = explode(',', get_option('onelogin_saml_role_mapping_subscriber'));
 
-			$role = 0;
+			/* In order to use custom roles, you only need to uncomment those lines and replace the values
+			 *  First we assign possible OneLogin roles that we want to map with Wordpress Roles
+			 *  Then we asigned to the $userdata['role'] the name of the Wordpress role
+			 */
 
+			//$customRole1 = array('value1', 'value2');  // value1 and value2 are roles of OneLogin platform that will be mapped to customRole1
+			//$customRole2 = array('value3');  // value3 is a role of OneLogin platformthat will be mapped to customRole2
+
+			$foundCustomizedRole = false;
+
+			/*
 			foreach ($attrs[$roleMapping] as $samlRole) {
-				$samlRole = trim($samlRole);
-				if (empty($samlRole)) {
-					break;	
-				}
-				else if (in_array($samlRole, $adminsRole)) {
-					if ($role < 5) {
-						$role = 5;
-					}
-					break;
-				} else if (in_array($samlRole, $editorsRole)) {
-					if ($role < 4) {
-						$role = 4;
-					}
-					break;
-				} else if (in_array($samlRole, $authorsRole)) {
-					if ($role < 3) {
-						$role = 3;
-					}
-					break;
-				} else if (in_array($samlRole, $contributorsRole)) {
-					if ($role < 2) {
-						$role = 2;
-					}
-					break;
-				} else if (in_array($samlRole, $subscribersRole)) {
-					if ($role < 1) {
-						$role = 1;
-					}
-					break;
-				}
-			}
+				if (in_array($samlRole, $customRole1)) {
+                	$userdata['role'] = 'customrole1'; // Name of the role -> customrole1
+                	$foundCustomized = true;
+                	break;
+            	} else if (in_array($samlRole, $customRole2)) {
+                	$userdata['role'] = 'customrole2'; // Name of the role -> customrole2
+                	$foundCustomized = true;
+                	break;
+            	}
+            }
+            */
 
-			switch ($role) {
-				case 5:
-					$userdata['role'] = 'administrator';
-					break;
-				case 4:
-					$userdata['role'] = 'editor';
-					break;
-				case 3:
-					$userdata['role'] = 'author';
-					break;
-				case 2:
-					$userdata['role'] = 'contributor';
-					break;
-				case 1:
-				case 0:
-				default:
-					$userdata['role'] = 'subscriber';		
-					break;
+            if (!$foundCustomizedRole) {
+				$role = 0;
 
+				foreach ($attrs[$roleMapping] as $samlRole) {
+					$samlRole = trim($samlRole);
+					if (empty($samlRole)) {
+						break;	
+					}
+					else if (in_array($samlRole, $adminsRole)) {
+						if ($role < 5) {
+							$role = 5;
+						}
+						break;
+					} else if (in_array($samlRole, $editorsRole)) {
+						if ($role < 4) {
+							$role = 4;
+						}
+						break;
+					} else if (in_array($samlRole, $authorsRole)) {
+						if ($role < 3) {
+							$role = 3;
+						}
+						break;
+					} else if (in_array($samlRole, $contributorsRole)) {
+						if ($role < 2) {
+							$role = 2;
+						}
+						break;
+					} else if (in_array($samlRole, $subscribersRole)) {
+						if ($role < 1) {
+							$role = 1;
+						}
+						break;
+					}
+				}
+
+				switch ($role) {
+					case 5:
+						$userdata['role'] = 'administrator';
+						break;
+					case 4:
+						$userdata['role'] = 'editor';
+						break;
+					case 3:
+						$userdata['role'] = 'author';
+						break;
+					case 2:
+						$userdata['role'] = 'contributor';
+						break;
+					case 1:
+					case 0:
+					default:
+						$userdata['role'] = 'subscriber';		
+						break;
+
+				}
 			}
 		}
 	}
