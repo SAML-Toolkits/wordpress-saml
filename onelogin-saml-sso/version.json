@@ -6,7 +6,7 @@
     "plugin": {
         "app":      "wordpress",
         "name":     "onelogin-saml-sso",
-        "version":  "2.1.1",
-        "released": "12/08/2014"
+        "version":  "2.1.2",
+        "released": "02/09/2014"
     }
 }
