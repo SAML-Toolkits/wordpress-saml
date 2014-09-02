@@ -151,18 +151,18 @@ function saml_acs() {
 			/*
 			foreach ($attrs[$roleMapping] as $samlRole) {
 				if (in_array($samlRole, $customRole1)) {
-                	$userdata['role'] = 'customrole1'; // Name of the role -> customrole1
-                	$foundCustomized = true;
-                	break;
-            	} else if (in_array($samlRole, $customRole2)) {
-                	$userdata['role'] = 'customrole2'; // Name of the role -> customrole2
-                	$foundCustomized = true;
-                	break;
-            	}
-            }
-            */
+					$userdata['role'] = 'customrole1'; // Name of the role -> customrole1
+					$foundCustomized = true;
+					break;
+				} else if (in_array($samlRole, $customRole2)) {
+					$userdata['role'] = 'customrole2'; // Name of the role -> customrole2
+					$foundCustomized = true;
+					break;
+				}
+			}
+			*/
 
-            if (!$foundCustomizedRole) {
+			if (!$foundCustomizedRole) {
 				$role = 0;
 
 				foreach ($attrs[$roleMapping] as $samlRole) {
@@ -216,7 +216,6 @@ function saml_acs() {
 					default:
 						$userdata['role'] = 'subscriber';		
 						break;
-
 				}
 			}
 		}

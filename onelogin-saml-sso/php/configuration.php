@@ -15,8 +15,8 @@ if ( !function_exists( 'add_action' ) ) {
 					<a href="http://www.onelogin.com"><img src="<?php echo plugins_url('onelogin.png', dirname(__FILE__));?>"></a>
 				</div>
 				<div class="alignright">
-					<a href="<?php echo plugins_url('php/metadata.php', dirname(__FILE__)); ?>" target="blank"><?php echo __("Go to the metadata of this SP", 'onelogin-saml-sso');?></a><br>
-					<a href="<?php echo plugins_url('php/validate.php', dirname(__FILE__)); ?>" target="blank"><?php echo __("Once configured, validate here your OneLogin SSO/SAML Settings", 'onelogin-saml-sso');?></a>
+					<a href="<?php echo get_site_url().'/wp-login.php?saml_metadata'; ?>" target="blank"><?php echo __("Go to the metadata of this SP", 'onelogin-saml-sso');?></a>
+					<a href="<?php echo get_site_url().'/wp-login.php?saml_validate_config'; ?>" target="blank"><?php echo __("Once configured, validate here your OneLogin SSO/SAML Settings", 'onelogin-saml-sso');?></a>
 				</div>
 				<div style="clear:both"></div>
 				<h2><?php echo esc_html( $title ); ?></h2>

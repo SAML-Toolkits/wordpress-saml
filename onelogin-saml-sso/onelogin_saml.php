@@ -37,9 +37,9 @@ if ((!isset($_GET['normal']) && !isset($_GET['saml_metadata']) && !isset($_GET['
 }
 
 if (isset($_COOKIE['saml_login'])) {
-    if (get_option('onelogin_saml_slo')) { 
+	if (get_option('onelogin_saml_slo')) { 
 		add_action('wp_logout', 'saml_slo', 1);
-    }
+	}
 }
 
 add_action('lost_password', 'saml_lostpassword', 1);
