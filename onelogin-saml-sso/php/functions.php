@@ -322,18 +322,20 @@ function initialize_saml() {
 	return $auth;
 }
 
-// Prevent that the user change the email when the 'email' field is used as 'matcher'
-class preventEmailChange
+// Prevent that the user change important fields
+class preventLocalChanges
 {
     function __construct()
     {
-	$matcher = get_option('onelogin_saml_account_matcher');
-	if ($matcher == 'email') {
-        	add_action('admin_footer', array($this, 'disable_userprofile_fields'));
+        if (get_option('onelogin_saml_customize_action_prevent_change_mail', false)) {
+            add_action('admin_footer', array($this, 'disable_email'));
+        }
+        if (get_option('onelogin_saml_customize_action_prevent_change_password', false)) {
+            add_action('admin_footer', array($this, 'disable_password'));
         }
     }
 
-    function disable_userprofile_fields()
+    function disable_email()
     {
         global $pagenow;
         if ($pagenow == 'profile.php' && !current_user_can( 'manage_options' )) {
@@ -350,6 +352,23 @@ class preventEmailChange
         <?php
         }
     }
+
+    function disable_password()
+    {
+        global $pagenow;
+        if ($pagenow == 'profile.php' && !current_user_can( 'manage_options' )) {
+
+            ?>
+            <script>
+                jQuery(document).ready(function ($) {
+                    $('tr[id=password]').hide();
+                    $('tr[id=password]').next().hide();
+                });
+            </script>
+        <?php
+        }
+    }
+
 }
 
-$preventEmailChange = new preventEmailChange();
+$preventLocalChanges = new preventLocalChanges();

@@ -119,18 +119,18 @@ class OneLogin_Saml2_LogoutResponse
 
                 // Check issuer
                 $issuer = $this->getIssuer();
-                if (empty($issuer) || $issuer != $idPEntityId) {
-                    throw new Exception("Invalid issuer in the Logout Request");
+                if (!empty($issuer) && $issuer != $idPEntityId) {
+                    throw new Exception("Invalid issuer in the Logout Response");
                 }
 
-                $currentURL = OneLogin_Saml2_Utils::getSelfURLNoQuery();
+                $currentURL = OneLogin_Saml2_Utils::getSelfRoutedURLNoQuery();
 
                 // Check destination
                 if ($this->document->documentElement->hasAttribute('Destination')) {
                     $destination = $this->document->documentElement->getAttribute('Destination');
                     if (!empty($destination)) {
                         if (strpos($destination, $currentURL) === false) {
-                            throw new Exception("The LogoutRequest was received at $currentURL instead of $destination");
+                            throw new Exception("The LogoutResponse was received at $currentURL instead of $destination");
                         }
                     }
                 }
@@ -149,10 +149,6 @@ class OneLogin_Saml2_LogoutResponse
                     $signAlg = $_GET['SigAlg'];
                 }
 
-                if ($signAlg != XMLSecurityKey::RSA_SHA1) {
-                    throw new Exception('Invalid signAlg in the recieved Logout Response');
-                }
-
                 $signedQuery = 'SAMLResponse='.urlencode($_GET['SAMLResponse']);
                 if (isset($_GET['RelayState'])) {
                     $signedQuery .= '&RelayState='.urlencode($_GET['RelayState']);
@@ -166,6 +162,14 @@ class OneLogin_Saml2_LogoutResponse
 
                 $objKey = new XMLSecurityKey(XMLSecurityKey::RSA_SHA1, array('type' => 'public'));
                 $objKey->loadKey($cert, false, true);
+
+                if ($signAlg != XMLSecurityKey::RSA_SHA1) {
+                    try {
+                        $objKey = OneLogin_Saml2_Utils::castKey($objKey, $signAlg, 'public');
+                    } catch (Exception $e) {
+                        throw new Exception('Invalid signAlg in the recieved Logout Response');
+                    }
+                }
 
                 if (!$objKey->verifySignature($signedQuery, base64_decode($_GET['Signature']))) {
                     throw new Exception('Signature validation failed. Logout Response rejected');

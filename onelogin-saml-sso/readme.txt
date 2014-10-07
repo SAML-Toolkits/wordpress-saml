@@ -1,7 +1,7 @@
 === Plugin Name ===
 Contributors: onelogin
 Tags: sso, saml, single sign on, password, active directory, ldap, identity, onelogin, yubico, yubikey, vip access, otp
-Requires at least: 2.0.2
+Requires at least: 2.1.2
 Tested up to: 3.5.1
 Stable tag: trunk
 
@@ -39,7 +39,9 @@ This SAML plugin eliminates passwords and allows you to authenticate WordPress u
 = 2.1.1 =
  * Fix bug introduced in the reimplementation
 
--= 2.1.2 =
+= 2.1.2 =
  * Fix minor bugs. Add customRole support (editing php/functions.php file, review commented code)
 
-`<?php code(); // goes in backticks ?>`
+= 2.1.3 =
+ * Updated the php-saml toolkit (now 2.2.0)
+ * Added more Customization related to change password, reset password, change mail

@@ -100,8 +100,19 @@ if ( !function_exists( 'add_action' ) ) {
 			add_settings_field($name, $description, "plugin_setting_string_$name", $option_group, 'role_mapping');
 		}
 
+		add_settings_section('customize_links', __('CUSTOMIZE ACTIONS AND LINKS', 'onelogin-saml-sso'), 'plugin_section_customize_links_text', $option_group);
 
-		add_settings_section('customize_links', __('CUSTOMIZE LINKS', 'onelogin-saml-sso'), 'plugin_section_customize_links_text', $option_group);
+		register_setting($option_group, 'onelogin_saml_customize_action_prevent_local_login');
+		add_settings_field('onelogin_saml_customize_action_prevent_local_login', __('Prevent local login', 'onelogin-saml-sso'), "plugin_setting_boolean_onelogin_saml_customize_action_prevent_local_login", $option_group, 'customize_links');
+
+		register_setting($option_group, 'onelogin_saml_customize_action_prevent_reset_password');
+		add_settings_field('onelogin_saml_customize_action_prevent_reset_password', __('Prevent reset password', 'onelogin-saml-sso'), "plugin_setting_boolean_onelogin_saml_customize_action_prevent_reset_password", $option_group, 'customize_links');
+
+		register_setting($option_group, 'onelogin_saml_customize_action_prevent_change_password');
+		add_settings_field('onelogin_saml_customize_action_prevent_change_password', __('Prevent change password', 'onelogin-saml-sso'), "plugin_setting_boolean_onelogin_saml_customize_action_prevent_change_password", $option_group, 'customize_links');
+
+		register_setting($option_group, 'onelogin_saml_customize_action_prevent_change_mail');
+		add_settings_field('onelogin_saml_customize_action_prevent_change_mail', __('Prevent change mail', 'onelogin-saml-sso'), "plugin_setting_boolean_onelogin_saml_customize_action_prevent_change_mail", $option_group, 'customize_links');
 
 		register_setting($option_group, 'onelogin_saml_customize_links_user_registration');
 		add_settings_field('onelogin_saml_customize_links_user_registration', __('User Registration', 'onelogin-saml-sso'), "plugin_setting_string_onelogin_saml_customize_links_user_registration", $option_group, 'customize_links');
@@ -256,14 +267,44 @@ if ( !function_exists( 'add_action' ) ) {
 			  value= "'.get_option('onelogin_saml_role_mapping_subscriber').'" size="30">';
 	}
 
+	function plugin_setting_boolean_onelogin_saml_customize_action_prevent_local_login() {
+		$value = get_option('onelogin_saml_customize_action_prevent_local_login');
+		echo '<input type="checkbox" name="onelogin_saml_customize_action_prevent_local_login" id="onelogin_saml_customize_action_prevent_local_login"
+			  '.($value ? 'checked="checked"': '').'>
+			  <p class="description">'.__("Check it in order to disable the local login. After that only SAML logins will be allowed.", 'onelogin-saml-sso').'</p>';
+	}
+
+	function plugin_setting_boolean_onelogin_saml_customize_action_prevent_reset_password() {
+		$value = get_option('onelogin_saml_customize_action_prevent_reset_password');
+		echo '<input type="checkbox" name="onelogin_saml_customize_action_prevent_reset_password" id="onelogin_saml_customize_action_prevent_reset_password"
+			  '.($value ? 'checked="checked"': '').'>
+			  <p class="description">'.__("Check it in order to disable the ability of reset the password on Wordpress.", 'onelogin-saml-sso').'</p>';
+	}
+
+	function plugin_setting_boolean_onelogin_saml_customize_action_prevent_change_password() {
+		$value = get_option('onelogin_saml_customize_action_prevent_change_password');
+		echo '<input type="checkbox" name="onelogin_saml_customize_action_prevent_change_password" id="onelogin_saml_customize_action_prevent_change_password"
+			  '.($value ? 'checked="checked"': '').'>
+			  <p class="description">'.__("Check it in order to disable the ability of change the password on Wordpress.", 'onelogin-saml-sso').'</p>';
+	}
+
+	function plugin_setting_boolean_onelogin_saml_customize_action_prevent_change_mail() {
+		$value = get_option('onelogin_saml_customize_action_prevent_change_mail');
+		echo '<input type="checkbox" name="onelogin_saml_customize_action_prevent_change_mail" id="onelogin_saml_customize_action_prevent_change_mail"
+			  '.($value ? 'checked="checked"': '').'>
+			  <p class="description">'.__("Check it in order to disable the ability of change the mail on Wordpress (we recommend that if you are using mail as the account matcher field.", 'onelogin-saml-sso').'</p>';
+	}
+
 	function plugin_setting_string_onelogin_saml_customize_links_user_registration() {
 		echo '<input type="text" name="onelogin_saml_customize_links_user_registration" id="onelogin_saml_customize_links_user_registration"
-			  value= "'.get_option('onelogin_saml_customize_links_user_registration').'" size="80">';
+			  value= "'.get_option('onelogin_saml_customize_links_user_registration').'" size="80">
+			  <p class="description">'.__("Override the user registration link. ", 'onelogin-saml-sso').'</p>';
 	}
 
 	function plugin_setting_string_onelogin_saml_customize_links_lost_password() {
 		echo '<input type="text" name="onelogin_saml_customize_links_lost_password" id="onelogin_saml_customize_links_lost_password"
-			  value= "'.get_option('onelogin_saml_customize_links_lost_password').'" size="80">';
+			  value= "'.get_option('onelogin_saml_customize_links_lost_password').'" size="80">
+ 			  <p class="description">'.__("Override the lost password link. (prevent reset password must be deactivated or always the SAMl SSO will be forced)", 'onelogin-saml-sso').'</p>';
 	}	
 
 	function plugin_setting_boolean_onelogin_saml_advanced_settings_debug() {
@@ -368,7 +409,7 @@ if ( !function_exists( 'add_action' ) ) {
 	}
 
 	function plugin_section_customize_links_text() {
-		echo "<p>".__("When we enable the SAML SSO to be integrated with a IdP some Wordpress links as 'user registration' or 'lost password' have no sense. Set here new urls in order to redirect the user to those url when executing these actions", 'onelogin-saml-sso')."</p>";
+		echo "<p>".__("When we enable the SAML SSO to be integrated with a IdP some Wordpress actions and links could be changed. In this section you will be able to enable or disable the ability of change the mail, change the password and reset the password. Also can override the user registration and the lost password links", 'onelogin-saml-sso')."</p>";
 	}
 
 	function plugin_section_advanced_settings_text() {

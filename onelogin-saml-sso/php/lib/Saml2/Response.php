@@ -111,6 +111,13 @@ class OneLogin_Saml2_Response
                 $signedElements[] = $signNode->parentNode->tagName;
             }
 
+            if (!empty($signedElements)) {
+                // Check SignedElements
+                if (!$this->validateSignedElements($signedElements)) {
+                    throw new Exception('Found an unexpected Signature Element. SAML Response rejected');
+                }
+            }
+
             if ($this->_settings->isStrict()) {
 
                 $res = OneLogin_Saml2_Utils::validateXML($this->document, 'saml-schema-protocol-2.0.xsd', $this->_settings->isDebugActive());
@@ -120,7 +127,7 @@ class OneLogin_Saml2_Response
 
                 $security = $this->_settings->getSecurityData();
 
-                $currentURL = OneLogin_Saml2_Utils::getSelfURLNoQuery();
+                $currentURL = OneLogin_Saml2_Utils::getSelfRoutedURLNoQuery();
                 
                 if ($this->document->documentElement->hasAttribute('InResponseTo')) {
                     $responseInResponseTo = $this->document->documentElement->getAttribute('InResponseTo');
@@ -246,14 +253,17 @@ class OneLogin_Saml2_Response
             if (!empty($signedElements)) {
                 $cert = $idpData['x509cert'];
                 $fingerprint = $idpData['certFingerprint'];
-                // Only validates the first sign found
+
+                // Only validates the first signed element
                 if (in_array('samlp:Response', $signedElements)) {
                     $documentToValidate = $this->document;
                 } else {
+                    $documentToValidate = $signNodes->item(0)->parentNode;
                     if ($this->encrypted) {
-                        $documentToValidate = $this->decryptedDocument;
-                    } else {
-                        $documentToValidate = $this->document;
+                        $encryptedIDNodes = OneLogin_Saml2_Utils::query($this->decryptedDocument, '/samlp:Response/saml:EncryptedAssertion/saml:Assertion/saml:Subject/saml:EncryptedID');
+                        if ($encryptedIDNodes->length > 0) {
+                            throw new Exception('Unsigned SAML Response that contains a signed and encrypted Assertion with encrypted nameId is not supported.');
+                        }
                     }
                 }
 
@@ -498,6 +508,26 @@ class OneLogin_Saml2_Response
             if ($naAttribute && Onelogin_SAML2_Utils::parseSAML2Time($naAttribute->textContent) + OneLogin_Saml2_Constants::ALOWED_CLOCK_DRIFT <= time()) {
                 return false;
             }
+        }
+        return true;
+    }
+
+    /**
+     * Verifies that the document has the expected signed nodes.
+     *
+     * @return bool
+     */
+    public function validateSignedElements($signedElements)
+    {
+        if (count($signedElements) > 2) {
+            return false;
+        }
+        $ocurrence = array_count_values($signedElements);
+        if ((in_array('samlp:Response', $signedElements) && $ocurrence['samlp:Response'] > 1) ||
+            (in_array('saml:Assertion', $signedElements) && $ocurrence['saml:Assertion'] > 1) ||
+            !in_array('samlp:Response', $signedElements) && !in_array('saml:Assertion', $signedElements)
+        ) {
+            return false;
         }
         return true;
     }

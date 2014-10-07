@@ -47,16 +47,16 @@ class OneLogin_Saml2_LogoutRequest
             $nameIdValue = OneLogin_Saml2_Utils::generateUniqueID();
             $issueInstant = OneLogin_Saml2_Utils::parseTime2SAML(time());
             
-            $key = null;
+            $cert = null;
             if (isset($security['nameIdEncrypted']) && $security['nameIdEncrypted']) {
-                $key = $idpData['x509cert'];
+                $cert = $idpData['x509cert'];
             }
 
             $nameId = OneLogin_Saml2_Utils::generateNameId(
                 $nameIdValue,
                 $spData['entityId'],
                 $spData['NameIDFormat'],
-                $key
+                $cert
             );
 
             $sessionIndexStr = isset($sessionIndex) ? "<samlp:SessionIndex>{$sessionIndex}</samlp:SessionIndex>" : "";
@@ -262,7 +262,7 @@ LOGOUTREQUEST;
 
                 $security = $this->_settings->getSecurityData();
 
-                $currentURL = OneLogin_Saml2_Utils::getSelfURLNoQuery();
+                $currentURL = OneLogin_Saml2_Utils::getSelfRoutedURLNoQuery();
 
                 // Check NotOnOrAfter
                 if ($dom->documentElement->hasAttribute('NotOnOrAfter')) {
@@ -286,7 +286,7 @@ LOGOUTREQUEST;
 
                 // Check issuer
                 $issuer = $this->getIssuer($dom);
-                if (empty($issuer) || $issuer != $idPEntityId) {
+                if (!empty($issuer) && $issuer != $idPEntityId) {
                     throw new Exception("Invalid issuer in the Logout Request");
                 }
 
@@ -305,10 +305,6 @@ LOGOUTREQUEST;
                     $signAlg = $_GET['SigAlg'];
                 }
 
-                if ($signAlg != XMLSecurityKey::RSA_SHA1) {
-                    throw new Exception('Invalid signAlg in the recieved Logout Request');
-                }
-
                 $signedQuery = 'SAMLRequest='.urlencode($_GET['SAMLRequest']);
                 if (isset($_GET['RelayState'])) {
                     $signedQuery .= '&RelayState='.urlencode($_GET['RelayState']);
@@ -322,6 +318,14 @@ LOGOUTREQUEST;
 
                 $objKey = new XMLSecurityKey(XMLSecurityKey::RSA_SHA1, array('type' => 'public'));
                 $objKey->loadKey($cert, false, true);
+
+                if ($signAlg != XMLSecurityKey::RSA_SHA1) {
+                    try {
+                        $objKey = OneLogin_Saml2_Utils::castKey($objKey, $signAlg, 'public');
+                    } catch (Exception $e) {
+                        throw new Exception('Invalid signAlg in the recieved Logout Request');
+                    }
+                }
 
                 if (!$objKey->verifySignature($signedQuery, base64_decode($_GET['Signature']))) {
                     throw new Exception('Signature validation failed. Logout Request rejected');
