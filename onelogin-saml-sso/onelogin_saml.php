@@ -40,7 +40,9 @@ else {
 $action = isset($_REQUEST['action']) ? $_REQUEST['action'] : 'login';
 
 // Handle SLO
-add_action('init', 'saml_slo', 1);
+if (isset($_COOKIE['saml_login']) && get_option('onelogin_saml_slo')) { 
+	add_action('init', 'saml_slo', 1);
+}
 
 $saml_actions = strpos($_SERVER['SCRIPT_NAME'], 'php/metadata.php') !== FALSE;
 
