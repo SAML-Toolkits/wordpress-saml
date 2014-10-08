@@ -48,4 +48,6 @@ This SAML plugin eliminates passwords and allows you to authenticate WordPress u
 
 = 2.1.4 =
  * Added stay when slo and forced logn
+
+= 2.1.5 =
  * Refactor sso/slo flow
