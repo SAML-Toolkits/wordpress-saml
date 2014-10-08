@@ -1,17 +1,19 @@
 <?php
 
 	function onelogin_saml_configuration_render() {
-		$title = __("OneLogin SSO/SAML Settings", 'onelogin-saml-sso');
+		$title = __("SSO/SAML Settings", 'onelogin-saml-sso');
 		?>
 			<div class="wrap">
 				<?php screen_icon(); ?>
-				<div class="alignright">
-					<a href="<?php echo plugins_url('php/metadata.php', dirname(__FILE__)); ?>" target="blank"><?php echo __("Go to the metadata of this SP", 'onelogin-saml-sso');?></a>
+				<div class="alignleft">
+					<a href="http://www.onelogin.com"><img src="<?php echo plugins_url('onelogin.png', dirname(__FILE__));?>"></a>
 				</div>
-				<h2><?php echo esc_html( $title ); ?></h2>
 				<div class="alignright">
+					<a href="<?php echo plugins_url('php/metadata.php', dirname(__FILE__)); ?>" target="blank"><?php echo __("Go to the metadata of this SP", 'onelogin-saml-sso');?></a><br>
 					<a href="<?php echo plugins_url('php/validate.php', dirname(__FILE__)); ?>" target="blank"><?php echo __("Once configured, validate here your OneLogin SSO/SAML Settings", 'onelogin-saml-sso');?></a>
 				</div>
+				<div style="clear:both"></div>
+				<h2><?php echo esc_html( $title ); ?></h2>
 				<form action="options.php" method="post">
 
 					<?php settings_fields('onelogin_saml_configuration'); ?>
@@ -93,13 +95,29 @@
 		}
 
 
-		add_settings_section('customize_links', __('CUSTOMIZE LINKS', 'onelogin-saml-sso'), 'plugin_section_customize_links_text', $option_group);
+		add_settings_section('customize_links', __('CUSTOMIZE ACTIONS AND LINKS', 'onelogin-saml-sso'), 'plugin_section_customize_links_text', $option_group);
+
+		register_setting($option_group, 'onelogin_saml_customize_action_prevent_local_login');
+		add_settings_field('onelogin_saml_customize_action_prevent_local_login', __('Prevent local login', 'onelogin-saml-sso'), "plugin_setting_boolean_onelogin_saml_customize_action_prevent_local_login", $option_group, 'customize_links');
+
+		register_setting($option_group, 'onelogin_saml_customize_action_prevent_reset_password');
+		add_settings_field('onelogin_saml_customize_action_prevent_reset_password', __('Prevent reset password', 'onelogin-saml-sso'), "plugin_setting_boolean_onelogin_saml_customize_action_prevent_reset_password", $option_group, 'customize_links');
+
+		register_setting($option_group, 'onelogin_saml_customize_action_prevent_change_password');
+		add_settings_field('onelogin_saml_customize_action_prevent_change_password', __('Prevent change password', 'onelogin-saml-sso'), "plugin_setting_boolean_onelogin_saml_customize_action_prevent_change_password", $option_group, 'customize_links');
+
+		register_setting($option_group, 'onelogin_saml_customize_action_prevent_change_mail');
+		add_settings_field('onelogin_saml_customize_action_prevent_change_mail', __('Prevent change mail', 'onelogin-saml-sso'), "plugin_setting_boolean_onelogin_saml_customize_action_prevent_change_mail", $option_group, 'customize_links');
+
+		register_setting($option_group, 'onelogin_saml_customize_stay_in_wordpress_after_slo');
+		add_settings_field('onelogin_saml_customize_stay_in_wordpress_after_slo', __('Stay in Wordpress after SLO', 'onelogin-saml-sso'), "plugin_setting_string_onelogin_saml_customize_stay_in_wordpress_after_slo", $option_group, 'customize_links');
 
 		register_setting($option_group, 'onelogin_saml_customize_links_user_registration');
 		add_settings_field('onelogin_saml_customize_links_user_registration', __('User Registration', 'onelogin-saml-sso'), "plugin_setting_string_onelogin_saml_customize_links_user_registration", $option_group, 'customize_links');
 
 		register_setting($option_group, 'onelogin_saml_customize_links_lost_password');
 		add_settings_field('onelogin_saml_customize_links_lost_password', __('Lost Password', 'onelogin-saml-sso'), "plugin_setting_string_onelogin_saml_customize_links_lost_password", $option_group, 'customize_links');
+
 
 
 		add_settings_section('advanced_settings', __('ADVANCED SETTINGS', 'onelogin-saml-sso'), 'plugin_section_advanced_settings_text', $option_group);
@@ -248,15 +266,52 @@
 			  value= "'.get_option('onelogin_saml_role_mapping_subscriber').'" size="30">';
 	}
 
+	function plugin_setting_boolean_onelogin_saml_customize_action_prevent_local_login() {
+		$value = get_option('onelogin_saml_customize_action_prevent_local_login');
+		echo '<input type="checkbox" name="onelogin_saml_customize_action_prevent_local_login" id="onelogin_saml_customize_action_prevent_local_login"
+			  '.($value ? 'checked="checked"': '').'>
+			  <p class="description">'.__("Check it in order to disable the local login. After that only SAML logins will be allowed.", 'onelogin-saml-sso').'</p>';
+	}
+
+	function plugin_setting_boolean_onelogin_saml_customize_action_prevent_reset_password() {
+		$value = get_option('onelogin_saml_customize_action_prevent_reset_password');
+		echo '<input type="checkbox" name="onelogin_saml_customize_action_prevent_reset_password" id="onelogin_saml_customize_action_prevent_reset_password"
+			  '.($value ? 'checked="checked"': '').'>
+			  <p class="description">'.__("Check it in order to disable the ability of reset the password on Wordpress.", 'onelogin-saml-sso').'</p>';
+	}
+
+	function plugin_setting_boolean_onelogin_saml_customize_action_prevent_change_password() {
+		$value = get_option('onelogin_saml_customize_action_prevent_change_password');
+		echo '<input type="checkbox" name="onelogin_saml_customize_action_prevent_change_password" id="onelogin_saml_customize_action_prevent_change_password"
+			  '.($value ? 'checked="checked"': '').'>
+			  <p class="description">'.__("Check it in order to disable the ability of change the password on Wordpress.", 'onelogin-saml-sso').'</p>';
+	}
+
+	function plugin_setting_boolean_onelogin_saml_customize_action_prevent_change_mail() {
+		$value = get_option('onelogin_saml_customize_action_prevent_change_mail');
+		echo '<input type="checkbox" name="onelogin_saml_customize_action_prevent_change_mail" id="onelogin_saml_customize_action_prevent_change_mail"
+			  '.($value ? 'checked="checked"': '').'>
+			  <p class="description">'.__("Check it in order to disable the ability of change the mail on Wordpress (we recommend that if you are using mail as the account matcher field.", 'onelogin-saml-sso').'</p>';
+	}
+
 	function plugin_setting_string_onelogin_saml_customize_links_user_registration() {
 		echo '<input type="text" name="onelogin_saml_customize_links_user_registration" id="onelogin_saml_customize_links_user_registration"
-			  value= "'.get_option('onelogin_saml_customize_links_user_registration').'" size="80">';
+			  value= "'.get_option('onelogin_saml_customize_links_user_registration').'" size="80">
+			  <p class="description">'.__("Override the user registration link. ", 'onelogin-saml-sso').'</p>';
+	}
+
+	function plugin_setting_string_onelogin_saml_customize_stay_in_wordpress_after_slo() {
+		$value = get_option('onelogin_saml_customize_stay_in_wordpress_after_slo');
+		echo '<input type="checkbox" name="onelogin_saml_customize_stay_in_wordpress_after_slo" id="onelogin_saml_customize_stay_in_wordpress_after_slo"
+			  '.($value ? 'checked="checked"': '').'>
+			  <p class="description">'.__("If SLO and Force SAML login are enabled, after the SLO process you will be redirected to the WP main page and a SAML SSO process will start, to prevent that check this and you will stay at the Wordpress Login Form. ", 'onelogin-saml-sso').'</p>';
 	}
 
 	function plugin_setting_string_onelogin_saml_customize_links_lost_password() {
 		echo '<input type="text" name="onelogin_saml_customize_links_lost_password" id="onelogin_saml_customize_links_lost_password"
-			  value= "'.get_option('onelogin_saml_customize_links_lost_password').'" size="80">';
-	}	
+			  value= "'.get_option('onelogin_saml_customize_links_lost_password').'" size="80">
+ 			  <p class="description">'.__("Override the lost password link. (prevent reset password must be deactivated or always the SAMl SSO will be forced)", 'onelogin-saml-sso').'</p>';
+	}
 
 	function plugin_setting_boolean_onelogin_saml_advanced_settings_debug() {
 		$value = get_option('onelogin_saml_advanced_settings_debug');

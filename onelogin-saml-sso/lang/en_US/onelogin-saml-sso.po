@@ -1,8 +1,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: onelogin-saml-sso\n"
-"POT-Creation-Date: 2014-07-31 03:19+0100\n"
-"PO-Revision-Date: 2014-07-31 03:19+0100\n"
+"POT-Creation-Date: 2014-10-08 03:16+0100\n"
+"PO-Revision-Date: 2014-10-08 03:16+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: default\n"
@@ -103,13 +103,13 @@ msgstr ""
 
 #: /var/www/onelogindemo/wordpress/wp-content/plugins/onelogin-saml-sso/php/validate.php:93
 #: /var/www/onelogindemo/wordpress/wp-content/plugins/onelogin-saml-sso/php/configuration.php:71
-#: /var/www/onelogindemo/wordpress/wp-content/plugins/onelogin-saml-sso/php/configuration.php:194
+#: /var/www/onelogindemo/wordpress/wp-content/plugins/onelogin-saml-sso/php/configuration.php:210
 msgid "Username"
 msgstr ""
 
 #: /var/www/onelogindemo/wordpress/wp-content/plugins/onelogin-saml-sso/php/validate.php:94
 #: /var/www/onelogindemo/wordpress/wp-content/plugins/onelogin-saml-sso/php/configuration.php:72
-#: /var/www/onelogindemo/wordpress/wp-content/plugins/onelogin-saml-sso/php/configuration.php:195
+#: /var/www/onelogindemo/wordpress/wp-content/plugins/onelogin-saml-sso/php/configuration.php:211
 msgid "E-mail"
 msgstr ""
 
@@ -223,6 +223,10 @@ msgstr ""
 msgid "X.509 Certificate"
 msgstr ""
 
+#: /var/www/onelogindemo/wordpress/wp-content/plugins/onelogin-saml-sso/php/configuration.php:54
+msgid "OPTIONS"
+msgstr ""
+
 #: /var/www/onelogindemo/wordpress/wp-content/plugins/onelogin-saml-sso/php/configuration.php:56
 msgid "Create user if not exists"
 msgstr ""
@@ -243,109 +247,137 @@ msgstr ""
 msgid "Match Wordpress account by"
 msgstr ""
 
+#: /var/www/onelogindemo/wordpress/wp-content/plugins/onelogin-saml-sso/php/configuration.php:69
+msgid "ATTRIBUTE MAPPING"
+msgstr ""
+
+#: /var/www/onelogindemo/wordpress/wp-content/plugins/onelogin-saml-sso/php/configuration.php:82
+msgid "ROLE MAPPING"
+msgstr ""
+
 #: /var/www/onelogindemo/wordpress/wp-content/plugins/onelogin-saml-sso/php/configuration.php:96
-msgid "CUSTOMIZE LINKS"
+msgid "CUSTOMIZE ACTIONS AND LINKS"
 msgstr ""
 
 #: /var/www/onelogindemo/wordpress/wp-content/plugins/onelogin-saml-sso/php/configuration.php:99
-msgid "User Registration"
+msgid "Prevent local login"
 msgstr ""
 
 #: /var/www/onelogindemo/wordpress/wp-content/plugins/onelogin-saml-sso/php/configuration.php:102
-msgid "Lost Password"
+msgid "Prevent reset password"
 msgstr ""
 
 #: /var/www/onelogindemo/wordpress/wp-content/plugins/onelogin-saml-sso/php/configuration.php:105
-msgid "ADVANCED SETTINGS"
+msgid "Prevent change password"
 msgstr ""
 
 #: /var/www/onelogindemo/wordpress/wp-content/plugins/onelogin-saml-sso/php/configuration.php:108
-msgid "Debug Mode"
+msgid "Prevent change mail"
 msgstr ""
 
 #: /var/www/onelogindemo/wordpress/wp-content/plugins/onelogin-saml-sso/php/configuration.php:111
-msgid "Strict Mode"
+msgid "Stay in Wordpress after SLO"
 msgstr ""
 
 #: /var/www/onelogindemo/wordpress/wp-content/plugins/onelogin-saml-sso/php/configuration.php:114
-msgid "Service Provider Entity Id"
+msgid "User Registration"
 msgstr ""
 
 #: /var/www/onelogindemo/wordpress/wp-content/plugins/onelogin-saml-sso/php/configuration.php:117
-msgid "Encrypt nameID"
-msgstr ""
-
-#: /var/www/onelogindemo/wordpress/wp-content/plugins/onelogin-saml-sso/php/configuration.php:118
-msgid "Sign AuthnRequest"
-msgstr ""
-
-#: /var/www/onelogindemo/wordpress/wp-content/plugins/onelogin-saml-sso/php/configuration.php:119
-msgid "Sign LogoutRequest"
-msgstr ""
-
-#: /var/www/onelogindemo/wordpress/wp-content/plugins/onelogin-saml-sso/php/configuration.php:120
-msgid "Sign LogoutResponse"
+msgid "Lost Password"
 msgstr ""
 
 #: /var/www/onelogindemo/wordpress/wp-content/plugins/onelogin-saml-sso/php/configuration.php:121
-msgid "Reject Unsigned Messages"
+msgid "ADVANCED SETTINGS"
 msgstr ""
 
-#: /var/www/onelogindemo/wordpress/wp-content/plugins/onelogin-saml-sso/php/configuration.php:122
-msgid "Reject Unsigned Assertions"
+#: /var/www/onelogindemo/wordpress/wp-content/plugins/onelogin-saml-sso/php/configuration.php:124
+msgid "Debug Mode"
 msgstr ""
 
-#: /var/www/onelogindemo/wordpress/wp-content/plugins/onelogin-saml-sso/php/configuration.php:123
-msgid "Reject Unencrypted Assertions"
+#: /var/www/onelogindemo/wordpress/wp-content/plugins/onelogin-saml-sso/php/configuration.php:127
+msgid "Strict Mode"
 msgstr ""
 
-#: /var/www/onelogindemo/wordpress/wp-content/plugins/onelogin-saml-sso/php/configuration.php:131
-msgid "Service Provider X.509 Certificate"
+#: /var/www/onelogindemo/wordpress/wp-content/plugins/onelogin-saml-sso/php/configuration.php:130
+msgid "Service Provider Entity Id"
+msgstr ""
+
+#: /var/www/onelogindemo/wordpress/wp-content/plugins/onelogin-saml-sso/php/configuration.php:133
+msgid "Encrypt nameID"
 msgstr ""
 
 #: /var/www/onelogindemo/wordpress/wp-content/plugins/onelogin-saml-sso/php/configuration.php:134
+msgid "Sign AuthnRequest"
+msgstr ""
+
+#: /var/www/onelogindemo/wordpress/wp-content/plugins/onelogin-saml-sso/php/configuration.php:135
+msgid "Sign LogoutRequest"
+msgstr ""
+
+#: /var/www/onelogindemo/wordpress/wp-content/plugins/onelogin-saml-sso/php/configuration.php:136
+msgid "Sign LogoutResponse"
+msgstr ""
+
+#: /var/www/onelogindemo/wordpress/wp-content/plugins/onelogin-saml-sso/php/configuration.php:137
+msgid "Reject Unsigned Messages"
+msgstr ""
+
+#: /var/www/onelogindemo/wordpress/wp-content/plugins/onelogin-saml-sso/php/configuration.php:138
+msgid "Reject Unsigned Assertions"
+msgstr ""
+
+#: /var/www/onelogindemo/wordpress/wp-content/plugins/onelogin-saml-sso/php/configuration.php:139
+msgid "Reject Unencrypted Assertions"
+msgstr ""
+
+#: /var/www/onelogindemo/wordpress/wp-content/plugins/onelogin-saml-sso/php/configuration.php:147
+msgid "Service Provider X.509 Certificate"
+msgstr ""
+
+#: /var/www/onelogindemo/wordpress/wp-content/plugins/onelogin-saml-sso/php/configuration.php:150
 msgid "Service Provider Private Key"
 msgstr ""
 
-#: /var/www/onelogindemo/wordpress/wp-content/plugins/onelogin-saml-sso/php/configuration.php:140
+#: /var/www/onelogindemo/wordpress/wp-content/plugins/onelogin-saml-sso/php/configuration.php:156
 msgid "Identifier of the IdP entity. (\"Issuer URL\")"
 msgstr ""
 
-#: /var/www/onelogindemo/wordpress/wp-content/plugins/onelogin-saml-sso/php/configuration.php:146
+#: /var/www/onelogindemo/wordpress/wp-content/plugins/onelogin-saml-sso/php/configuration.php:162
 msgid ""
 "SSO endpoint info of the IdP. URL target of the IdP where the SP will send "
 "the Authentication Request. (\"SAML 2.0 Endpoint (HTTP)\")"
 msgstr ""
 
-#: /var/www/onelogindemo/wordpress/wp-content/plugins/onelogin-saml-sso/php/configuration.php:152
+#: /var/www/onelogindemo/wordpress/wp-content/plugins/onelogin-saml-sso/php/configuration.php:168
 msgid ""
 "SLO endpoint info of the IdP. URL target of the IdP where the SP will send "
 "the SLO Request. (\"SLO Endpoint (HTTP)\")"
 msgstr ""
 
-#: /var/www/onelogindemo/wordpress/wp-content/plugins/onelogin-saml-sso/php/configuration.php:159
+#: /var/www/onelogindemo/wordpress/wp-content/plugins/onelogin-saml-sso/php/configuration.php:175
 msgid "Public x509 certificate of the IdP.  (\"X.509 certificate\")"
 msgstr ""
 
-#: /var/www/onelogindemo/wordpress/wp-content/plugins/onelogin-saml-sso/php/configuration.php:166
+#: /var/www/onelogindemo/wordpress/wp-content/plugins/onelogin-saml-sso/php/configuration.php:182
 msgid ""
 "Auto-provisioning. If user not exists,  Wordpress will create a new user "
 "with the data provided by the IdP.<br>Review the Mapping section."
 msgstr ""
 
-#: /var/www/onelogindemo/wordpress/wp-content/plugins/onelogin-saml-sso/php/configuration.php:173
+#: /var/www/onelogindemo/wordpress/wp-content/plugins/onelogin-saml-sso/php/configuration.php:189
 msgid ""
 "Auto-update. Wordpress will update the account of the user with the data "
 "provided by the IdP.<br>Review the Mapping section."
 msgstr ""
 
-#: /var/www/onelogindemo/wordpress/wp-content/plugins/onelogin-saml-sso/php/configuration.php:180
+#: /var/www/onelogindemo/wordpress/wp-content/plugins/onelogin-saml-sso/php/configuration.php:196
 msgid ""
 "Protect Wordpress and force the user to authenticate at the IdP in order to "
 "access"
 msgstr ""
 
-#: /var/www/onelogindemo/wordpress/wp-content/plugins/onelogin-saml-sso/php/configuration.php:187
+#: /var/www/onelogindemo/wordpress/wp-content/plugins/onelogin-saml-sso/php/configuration.php:203
 msgid ""
 "Enable/disable Single Log Out. SLO  is a complex functionality, the most "
 "common SLO implementation is based on front-channel (redirections), "
@@ -355,27 +387,66 @@ msgid ""
 "problems than benefits."
 msgstr ""
 
-#: /var/www/onelogindemo/wordpress/wp-content/plugins/onelogin-saml-sso/php/configuration.php:197
+#: /var/www/onelogindemo/wordpress/wp-content/plugins/onelogin-saml-sso/php/configuration.php:213
 msgid ""
 "Select what field will be used in order to find the user account. If you "
 "select the 'email' fieldname the plugin will prevent that the user can "
 "change his mail in his profile."
 msgstr ""
 
-#: /var/www/onelogindemo/wordpress/wp-content/plugins/onelogin-saml-sso/php/configuration.php:223
+#: /var/www/onelogindemo/wordpress/wp-content/plugins/onelogin-saml-sso/php/configuration.php:239
 msgid ""
 "The attribute that contains the role of the user, For example 'memberof'. If "
 "Wordpress can't figure what role assign to the user, it will assign the "
 "default role defined at the general settings."
 msgstr ""
 
-#: /var/www/onelogindemo/wordpress/wp-content/plugins/onelogin-saml-sso/php/configuration.php:265
+#: /var/www/onelogindemo/wordpress/wp-content/plugins/onelogin-saml-sso/php/configuration.php:271
+msgid ""
+"Check it in order to disable the local login. After that only SAML logins "
+"will be allowed."
+msgstr ""
+
+#: /var/www/onelogindemo/wordpress/wp-content/plugins/onelogin-saml-sso/php/configuration.php:278
+msgid ""
+"Check it in order to disable the ability of reset the password on Wordpress."
+msgstr ""
+
+#: /var/www/onelogindemo/wordpress/wp-content/plugins/onelogin-saml-sso/php/configuration.php:285
+msgid ""
+"Check it in order to disable the ability of change the password on Wordpress."
+msgstr ""
+
+#: /var/www/onelogindemo/wordpress/wp-content/plugins/onelogin-saml-sso/php/configuration.php:292
+msgid ""
+"Check it in order to disable the ability of change the mail on Wordpress (we "
+"recommend that if you are using mail as the account matcher field."
+msgstr ""
+
+#: /var/www/onelogindemo/wordpress/wp-content/plugins/onelogin-saml-sso/php/configuration.php:298
+msgid "Override the user registration link. "
+msgstr ""
+
+#: /var/www/onelogindemo/wordpress/wp-content/plugins/onelogin-saml-sso/php/configuration.php:305
+msgid ""
+"If SLO and Force SAML login are enabled, after the SLO process you will be "
+"redirected to the WP main page and a SAML SSO process will start, to prevent "
+"that check this and you will stay at the Wordpress Login Form. "
+msgstr ""
+
+#: /var/www/onelogindemo/wordpress/wp-content/plugins/onelogin-saml-sso/php/configuration.php:311
+msgid ""
+"Override the lost password link. (prevent reset password must be deactivated "
+"or always the SAMl SSO will be forced)"
+msgstr ""
+
+#: /var/www/onelogindemo/wordpress/wp-content/plugins/onelogin-saml-sso/php/configuration.php:318
 msgid ""
 "Enable it when your are debugging the SAML workflow. Errors and Warnigs will "
 "be showed."
 msgstr ""
 
-#: /var/www/onelogindemo/wordpress/wp-content/plugins/onelogin-saml-sso/php/configuration.php:272
+#: /var/www/onelogindemo/wordpress/wp-content/plugins/onelogin-saml-sso/php/configuration.php:325
 msgid ""
 "If Strict mode is Enabled, then Wordpress will reject unsigned or "
 "unencrypted messages if it expects them signed or encrypted.\n"
@@ -383,66 +454,66 @@ msgid ""
 "standard: Destination, NameId, Conditions ... are validated too."
 msgstr ""
 
-#: /var/www/onelogindemo/wordpress/wp-content/plugins/onelogin-saml-sso/php/configuration.php:279
+#: /var/www/onelogindemo/wordpress/wp-content/plugins/onelogin-saml-sso/php/configuration.php:332
 msgid ""
 "Set the Entity ID for the Service Provider. If not provided, 'php-saml' will "
 "be used."
 msgstr ""
 
-#: /var/www/onelogindemo/wordpress/wp-content/plugins/onelogin-saml-sso/php/configuration.php:287
+#: /var/www/onelogindemo/wordpress/wp-content/plugins/onelogin-saml-sso/php/configuration.php:340
 msgid "The nameID sent by this SP will be encrypted."
 msgstr ""
 
-#: /var/www/onelogindemo/wordpress/wp-content/plugins/onelogin-saml-sso/php/configuration.php:294
+#: /var/www/onelogindemo/wordpress/wp-content/plugins/onelogin-saml-sso/php/configuration.php:347
 msgid "The samlp:AuthnRequest messages sent by this SP will be signed."
 msgstr ""
 
-#: /var/www/onelogindemo/wordpress/wp-content/plugins/onelogin-saml-sso/php/configuration.php:301
+#: /var/www/onelogindemo/wordpress/wp-content/plugins/onelogin-saml-sso/php/configuration.php:354
 msgid "The samlp:logoutRequest messages sent by this SP will be signed."
 msgstr ""
 
-#: /var/www/onelogindemo/wordpress/wp-content/plugins/onelogin-saml-sso/php/configuration.php:308
+#: /var/www/onelogindemo/wordpress/wp-content/plugins/onelogin-saml-sso/php/configuration.php:361
 msgid "The samlp:logoutResponse messages sent by this SP will be signed."
 msgstr ""
 
-#: /var/www/onelogindemo/wordpress/wp-content/plugins/onelogin-saml-sso/php/configuration.php:315
+#: /var/www/onelogindemo/wordpress/wp-content/plugins/onelogin-saml-sso/php/configuration.php:368
 msgid ""
 "Reject unsigned samlp:Response, samlp:LogoutRequest and samlp:LogoutResponse "
 "received"
 msgstr ""
 
-#: /var/www/onelogindemo/wordpress/wp-content/plugins/onelogin-saml-sso/php/configuration.php:322
+#: /var/www/onelogindemo/wordpress/wp-content/plugins/onelogin-saml-sso/php/configuration.php:375
 msgid "Reject unsigned saml:Assertion received"
 msgstr ""
 
-#: /var/www/onelogindemo/wordpress/wp-content/plugins/onelogin-saml-sso/php/configuration.php:329
+#: /var/www/onelogindemo/wordpress/wp-content/plugins/onelogin-saml-sso/php/configuration.php:382
 msgid "Reject unencrypted saml:Assertion received"
 msgstr ""
 
-#: /var/www/onelogindemo/wordpress/wp-content/plugins/onelogin-saml-sso/php/configuration.php:336
+#: /var/www/onelogindemo/wordpress/wp-content/plugins/onelogin-saml-sso/php/configuration.php:389
 msgid ""
 "Public x509 certificate of the SP. Leave this field empty if you gonna "
 "provide the private key by the sp.crt"
 msgstr ""
 
-#: /var/www/onelogindemo/wordpress/wp-content/plugins/onelogin-saml-sso/php/configuration.php:343
+#: /var/www/onelogindemo/wordpress/wp-content/plugins/onelogin-saml-sso/php/configuration.php:396
 msgid ""
 "Private Key of the SP. Leave this field empty if you gonna provide the "
 "private key by the sp.key"
 msgstr ""
 
-#: /var/www/onelogindemo/wordpress/wp-content/plugins/onelogin-saml-sso/php/configuration.php:347
+#: /var/www/onelogindemo/wordpress/wp-content/plugins/onelogin-saml-sso/php/configuration.php:400
 msgid ""
 "Set here some info related to the IdP that will be connected with our "
 "Wordpress. You can find this values at the Onelogin's platform in the "
 "Wordpress App at the Single Sign-On tab"
 msgstr ""
 
-#: /var/www/onelogindemo/wordpress/wp-content/plugins/onelogin-saml-sso/php/configuration.php:351
+#: /var/www/onelogindemo/wordpress/wp-content/plugins/onelogin-saml-sso/php/configuration.php:404
 msgid "In this section the behavior of the plugin is set."
 msgstr ""
 
-#: /var/www/onelogindemo/wordpress/wp-content/plugins/onelogin-saml-sso/php/configuration.php:355
+#: /var/www/onelogindemo/wordpress/wp-content/plugins/onelogin-saml-sso/php/configuration.php:408
 msgid ""
 "Sometimes the names of the attributes sent by the IdP not match the names "
 "used by Wordpress for the user accounts. In this section we can set the "
@@ -450,21 +521,21 @@ msgid ""
 "could be also set at Onelogin's IdP"
 msgstr ""
 
-#: /var/www/onelogindemo/wordpress/wp-content/plugins/onelogin-saml-sso/php/configuration.php:359
+#: /var/www/onelogindemo/wordpress/wp-content/plugins/onelogin-saml-sso/php/configuration.php:412
 msgid ""
 "The IdP can use it's own roles. Set in this section the mapping between IdP "
 "and Wordpress roles. Accepts multiple valued comma separated. Example: admin,"
 "owner,superuser"
 msgstr ""
 
-#: /var/www/onelogindemo/wordpress/wp-content/plugins/onelogin-saml-sso/php/configuration.php:363
+#: /var/www/onelogindemo/wordpress/wp-content/plugins/onelogin-saml-sso/php/configuration.php:416
 msgid ""
 "When we enable the SAML SSO to be integrated with a IdP some Wordpress links "
 "as 'user registration' or 'lost password' have no sense. Set here new urls "
 "in order to redirect the user to those url when executing those actions"
 msgstr ""
 
-#: /var/www/onelogindemo/wordpress/wp-content/plugins/onelogin-saml-sso/php/configuration.php:367
+#: /var/www/onelogindemo/wordpress/wp-content/plugins/onelogin-saml-sso/php/configuration.php:420
 msgid ""
 "Handle some other parameters related to customizations and security issues."
 "<br>If sign/encryption is enabled, then x509 cert and private key for the SP "
@@ -476,50 +547,50 @@ msgid ""
 "(take care of security issues)"
 msgstr ""
 
-#: /var/www/onelogindemo/wordpress/wp-content/plugins/onelogin-saml-sso/php/functions.php:58
+#: /var/www/onelogindemo/wordpress/wp-content/plugins/onelogin-saml-sso/php/functions.php:63
 msgid "There was at least one error processing the SAML Response"
 msgstr ""
 
-#: /var/www/onelogindemo/wordpress/wp-content/plugins/onelogin-saml-sso/php/functions.php:60
+#: /var/www/onelogindemo/wordpress/wp-content/plugins/onelogin-saml-sso/php/functions.php:65
 msgid "Contact the administrator"
 msgstr ""
 
-#: /var/www/onelogindemo/wordpress/wp-content/plugins/onelogin-saml-sso/php/functions.php:82
+#: /var/www/onelogindemo/wordpress/wp-content/plugins/onelogin-saml-sso/php/functions.php:87
 msgid "The username could not be retrieved from the IdP and is required"
 msgstr ""
 
-#: /var/www/onelogindemo/wordpress/wp-content/plugins/onelogin-saml-sso/php/functions.php:86
+#: /var/www/onelogindemo/wordpress/wp-content/plugins/onelogin-saml-sso/php/functions.php:91
 msgid "The email could not be retrieved from the IdP and is required"
 msgstr ""
 
-#: /var/www/onelogindemo/wordpress/wp-content/plugins/onelogin-saml-sso/php/functions.php:193
+#: /var/www/onelogindemo/wordpress/wp-content/plugins/onelogin-saml-sso/php/functions.php:198
 msgid "The username provided by the IdP"
 msgstr ""
 
-#: /var/www/onelogindemo/wordpress/wp-content/plugins/onelogin-saml-sso/php/functions.php:193
+#: /var/www/onelogindemo/wordpress/wp-content/plugins/onelogin-saml-sso/php/functions.php:198
 msgid "is not valid and can't create the user at wordpress"
 msgstr ""
 
-#: /var/www/onelogindemo/wordpress/wp-content/plugins/onelogin-saml-sso/php/functions.php:199
+#: /var/www/onelogindemo/wordpress/wp-content/plugins/onelogin-saml-sso/php/functions.php:204
 msgid "User provided by the IdP "
 msgstr ""
 
-#: /var/www/onelogindemo/wordpress/wp-content/plugins/onelogin-saml-sso/php/functions.php:199
+#: /var/www/onelogindemo/wordpress/wp-content/plugins/onelogin-saml-sso/php/functions.php:204
 msgid "not exists in wordpress and auto-provisioning is disabled."
 msgstr ""
 
-#: /var/www/onelogindemo/wordpress/wp-content/plugins/onelogin-saml-sso/php/functions.php:251
+#: /var/www/onelogindemo/wordpress/wp-content/plugins/onelogin-saml-sso/php/functions.php:263
 msgid "The Onelogin SSO/SAML plugin is not correctly configured."
 msgstr ""
 
-#: /var/www/onelogindemo/wordpress/wp-content/plugins/onelogin-saml-sso/php/functions.php:253
+#: /var/www/onelogindemo/wordpress/wp-content/plugins/onelogin-saml-sso/php/functions.php:265
 msgid "If you are the administrator"
 msgstr ""
 
-#: /var/www/onelogindemo/wordpress/wp-content/plugins/onelogin-saml-sso/php/functions.php:253
+#: /var/www/onelogindemo/wordpress/wp-content/plugins/onelogin-saml-sso/php/functions.php:265
 msgid "access using your wordpress credentials"
 msgstr ""
 
-#: /var/www/onelogindemo/wordpress/wp-content/plugins/onelogin-saml-sso/php/functions.php:253
+#: /var/www/onelogindemo/wordpress/wp-content/plugins/onelogin-saml-sso/php/functions.php:265
 msgid "and fix the problem"
 msgstr ""

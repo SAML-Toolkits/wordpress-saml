@@ -19,11 +19,14 @@ class OneLogin_Saml2_Utils
     public static function t($msg, $args = array())
     {
         assert('is_string($msg)');
+        if (extension_loaded('gettext')) {
+            bindtextdomain("phptoolkit", dirname(dirname(dirname(__FILE__))).'/locale');
+            textdomain('phptoolkit');
 
-        bindtextdomain("phptoolkit", dirname(dirname(dirname(__FILE__))).'/locale');
-        textdomain('phptoolkit');
-
-        $translatedMsg = gettext($msg);
+            $translatedMsg = gettext($msg);
+        } else {
+            $translatedMsg = $msg;
+        }
         if (!empty($args)) {
             $params = array_merge(array($translatedMsg), $args);
             $translatedMsg = call_user_func_array('sprintf', $params);
@@ -149,18 +152,28 @@ class OneLogin_Saml2_Utils
 
     public static function formatPrivateKey($key, $heads = true)
     {
-        $rsaKey = str_replace(array("\x0D", "\r", "\n"), "", $key);
-        if (!empty($rsaKey)) {
-            $rsaKey = str_replace('-----BEGIN RSA PRIVATE KEY-----', "", $rsaKey);
-            $rsaKey = str_replace('-----END RSA PRIVATE KEY-----', "", $rsaKey);
-            $rsaKey = str_replace(' ', '', $rsaKey);
+        $key = str_replace(array("\x0D", "\r", "\n"), "", $key);
+        if (!empty($key)) {
 
-            if ($heads) {
-                $rsaKey = "-----BEGIN RSA PRIVATE KEY-----\n".chunk_split($rsaKey, 64, "\n")."-----END RSA PRIVATE KEY-----\n";
+            if (strpos($key, '-----BEGIN PRIVATE KEY-----') !== false) {
+                $key = str_replace('-----BEGIN PRIVATE KEY-----', "", $key);
+                $key = str_replace('-----END PRIVATE KEY-----', "", $key);
+                $key = str_replace(' ', '', $key);
+
+                if ($heads) {
+                    $key = "-----BEGIN PRIVATE KEY-----\n".chunk_split($key, 64, "\n")."-----END PRIVATE KEY-----\n";
+                }
+            } else {
+                $key = str_replace('-----BEGIN RSA PRIVATE KEY-----', "", $key);
+                $key = str_replace('-----END RSA PRIVATE KEY-----', "", $key);
+                $key = str_replace(' ', '', $key);
+
+                if ($heads) {
+                    $key = "-----BEGIN RSA PRIVATE KEY-----\n".chunk_split($key, 64, "\n")."-----END RSA PRIVATE KEY-----\n";
+                }
             }
-
         }
-        return $rsaKey;
+        return $key;
     }
 
     /**
@@ -213,8 +226,10 @@ class OneLogin_Saml2_Utils
                 $param = urlencode($name) . '=' . urlencode($value);
             }
 
-            $url .= $paramPrefix . $param;
-            $paramPrefix = '&';
+            if (!empty($param)) {
+                $url .= $paramPrefix . $param;
+                $paramPrefix = '&';
+            }
         }
 
         if ($stay) {
@@ -337,6 +352,9 @@ class OneLogin_Saml2_Utils
             $route = $_SERVER['REQUEST_URI'];
             if (!empty($_SERVER['QUERY_STRING'])) {
                 $route = str_replace($_SERVER['QUERY_STRING'], '', $route);
+                if (substr($route, -1) == '?') {
+                    $route = substr($route, 0, -1);
+                }
             }
         }
 
@@ -661,11 +679,11 @@ class OneLogin_Saml2_Utils
      * @param string $value  fingerprint
      * @param string $spnq   SP Name Qualifier
      * @param string $format SP Format
-     * @param string $key    SP Key to encrypt the nameID
+     * @param string $cert   IdP Public cert to encrypt the nameID
      *
      * @return string $nameIDElement DOMElement | XMLSec nameID
      */
-    public static function generateNameId($value, $spnq, $format, $key = null)
+    public static function generateNameId($value, $spnq, $format, $cert = null)
     {
 
         $doc = new DOMDocument();
@@ -677,9 +695,9 @@ class OneLogin_Saml2_Utils
 
         $doc->appendChild($nameId);
 
-        if (!empty($key)) {
+        if (!empty($cert)) {
             $seckey = new XMLSecurityKey(XMLSecurityKey::RSA_1_5, array('type'=>'public'));
-            $seckey->loadKey($key);
+            $seckey->loadKey($cert);
 
             $enc = new XMLSecEnc();
             $enc->setNode($nameId);
@@ -785,7 +803,26 @@ class OneLogin_Saml2_Utils
 
             $encKey = $symmetricKeyInfo->encryptedCtx;
             $symmetricKeyInfo->key = $inputKey->key;
+            $keySize = $symmetricKey->getSymmetricKeySize();
+            if ($keySize === null) {
+                // To protect against "key oracle" attacks
+                throw new Exception('Unknown key size for encryption algorithm: ' . var_export($symmetricKey->type, true));
+            }
+
             $key = $encKey->decryptKey($symmetricKeyInfo);
+            if (strlen($key) != $keySize) {
+                $encryptedKey = $encKey->getCipherValue();
+                $pkey = openssl_pkey_get_details($symmetricKeyInfo->key);
+                $pkey = sha1(serialize($pkey), true);
+                $key = sha1($encryptedKey . $pkey, true);
+
+                /* Make sure that the key has the correct length. */
+                if (strlen($key) > $keySize) {
+                    $key = substr($key, 0, $keySize);
+                } elseif (strlen($key) < $keySize) {
+                    $key = str_pad($key, $keySize);
+                }
+            }
             $symmetricKey->loadkey($key);
         } else {
             $symKeyAlgo = $symmetricKey->getAlgorith();
@@ -803,9 +840,11 @@ class OneLogin_Saml2_Utils
 
         $xml = '<root xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">'.$decrypted.'</root>';
         $newDoc = new DOMDocument();
+        $newDoc->preserveWhiteSpace = false;
+        $newDoc->formatOutput = true;
         $newDoc = self::loadXML($newDoc, $xml);
         if (!$newDoc) {
-            throw new Exception('Failed to parse decrypted XML. Maybe the wrong sharedkey was used?');
+            throw new Exception('Failed to parse decrypted XML.');
         }
  
         $decryptedElement = $newDoc->firstChild->firstChild;
@@ -814,6 +853,35 @@ class OneLogin_Saml2_Utils
         }
 
         return $decryptedElement;
+    }
+
+     /**
+    * Converts a XMLSecurityKey to the correct algorithm.
+    *
+    * @param XMLSecurityKey $key The key.
+    * @param string $algorithm The desired algorithm.
+    * @param string $type Public or private key, defaults to public.
+    * @return XMLSecurityKey The new key.
+    * @throws Exception
+    */
+    public static function castKey(XMLSecurityKey $key, $algorithm, $type = 'public')
+    {
+        assert('is_string($algorithm)');
+        assert('$type === "public" || $type === "private"');
+        // do nothing if algorithm is already the type of the key
+        if ($key->type === $algorithm) {
+            return $key;
+        }
+        $keyInfo = openssl_pkey_get_details($key->key);
+        if ($keyInfo === false) {
+            throw new Exception('Unable to get key details from XMLSecurityKey.');
+        }
+        if (!isset($keyInfo['key'])) {
+            throw new Exception('Missing key in public key details.');
+        }
+        $newKey = new XMLSecurityKey($algorithm, array('type'=>$type));
+        $newKey->loadKey($keyInfo['key']);
+        return $newKey;
     }
 
     /**
@@ -896,7 +964,6 @@ class OneLogin_Saml2_Utils
             $dom = new DOMDocument();
             $dom = self::loadXML($dom, $xml);
         }
-
 
         $objXMLSecDSig = new XMLSecurityDSig();
         $objXMLSecDSig->idKeys = array('ID');
