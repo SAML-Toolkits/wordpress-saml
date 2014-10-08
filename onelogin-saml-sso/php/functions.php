@@ -1,5 +1,24 @@
 <?php
 
+// Make sure we don't expose any info if called directly
+if ( !function_exists( 'add_action' ) ) {
+	echo 'Hi there!  I\'m just a plugin, not much I can do when called directly.';
+	exit;
+}
+
+function saml_checker() {
+	if (isset($_GET['saml_acs'])) {
+		saml_acs();
+	}
+	else if (isset($_GET['saml_sls'])) {
+		saml_sls();
+	} else if (isset($_GET['saml_metadata'])) {
+		saml_metadata();
+	} else if (isset($_GET['saml_validate_config'])) {
+		saml_validate_config();
+	}
+}
+
 function saml_load_translations() {
 	$domain = 'onelogin-saml-sso';
 	$mo_file = plugin_dir_path(dirname(__FILE__)) . 'lang/'.get_locale() . '/' . $domain  . '.mo';
@@ -60,9 +79,9 @@ function saml_acs() {
 
 	$errors = $auth->getErrors();
 	if (!empty($errors)) {
-		echo '<br>'.__("There was at least one error processing the SAML Response", 'onelogin-saml-sso').': ';
+		echo '<br>'.__("There was at least one error processing the SAML Response").': ';
 		echo implode("<br>", $errors);
-		echo '<br>'.__("Contact the administrator", 'onelogin-saml-sso');
+		echo '<br>'.__("Contact the administrator");
 		exit();
 	}
 
@@ -84,11 +103,11 @@ function saml_acs() {
 	}
 
 	if (empty($username)) {
-		echo __("The username could not be retrieved from the IdP and is required", 'onelogin-saml-sso');
+		echo __("The username could not be retrieved from the IdP and is required");
 		exit();
 	}
 	else if (empty($email)) {
-		echo __("The email could not be retrieved from the IdP and is required", 'onelogin-saml-sso');
+		echo __("The email could not be retrieved from the IdP and is required");
 		exit();	
 	} else {
 		$userdata = array();
@@ -116,11 +135,9 @@ function saml_acs() {
 			$contributorsRole = explode(',', get_option('onelogin_saml_role_mapping_contributor'));
 			$subscribersRole = explode(',', get_option('onelogin_saml_role_mapping_subscriber'));
 
-			/* In order to use custom roles, you only need to uncomment those lines, set $foundCustomizedRole
-			 * to true and replace the values
-			 *
-			 * First we assign possible OneLogin roles that we want to map with Wordpress Roles
-			 * Then we asigned to the $userdata['role'] the name of the Wordpress role
+			/* In order to use custom roles, you only need to uncomment those lines and replace the values
+			 *  First we assign possible OneLogin roles that we want to map with Wordpress Roles
+			 *  Then we asigned to the $userdata['role'] the name of the Wordpress role
 			 */
 
 			//$customRole1 = array('value1', 'value2');  // value1 and value2 are roles of OneLogin platform that will be mapped to customRole1
@@ -200,10 +217,7 @@ function saml_acs() {
 			}
 		}
 	}
-
-	require_once ABSPATH . WPINC . '/registration.php';
-	require_once ABSPATH . WPINC . '/pluggable.php';
-
+	
 	$matcher = get_option('onelogin_saml_account_matcher');
 
 	if (empty($matcher) || $matcher == 'username') {
@@ -222,13 +236,13 @@ function saml_acs() {
 		}
 	} else if (get_option('onelogin_saml_autocreate')) {
 		if (!validate_username($username)) {
-			echo __("The username provided by the IdP", 'onelogin-saml-sso'). ' "'. $username. '" '. __("is not valid and can't create the user at wordpress", 'onelogin-saml-sso');
+			echo __("The username provided by the IdP"). ' "'. $username. '" '. __("is not valid and can't create the user at wordpress");
 			return false;			
 		}
 		$userdata['user_pass'] = '@@@nopass@@@';
 		$user_id = wp_insert_user($userdata);
 	} else {
-		echo __("User provided by the IdP ", 'onelogin-saml-sso'). ' "'. $matcherValue. '" '. __("not exists in wordpress and auto-provisioning is disabled.", 'onelogin-saml-sso');
+		echo __("User provided by the IdP "). ' "'. $matcherValue. '" '. __("not exists in wordpress and auto-provisioning is disabled.");
 		return false;
 	}
 
@@ -278,6 +292,25 @@ function saml_sls() {
 			wp_redirect(home_url());
 		}
 	}
+}
+
+function saml_metadata() {
+	$auth = initialize_saml();
+	$settings = $auth->getSettings();
+	$metadata = $settings->getSPMetadata();
+	
+	header('Content-Type: text/xml');
+	echo $metadata;
+	exit();
+}
+
+
+function saml_validate_config() {
+	saml_load_translations();
+	require_once plugin_dir_path(__FILE__).'_toolkit_loader.php';
+	require plugin_dir_path(__FILE__).'settings.php';
+	require_once plugin_dir_path(__FILE__)."validate.php";
+	exit();
 }
 
 function initialize_saml() {
