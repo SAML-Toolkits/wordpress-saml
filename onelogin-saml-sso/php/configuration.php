@@ -7,7 +7,7 @@ if ( !function_exists( 'add_action' ) ) {
 }
 
 	function onelogin_saml_configuration_render() {
-		$title = __("OneLogin SSO/SAML Settings", 'onelogin-saml-sso');
+		$title = __("SSO/SAML Settings", 'onelogin-saml-sso');
 		?>
 			<div class="wrap">
 				<?php screen_icon(); ?>
@@ -113,6 +113,9 @@ if ( !function_exists( 'add_action' ) ) {
 
 		register_setting($option_group, 'onelogin_saml_customize_action_prevent_change_mail');
 		add_settings_field('onelogin_saml_customize_action_prevent_change_mail', __('Prevent change mail', 'onelogin-saml-sso'), "plugin_setting_boolean_onelogin_saml_customize_action_prevent_change_mail", $option_group, 'customize_links');
+
+		register_setting($option_group, 'onelogin_saml_customize_stay_in_wordpress_after_slo');
+		add_settings_field('onelogin_saml_customize_stay_in_wordpress_after_slo', __('Stay in Wordpress after SLO', 'onelogin-saml-sso'), "plugin_setting_boolean_onelogin_saml_customize_stay_in_wordpress_after_slo", $option_group, 'customize_links');
 
 		register_setting($option_group, 'onelogin_saml_customize_links_user_registration');
 		add_settings_field('onelogin_saml_customize_links_user_registration', __('User Registration', 'onelogin-saml-sso'), "plugin_setting_string_onelogin_saml_customize_links_user_registration", $option_group, 'customize_links');
@@ -293,6 +296,13 @@ if ( !function_exists( 'add_action' ) ) {
 		echo '<input type="checkbox" name="onelogin_saml_customize_action_prevent_change_mail" id="onelogin_saml_customize_action_prevent_change_mail"
 			  '.($value ? 'checked="checked"': '').'>
 			  <p class="description">'.__("Check it in order to disable the ability of change the mail on Wordpress (we recommend that if you are using mail as the account matcher field.", 'onelogin-saml-sso').'</p>';
+	}
+
+	function plugin_setting_boolean_onelogin_saml_customize_stay_in_wordpress_after_slo() {
+		$value = get_option('onelogin_saml_customize_stay_in_wordpress_after_slo');
+		echo '<input type="checkbox" name="onelogin_saml_customize_stay_in_wordpress_after_slo" id="onelogin_saml_customize_stay_in_wordpress_after_slo"
+			  '.($value ? 'checked="checked"': '').'>
+			  <p class="description">'.__("If SLO and Force SAML login are enabled, after the SLO process you will be redirected to the WP main page and a SAML SSO process will start, to prevent that check this and you will stay at the Wordpress Login Form. ", 'onelogin-saml-sso').'</p>';
 	}
 
 	function plugin_setting_string_onelogin_saml_customize_links_user_registration() {

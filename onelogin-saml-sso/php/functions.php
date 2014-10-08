@@ -44,18 +44,6 @@ function saml_user_register() {
 }
 
 function saml_sso() {
-	$slo = get_option('onelogin_saml_slo');	
-
-	if (!$slo) {
-		if (isset($_GET['action']) && $_GET['action']  == 'logout') {
-			wp_logout();
-			return false;
-		} else if (isset($_GET['loggedout']) && $_GET['loggedout']) {
-			setcookie('saml_login', 0, time() - 3600, SITECOOKIEPATH );
-			return false;
-		}
-	}
-
 	if (is_user_logged_in()) {
 		return true;
 	}
@@ -69,9 +57,18 @@ function saml_sso() {
 }
 
 function saml_slo() {
-	setcookie('saml_login', 0, time() - 3600, SITECOOKIEPATH );
-	$auth = initialize_saml();
-	$auth->logout(get_site_url());
+	$slo = get_option('onelogin_saml_slo');
+
+	if (isset($_GET['action']) && $_GET['action']  == 'logout') {
+		if (!$slo) {
+			wp_logout();
+			return false;
+		} else {
+			$auth = initialize_saml();
+			$auth->logout(home_url());
+			return false;
+		}
+	}
 }
 
 
@@ -283,8 +280,18 @@ function saml_acs() {
 function saml_sls() {
 	$auth = initialize_saml();
 	$auth->processSLO();
-	wp_redirect(home_url());
-	exit();
+	wp_logout();
+	setcookie('saml_login', 0, time() - 3600, SITECOOKIEPATH );
+
+	if (get_option('onelogin_saml_forcelogin') && get_option('onelogin_saml_customize_stay_in_wordpress_after_slo')) {
+		wp_redirect(home_url().'/wp-login.php?loggedout=true');
+	} else {
+		if (isset($_REQUEST['RelayState'])) {
+			wp_redirect($_REQUEST['RelayState']);
+		} else {
+			wp_redirect(home_url());
+		}
+	}
 }
 
 function saml_metadata() {
