@@ -102,17 +102,37 @@ function saml_acs() {
 		}
 	}
 
-	if (empty($username)) {
+	$matcher = get_option('onelogin_saml_account_matcher');
+	$default_logged_user = get_option('onelogin_saml_customize_links_default_logged_user');
+	$default_user_id = false;
+
+	if (!empty($default_logged_user)) {
+		if (empty($matcher) || $matcher == 'username') {
+			$default_user_id = username_exists($default_logged_user);
+		} else {
+			$default_user_id = email_exists($default_logged_user);
+		}
+	} else if (empty($username)) {
 		echo __("The username could not be retrieved from the IdP and is required");
 		exit();
 	}
 	else if (empty($email)) {
 		echo __("The email could not be retrieved from the IdP and is required");
 		exit();	
-	} else {
+	}
+
+	if (!empty($username) && !empty($email)) {
 		$userdata = array();
 		$userdata['user_login'] = wp_slash($username);
 		$userdata['user_email'] = wp_slash($email);
+
+		if (empty($matcher) || $matcher == 'username') {
+			$matcherValue = $userdata['user_login'];
+			$user_id = username_exists($matcherValue);
+		} else {
+			$matcherValue = $userdata['user_email'];
+			$user_id = email_exists($matcherValue);
+		}
 	}
 
 	if (!empty($attrs)) {
@@ -217,33 +237,31 @@ function saml_acs() {
 			}
 		}
 	}
-	
-	$matcher = get_option('onelogin_saml_account_matcher');
 
-	if (empty($matcher) || $matcher == 'username') {
-		$matcherValue = $userdata['user_login'];
-		$user_id = username_exists($matcherValue);		
-	} else {
-		$matcherValue = $userdata['user_email'];
-		$user_id = email_exists($matcherValue);
-	}
-
-	if ($user_id) {
-		if (get_option('onelogin_saml_updateuser')) {
-			$userdata['ID'] = $user_id;
-			unset($userdata['$user_pass']);
-			$user_id = wp_update_user($userdata);
+	if (isset($userdata)) {
+		if ($user_id) {
+			if (get_option('onelogin_saml_updateuser')) {
+				$userdata['ID'] = $user_id;
+				unset($userdata['$user_pass']);
+				$user_id = wp_update_user($userdata);
+			}
+		} else if (get_option('onelogin_saml_autocreate')) {
+			if (!validate_username($username)) {
+				echo __("The username provided by the IdP"). ' "'. $username. '" '. __("is not valid and can't create the user at wordpress");
+				return false;			
+			}
+			$userdata['user_pass'] = '@@@nopass@@@';
+			$user_id = wp_insert_user($userdata);
+		} else if (!empty($default_logged_user)) {
+			if (!$default_user_id ) {
+				echo __("User provided by the IdP "). ' "'. $matcherValue. '" '. __("not exists in wordpress and auto-provisioning is disabled.");
+				return false;
+			} else {
+				$user_id = $default_user_id;
+			}
 		}
-	} else if (get_option('onelogin_saml_autocreate')) {
-		if (!validate_username($username)) {
-			echo __("The username provided by the IdP"). ' "'. $username. '" '. __("is not valid and can't create the user at wordpress");
-			return false;			
-		}
-		$userdata['user_pass'] = '@@@nopass@@@';
-		$user_id = wp_insert_user($userdata);
-	} else {
-		echo __("User provided by the IdP "). ' "'. $matcherValue. '" '. __("not exists in wordpress and auto-provisioning is disabled.");
-		return false;
+	} else if ($default_user_id) {
+		$user_id = $default_user_id;
 	}
 
 	if (is_a($user_id, 'WP_Error')) {
@@ -255,6 +273,9 @@ function saml_acs() {
 		wp_set_auth_cookie($user_id);
 		setcookie('saml_login', 1, time() + YEAR_IN_SECONDS, SITECOOKIEPATH );
 		do_action('wp_login', $user_id);
+	} else {
+		echo __("With the data provided by the IdP can't log in, enable a valid default logged user");
+		exit();
 	}
 
 	if (isset($_REQUEST['RelayState'])) {

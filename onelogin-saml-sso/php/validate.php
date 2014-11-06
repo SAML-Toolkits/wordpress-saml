@@ -130,7 +130,27 @@ if (!empty($lacked_role_mappings)) {
 	echo '<br>'.__("Notice that there are roles without mapping:", 'onelogin-saml-sso').'<br>';
 	print_r(implode('<br>', $lacked_role_mappings).'</br>');
 }
+
+$default_logged_user = get_option('onelogin_saml_customize_links_default_logged_user');
+if (!empty($default_logged_user)) {
+	$matcher = get_option('onelogin_saml_account_matcher');
+
+	if (empty($matcher) || $matcher == 'username') {
+		$user_id = username_exists($default_logged_user);
+	} else {
+		$matcherValue = $userdata['user_email'];
+		$user_id = email_exists($default_logged_user);
+	}
+
+	if (!$user_id) {
+		echo '<br>'.__("The value of the 'default logged user' is not valid, does not match any wordpress account.", 'onelogin-saml-sso').'<br>';
+	} else {
+		echo '<br>'.__("User logged in the IdP that can't be created/found, will be logged as ".$default_logged_user.".", 'onelogin-saml-sso').'<br>';
+	}
+}
+
 ?>
+
 
 </body>
 </html>

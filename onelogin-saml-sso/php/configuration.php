@@ -114,6 +114,10 @@ if ( !function_exists( 'add_action' ) ) {
 		register_setting($option_group, 'onelogin_saml_customize_action_prevent_change_mail');
 		add_settings_field('onelogin_saml_customize_action_prevent_change_mail', __('Prevent change mail', 'onelogin-saml-sso'), "plugin_setting_boolean_onelogin_saml_customize_action_prevent_change_mail", $option_group, 'customize_links');
 
+		register_setting($option_group, 'onelogin_saml_customize_links_default_logged_user');
+		add_settings_field('onelogin_saml_customize_links_default_logged_user', __('Default logged user', 'onelogin-saml-sso'), "plugin_setting_string_onelogin_saml_customize_links_default_logged_user", $option_group, 'customize_links');
+
+
 		register_setting($option_group, 'onelogin_saml_customize_stay_in_wordpress_after_slo');
 		add_settings_field('onelogin_saml_customize_stay_in_wordpress_after_slo', __('Stay in Wordpress after SLO', 'onelogin-saml-sso'), "plugin_setting_boolean_onelogin_saml_customize_stay_in_wordpress_after_slo", $option_group, 'customize_links');
 
@@ -298,6 +302,12 @@ if ( !function_exists( 'add_action' ) ) {
 			  <p class="description">'.__("Check it in order to disable the ability of change the mail on Wordpress (we recommend that if you are using mail as the account matcher field.", 'onelogin-saml-sso').'</p>';
 	}
 
+	function plugin_setting_string_onelogin_saml_customize_links_default_logged_user() {
+		echo '<input type="text" name="onelogin_saml_customize_links_default_logged_user" id="onelogin_saml_customize_links_default_logged_user"
+			  value= "'.get_option('onelogin_saml_customize_links_default_logged_user').'" size="30">
+			  <p class="description">'.__("If an user is logged in the IdP but not enought data is provided to match a wordpress user account or the account does not exists and auto-provisioning is disable, You can set here an username/email (depends what was set as matcher). The user will be logged in wordpress with the related account.", 'onelogin-saml-sso').'</p>';
+	}
+
 	function plugin_setting_boolean_onelogin_saml_customize_stay_in_wordpress_after_slo() {
 		$value = get_option('onelogin_saml_customize_stay_in_wordpress_after_slo');
 		echo '<input type="checkbox" name="onelogin_saml_customize_stay_in_wordpress_after_slo" id="onelogin_saml_customize_stay_in_wordpress_after_slo"
@@ -334,7 +344,7 @@ if ( !function_exists( 'add_action' ) ) {
 
 	function plugin_setting_string_onelogin_saml_advanced_settings_sp_entity_id() {
 		echo '<input type="text" name="onelogin_saml_advanced_settings_sp_entity_id" id="onelogin_saml_advanced_settings_sp_entity_id"
-			  value= "'.get_option('onelogin_saml_advanced_settings_sp_entity_id').'" size="30">'.
+			  value= "'.get_option('onelogin_saml_advanced_settings_sp_entity_id').'" size="60">'.
 			  '<p class="description">'.__("Set the Entity ID for the Service Provider. If not provided, 'php-saml' will be used.", 'onelogin-saml-sso').'</p>';
 	}
 
