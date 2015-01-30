@@ -383,6 +383,19 @@ class OneLogin_Saml2_Utils
         return $selfURLhost . $requestURI;
     }
 
+     /**
+     * Extract a query param - as it was sent - from $_SERVER[QUERY_STRING]
+     *
+     * @param string The param to-be extracted
+     */
+    public static function extractOriginalQueryParam ($name)
+    {
+        $index = strpos($_SERVER['QUERY_STRING'], $name.'=');
+        $substring = substr($_SERVER['QUERY_STRING'], $index + strlen($name) + 1);
+        $end = strpos($substring, '&');
+        return $end ? substr($substring, 0, strpos($substring, '&')) : $substring;
+    }
+
     /**
      * Generates an unique string (used for example as ID for assertions).
      *
@@ -749,7 +762,12 @@ class OneLogin_Saml2_Utils
 
         $messageEntry = self::query($dom, '/samlp:Response/samlp:Status/samlp:StatusMessage', $statusEntry->item(0));
         if ($messageEntry->length == 0) {
-            $status['msg'] = '';
+            $subCodeEntry = self::query($dom, '/samlp:Response/samlp:Status/samlp:StatusCode/samlp:StatusCode', $statusEntry->item(0));
+            if ($subCodeEntry->length > 0) {
+                $status['msg'] = $subCodeEntry->item(0)->getAttribute('Value');
+            } else {
+                $status['msg'] = '';
+            }
         } else {
             $msg = $messageEntry->item(0)->textContent;
             $status['msg'] = $msg;
@@ -927,8 +945,8 @@ class OneLogin_Saml2_Utils
         $objXMLSecDSig->add509Cert($cert, true);
 
         $insertBefore = $rootNode->firstChild;
-        $messageTypes = array('samlp:AuthnRequest', 'samlp:Response', 'samlp:LogoutRequest','samlp:LogoutResponse');
-        if (in_array($rootNode->tagName, $messageTypes)) {
+        $messageTypes = array('AuthnRequest', 'Response', 'LogoutRequest','LogoutResponse');
+        if (in_array($rootNode->localName, $messageTypes)) {
             $issuerNodes = self::query($dom, '/'.$rootNode->tagName.'/saml:Issuer');
             if ($issuerNodes->length == 1) {
                 $insertBefore = $issuerNodes->item(0)->nextSibling;

@@ -29,10 +29,11 @@ class OneLogin_Saml2_LogoutRequest
      *
      * @param OneLogin_Saml2_Settings $settings Settings
      * @param string                  $response A UUEncoded Logout Request.
+     * @param string                  $nameId   The NameID that will be set in the LogoutRequest.
      * @param string                  $session  The SessionIndex (taken from the SAML Response in the SSO process).
      *
      */
-    public function __construct(OneLogin_Saml2_Settings $settings, $request = null, $sessionIndex = null)
+    public function __construct(OneLogin_Saml2_Settings $settings, $request = null, $nameId = null,$sessionIndex = null)
     {
 
         $this->_settings = $settings;
@@ -52,10 +53,17 @@ class OneLogin_Saml2_LogoutRequest
                 $cert = $idpData['x509cert'];
             }
 
-            $nameId = OneLogin_Saml2_Utils::generateNameId(
-                $nameIdValue,
+            if (!empty($nameId)) {
+                $nameIdFormat = $spData['NameIDFormat'];
+            } else {
+                $nameId = $idpData['entityId'];
+                $nameIdFormat = OneLogin_Saml2_Constants::NAMEID_ENTITY;
+            }
+
+            $nameIdObj = OneLogin_Saml2_Utils::generateNameId(
+                $nameId,
                 $spData['entityId'],
-                $spData['NameIDFormat'],
+                $nameIdFormat,
                 $cert
             );
 
@@ -70,7 +78,7 @@ class OneLogin_Saml2_LogoutRequest
     IssueInstant="{$issueInstant}"
     Destination="{$idpData['singleLogoutService']['url']}">
     <saml:Issuer>{$spData['entityId']}</saml:Issuer>
-    {$nameId}
+    {$nameIdObj}
     {$sessionIndexStr}
 </samlp:LogoutRequest>
 LOGOUTREQUEST;
@@ -243,7 +251,7 @@ LOGOUTREQUEST;
      *
      * @return boolean If the Logout Request is or not valid
      */
-    public function isValid()
+    public function isValid($retrieveParametersFromServer=false)
     {
         $this->_error = null;
         try {
@@ -305,11 +313,19 @@ LOGOUTREQUEST;
                     $signAlg = $_GET['SigAlg'];
                 }
 
-                $signedQuery = 'SAMLRequest='.urlencode($_GET['SAMLRequest']);
-                if (isset($_GET['RelayState'])) {
-                    $signedQuery .= '&RelayState='.urlencode($_GET['RelayState']);
+                if ($retrieveParametersFromServer) {
+                    $signedQuery = 'SAMLRequest='.OneLogin_Saml2_Utils::extractOriginalQueryParam('SAMLRequest');
+                    if (isset($_GET['RelayState'])) {
+                        $signedQuery .= '&RelayState='.OneLogin_Saml2_Utils::extractOriginalQueryParam('RelayState');
+                    }
+                    $signedQuery .= '&SigAlg='.OneLogin_Saml2_Utils::extractOriginalQueryParam('SigAlg');
+                } else {
+                    $signedQuery = 'SAMLRequest='.urlencode($_GET['SAMLRequest']);
+                    if (isset($_GET['RelayState'])) {
+                        $signedQuery .= '&RelayState='.urlencode($_GET['RelayState']);
+                    }
+                    $signedQuery .= '&SigAlg='.urlencode($signAlg);
                 }
-                $signedQuery .= '&SigAlg='.urlencode($signAlg);
 
                 if (!isset($idpData['x509cert']) || empty($idpData['x509cert'])) {
                     throw new Exception('In order to validate the sign on the Logout Request, the x509cert of the IdP is required');

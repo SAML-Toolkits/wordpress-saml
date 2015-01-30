@@ -29,8 +29,10 @@ class OneLogin_Saml2_AuthnRequest
      * Constructs the AuthnRequest object.
      *
      * @param OneLogin_Saml2_Settings $settings Settings
+     * @param bool   $forceAuthn When true the AuthNReuqest will set the ForceAuthn='true'
+     * @param bool   $isPassive  When true the AuthNReuqest will set the Ispassive='true' 
      */
-    public function __construct(OneLogin_Saml2_Settings $settings)
+    public function __construct(OneLogin_Saml2_Settings $settings, $forceAuthn = false, $isPassive = false)
     {
         $this->_settings = $settings;
 
@@ -62,13 +64,46 @@ PROVIDERNAME;
             }
         }
 
+        $forceAuthnStr = '';
+        if ($forceAuthn) {
+            $forceAuthnStr = <<<FORCEAUTHN
+
+    ForceAuthn="true"
+FORCEAUTHN;
+        }
+
+        $isPassiveStr = '';
+        if ($isPassive) {
+            $isPassiveStr = <<<ISPASSIVE
+
+    IsPassive="true"
+ISPASSIVE;
+        }
+
+        $requestedAuthnStr = '';
+        if (isset($security['requestedAuthnContext']) && $security['requestedAuthnContext'] !== false) {
+            if ($security['requestedAuthnContext'] === true) {
+                $requestedAuthnStr = <<<REQUESTEDAUTHN
+    <samlp:RequestedAuthnContext Comparison="exact">
+        <saml:AuthnContextClassRef>urn:oasis:names:tc:SAML:2.0:ac:classes:PasswordProtectedTransport</saml:AuthnContextClassRef>
+    </samlp:RequestedAuthnContext>
+REQUESTEDAUTHN;
+            } else {
+                $requestedAuthnStr .= "    <samlp:RequestedAuthnContext Comparison=\"exact\">\n";
+                foreach ($security['requestedAuthnContext'] as $contextValue) {
+                    $requestedAuthnStr .= "        <saml:AuthnContextClassRef>".$contextValue."</saml:AuthnContextClassRef>\n";
+                }
+                $requestedAuthnStr .= '    </samlp:RequestedAuthnContext>';
+            }
+        }
+
         $request = <<<AUTHNREQUEST
 <samlp:AuthnRequest
     xmlns:samlp="urn:oasis:names:tc:SAML:2.0:protocol"
     xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion"
     ID="$id"
     Version="2.0"
-{$providerNameStr}
+{$providerNameStr}{$forceAuthnStr}{$isPassiveStr}
     IssueInstant="$issueInstant"
     Destination="{$idpData['singleSignOnService']['url']}"
     ProtocolBinding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST"
@@ -77,9 +112,7 @@ PROVIDERNAME;
     <samlp:NameIDPolicy
         Format="{$nameIDPolicyFormat}"
         AllowCreate="true" />
-    <samlp:RequestedAuthnContext Comparison="exact">
-        <saml:AuthnContextClassRef>urn:oasis:names:tc:SAML:2.0:ac:classes:PasswordProtectedTransport</saml:AuthnContextClassRef>
-    </samlp:RequestedAuthnContext>    
+{$requestedAuthnStr}
 </samlp:AuthnRequest>
 AUTHNREQUEST;
 
