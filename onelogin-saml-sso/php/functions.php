@@ -272,8 +272,7 @@ function saml_acs() {
 			}
 		}
 	} else {
-		echo __("SLS endpoint found an error.").$auth->getLastErrorReason();
-		return false;
+		wp_redirect(home_url());
 	}
 	exit();
 }
@@ -295,8 +294,8 @@ function saml_sls() {
 			}
 		}
 	} else {
-		
-		wp_redirect(home_url());
+		echo __("SLS endpoint found an error.").$auth->getLastErrorReason();
+		return false;
 	}
 }
 
