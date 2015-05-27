@@ -272,7 +272,8 @@ function saml_acs() {
 			}
 		}
 	} else {
-		wp_redirect(home_url());
+		echo __("SLS endpoint found an error.").$auth->getLastErrorReason();
+		return false;
 	}
 	exit();
 }
@@ -280,17 +281,22 @@ function saml_acs() {
 function saml_sls() {
 	$auth = initialize_saml();
 	$auth->processSLO();
-	wp_logout();
-	setcookie('saml_login', 0, time() - 3600, SITECOOKIEPATH );
+	if (empty($auth->getErrors())) {
+		wp_logout();
+		setcookie('saml_login', 0, time() - 3600, SITECOOKIEPATH );
 
-	if (get_option('onelogin_saml_forcelogin') && get_option('onelogin_saml_customize_stay_in_wordpress_after_slo')) {
-		wp_redirect(home_url().'/wp-login.php?loggedout=true');
-	} else {
-		if (isset($_REQUEST['RelayState'])) {
-			wp_redirect($_REQUEST['RelayState']);
+		if (get_option('onelogin_saml_forcelogin') && get_option('onelogin_saml_customize_stay_in_wordpress_after_slo')) {
+			wp_redirect(home_url().'/wp-login.php?loggedout=true');
 		} else {
-			wp_redirect(home_url());
+			if (isset($_REQUEST['RelayState'])) {
+				wp_redirect($_REQUEST['RelayState']);
+			} else {
+				wp_redirect(home_url());
+			}
 		}
+	} else {
+		
+		wp_redirect(home_url());
 	}
 }
 
