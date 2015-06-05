@@ -260,19 +260,14 @@ class OneLogin_Saml2_Utils
             $protocol = 'http';
         }
 
-        if (isset($_SERVER["SERVER_PORT"])) {
+        if (isset($_SERVER["HTTP_X_FORWARDED_PORT"])) {
+            $portnumber = $_SERVER["HTTP_X_FORWARDED_PORT"];
+        } else if (isset($_SERVER["SERVER_PORT"])) {
             $portnumber = $_SERVER["SERVER_PORT"];
-            $port = ':' . $portnumber;
+        }
 
-            if ($protocol == 'http') {
-                if ($portnumber == '80') {
-                    $port = '';
-                }
-            } elseif ($protocol == 'https') {
-                if ($portnumber == '443') {
-                    $port = '';
-                }
-            }
+        if (isset($portnumber) && ($portnumber != '80') && ($portnumber != '443')) {
+            $port = ':' . $portnumber;
         }
 
         return $protocol."://" . $currenthost . $port;
@@ -315,10 +310,9 @@ class OneLogin_Saml2_Utils
      */
     public static function isHTTPS()
     {
-        $isHttps = (!empty($_SERVER['HTTPS'])
-                    && $_SERVER['HTTPS'] !== 'off'
+        $isHttps =  (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off')
                     || (isset($_SERVER['SERVER_PORT']) && $_SERVER['SERVER_PORT'] == 443)
-        );
+                    || (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] == 'https');
         return $isHttps;
     }
 
@@ -640,7 +634,7 @@ class OneLogin_Saml2_Utils
      *
      * @return string Formated fingerprint
      */
-    public static function calculateX509Fingerprint($x509cert)
+    public static function calculateX509Fingerprint($x509cert, $alg='sha1')
     {
         assert('is_string($x509cert)');
 
@@ -665,11 +659,20 @@ class OneLogin_Saml2_Utils
                 $data .= $line;
             }
         }
+        $decodedData = base64_decode($data);
 
-        /* $data now contains the certificate as a base64-encoded string. The fingerprint
-         * of the certificate is the sha1-hash of the certificate.
-         */
-        return strtolower(sha1(base64_decode($data)));
+        switch ($alg) {
+            case 'sha512':
+            case 'sha384':
+            case 'sha256':
+                $fingerprint = hash($alg, $decodedData, FALSE);
+                break;
+            case 'sha1':
+            default:
+                $fingerprint = strtolower(sha1($decodedData));
+                break;
+        }
+        return $fingerprint;
     }
 
     /**
@@ -968,11 +971,12 @@ class OneLogin_Saml2_Utils
     /**
      * Validates a signature (Message or Assertion).
      *
-     * @param string|DomDocument $xml         The element we should validate
-     * @param string|null        $cert        The pubic cert
-     * @param string|null        $fingerprint The fingerprint of the public cert
+     * @param string|DomDocument $xml            The element we should validate
+     * @param string|null        $cert           The pubic cert
+     * @param string|null        $fingerprint    The fingerprint of the public cert
+     * @param string|null        $fingerprintalg The algorithm used to get the fingerprint
      */
-    public static function validateSign ($xml, $cert = null, $fingerprint = null)
+    public static function validateSign ($xml, $cert = null, $fingerprint = null, $fingerprintalg = 'sha1')
     {
         if ($xml instanceof DOMDocument) {
             $dom = clone $xml;
@@ -1011,7 +1015,7 @@ class OneLogin_Saml2_Utils
             return ($objXMLSecDSig->verify($objKey) === 1);
         } else {
             $domCert = $objKey->getX509Certificate();
-            $domCertFingerprint = OneLogin_Saml2_Utils::calculateX509Fingerprint($domCert);
+            $domCertFingerprint = OneLogin_Saml2_Utils::calculateX509Fingerprint($domCert, $fingerprintalg);
             if (OneLogin_Saml2_Utils::formatFingerPrint($fingerprint) !== $domCertFingerprint) {
                 return false;
             } else {

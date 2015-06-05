@@ -122,13 +122,14 @@ class OneLogin_Saml2_Response
             }
 
             if ($this->_settings->isStrict()) {
-
-                $res = OneLogin_Saml2_Utils::validateXML($this->document, 'saml-schema-protocol-2.0.xsd', $this->_settings->isDebugActive());
-                if (!$res instanceof DOMDocument) {
-                    throw new Exception("Invalid SAML Response. Not match the saml-schema-protocol-2.0.xsd");
-                }
-
                 $security = $this->_settings->getSecurityData();
+
+                if ($security['wantXMLValidation']) {
+                    $res = OneLogin_Saml2_Utils::validateXML($this->document, 'saml-schema-protocol-2.0.xsd', $this->_settings->isDebugActive());
+                    if (!$res instanceof DOMDocument) {
+                        throw new Exception("Invalid SAML Response. Not match the saml-schema-protocol-2.0.xsd");
+                    }
+                }
 
                 $currentURL = OneLogin_Saml2_Utils::getSelfRoutedURLNoQuery();
                 
@@ -256,6 +257,7 @@ class OneLogin_Saml2_Response
             if (!empty($signedElements)) {
                 $cert = $idpData['x509cert'];
                 $fingerprint = $idpData['certFingerprint'];
+                $fingerprintalg = $idpData['certFingerprintAlgorithm'];
 
                 // Only validates the first signed element
                 if (in_array('Response', $signedElements)) {
@@ -270,7 +272,7 @@ class OneLogin_Saml2_Response
                     }
                 }
 
-                if (!OneLogin_Saml2_Utils::validateSign($documentToValidate, $cert, $fingerprint)) {
+                if (!OneLogin_Saml2_Utils::validateSign($documentToValidate, $cert, $fingerprint, $fingerprintalg)) {
                     throw new Exception('Signature validation failed. SAML Response rejected');
                 }
             } else {

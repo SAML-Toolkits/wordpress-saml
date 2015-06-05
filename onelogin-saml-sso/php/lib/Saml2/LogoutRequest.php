@@ -6,6 +6,13 @@
  */
 class OneLogin_Saml2_LogoutRequest
 {
+
+    /**
+    * Contains the ID of the Logout Request
+    * @var string
+    */
+    public $id;
+
     /**
      * Object that represents the setting info
      * @var OneLogin_Saml2_Settings
@@ -45,6 +52,8 @@ class OneLogin_Saml2_LogoutRequest
             $security = $this->_settings->getSecurityData();
 
             $id = OneLogin_Saml2_Utils::generateUniqueID();
+            $this->id = $id;
+
             $nameIdValue = OneLogin_Saml2_Utils::generateUniqueID();
             $issueInstant = OneLogin_Saml2_Utils::parseTime2SAML(time());
             
@@ -91,6 +100,7 @@ LOGOUTREQUEST;
             } else {
                 $logoutRequest = $decoded;
             }
+            $this->id = self::getID($logoutRequest);
         }
         $this->_logoutRequest = $logoutRequest;
     }
@@ -262,14 +272,15 @@ LOGOUTREQUEST;
             $idPEntityId = $idpData['entityId'];
 
             if ($this->_settings->isStrict()) {
-
-                $res = OneLogin_Saml2_Utils::validateXML($dom, 'saml-schema-protocol-2.0.xsd', $this->_settings->isDebugActive());
-                if (!$res instanceof DOMDocument) {
-                    throw new Exception("Invalid SAML Logout Request. Not match the saml-schema-protocol-2.0.xsd");
-                }
-
                 $security = $this->_settings->getSecurityData();
 
+                if ($security['wantXMLValidation']) {
+                    $res = OneLogin_Saml2_Utils::validateXML($dom, 'saml-schema-protocol-2.0.xsd', $this->_settings->isDebugActive());
+                    if (!$res instanceof DOMDocument) {
+                        throw new Exception("Invalid SAML Logout Request. Not match the saml-schema-protocol-2.0.xsd");
+                    }
+                }
+                
                 $currentURL = OneLogin_Saml2_Utils::getSelfRoutedURLNoQuery();
 
                 // Check NotOnOrAfter
