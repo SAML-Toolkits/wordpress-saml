@@ -280,7 +280,8 @@ function saml_acs() {
 function saml_sls() {
 	$auth = initialize_saml();
 	$auth->processSLO();
-	if (empty($auth->getErrors())) {
+	$errors = $auth->getErrors();
+	if (empty($errors)) {
 		wp_logout();
 		setcookie('saml_login', 0, time() - 3600, SITECOOKIEPATH );
 
