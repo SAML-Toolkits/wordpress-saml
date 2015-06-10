@@ -254,7 +254,6 @@ function saml_acs() {
 		wp_set_current_user($user_id);
 		wp_set_auth_cookie($user_id);
 		setcookie('saml_login', 1, time() + YEAR_IN_SECONDS, SITECOOKIEPATH );
-		wp_signon($user_id);
 	}
 
 	if (isset($_REQUEST['RelayState'])) {
