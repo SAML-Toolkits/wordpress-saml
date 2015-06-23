@@ -5,6 +5,9 @@ if ( !function_exists( 'add_action' ) ) {
 	echo 'Hi there!  I\'m just a plugin, not much I can do when called directly.';
 	exit;
 }
+	
+require_once (dirname(__FILE__) . "/lib/Saml2/Constants.php");
+
 
 	function onelogin_saml_configuration_render() {
 		$title = __("SSO/SAML Settings", 'onelogin-saml-sso');
@@ -141,13 +144,16 @@ if ( !function_exists( 'add_action' ) ) {
 			'onelogin_saml_advanced_settings_logout_request_signed' => __('Sign LogoutRequest', 'onelogin-saml-sso'),
 			'onelogin_saml_advanced_settings_logout_response_signed' => __('Sign LogoutResponse', 'onelogin-saml-sso'),
 			'onelogin_saml_advanced_settings_want_message_signed' => __('Reject Unsigned Messages', 'onelogin-saml-sso'),
-			'onelogin_saml_advanced_settings_want_assertion_signed' => __('Reject Unsigned Assertions', 'onelogin-saml-sso'),						
+			'onelogin_saml_advanced_settings_want_assertion_signed' => __('Reject Unsigned Assertions', 'onelogin-saml-sso'),
 			'onelogin_saml_advanced_settings_want_assertion_encrypted' => __('Reject Unencrypted Assertions', 'onelogin-saml-sso')
 		);
 		foreach ($mapping_fields as $name => $description) {
 			register_setting($option_group, $name);
 			add_settings_field($name, $description, "plugin_setting_boolean_$name", $option_group, 'advanced_settings');
 		}
+
+		register_setting($option_group, 'onelogin_saml_advanced_nameidformat');
+		add_settings_field('onelogin_saml_advanced_nameidformat', __('NameIDFormat', 'onelogin-saml-sso'), "plugin_setting_select_onelogin_saml_advanced_nameidformat", $option_group, 'advanced_settings');
 
 		register_setting($option_group, 'onelogin_saml_advanced_settings_sp_x509cert');
 		add_settings_field('onelogin_saml_advanced_settings_sp_x509cert', __('Service Provider X.509 Certificate', 'onelogin-saml-sso'), "plugin_setting_string_onelogin_saml_advanced_settings_sp_x509cert", $option_group, 'advanced_settings');
@@ -334,7 +340,7 @@ if ( !function_exists( 'add_action' ) ) {
 
 	function plugin_setting_string_onelogin_saml_advanced_settings_sp_entity_id() {
 		echo '<input type="text" name="onelogin_saml_advanced_settings_sp_entity_id" id="onelogin_saml_advanced_settings_sp_entity_id"
-			  value= "'.get_option('onelogin_saml_advanced_settings_sp_entity_id').'" size="30">'.
+			  value= "'.get_option('onelogin_saml_advanced_settings_sp_entity_id').'" size="80">'.
 			  '<p class="description">'.__("Set the Entity ID for the Service Provider. If not provided, 'php-saml' will be used.", 'onelogin-saml-sso').'</p>';
 	}
 
@@ -400,7 +406,31 @@ if ( !function_exists( 'add_action' ) ) {
 		echo get_option('onelogin_saml_advanced_settings_sp_privatekey');
 		echo '</textarea>';
 		echo '<p class="description">'.__('Private Key of the SP. Leave this field empty if you gonna provide the private key by the sp.key', 'onelogin-saml-sso');
-	}	
+	}
+
+	function plugin_setting_select_onelogin_saml_advanced_nameidformat() {
+		$nameidformat_value = get_option('onelogin_saml_advanced_nameidformat');
+		$posible_nameidformat_values = array(
+			'unspecified' => OneLogin_Saml2_Constants::NAMEID_UNSPECIFIED,
+			'emailAddress' => OneLogin_Saml2_Constants::NAMEID_EMAIL_ADDRESS,
+			'transient' => OneLogin_Saml2_Constants::NAMEID_TRANSIENT,
+			'persistent' => OneLogin_Saml2_Constants::NAMEID_PERSISTENT,
+			'entity' => OneLogin_Saml2_Constants::NAMEID_ENTITY,
+			'encrypted' => OneLogin_Saml2_Constants::NAMEID_ENCRYPTED,
+			'kerberos' => OneLogin_Saml2_Constants::NAMEID_KERBEROS,
+			'x509subjecname' => OneLogin_Saml2_Constants::NAMEID_X509_SUBJECT_NAME,
+			'windowsdomainqualifiedname' => OneLogin_Saml2_Constants::NAMEID_WINDOWS_DOMAIN_QUALIFIED_NAME
+		);
+
+		echo '<select name="onelogin_saml_advanced_nameidformat" id="onelogin_saml_advanced_nameidformat">';
+
+		foreach ($posible_nameidformat_values as $key => $value) {
+			echo '<option value='.$key.' '.($key == $nameidformat_value ? 'selected="selected"': '').' >'.$value.'</option>';
+		}
+
+		echo '</select>'.
+			 '<p class="description">'.__("Specifies constraints on the name identifier to be used to represent the requested subject.", 'onelogin-saml-sso').'</p>';
+	}
 
 	function plugin_section_idp_text() {
 		echo "<p>".__("Set here some info related to the IdP that will be connected with our Wordpress. You can find this values at the Onelogin's platform in the Wordpress App at the Single Sign-On tab", 'onelogin-saml-sso')."</p>";

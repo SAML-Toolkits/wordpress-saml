@@ -6,6 +6,20 @@ if ( !function_exists( 'add_action' ) ) {
     exit;
 }
 
+require_once (dirname(__FILE__) . "/lib/Saml2/Constants.php");
+
+$posible_nameidformat_values = array(
+    'unspecified' => OneLogin_Saml2_Constants::NAMEID_UNSPECIFIED,
+    'emailAddress' => OneLogin_Saml2_Constants::NAMEID_EMAIL_ADDRESS,
+    'transient' => OneLogin_Saml2_Constants::NAMEID_TRANSIENT,
+    'persistent' => OneLogin_Saml2_Constants::NAMEID_PERSISTENT,
+    'entity' => OneLogin_Saml2_Constants::NAMEID_ENTITY,
+    'encrypted' => OneLogin_Saml2_Constants::NAMEID_ENCRYPTED,
+    'kerberos' => OneLogin_Saml2_Constants::NAMEID_KERBEROS,
+    'x509subjecname' => OneLogin_Saml2_Constants::NAMEID_X509_SUBJECT_NAME,
+    'windowsdomainqualifiedname' => OneLogin_Saml2_Constants::NAMEID_WINDOWS_DOMAIN_QUALIFIED_NAME
+);
+
 $opt['strict'] = get_option('onelogin_saml_advanced_settings_strict_mode', 'on');
 $opt['debug'] = get_option('onelogin_saml_advanced_settings_debug', 'on');
 $opt['sp_entity_id'] = get_option('onelogin_saml_advanced_settings_sp_entity_id', 'php-saml');
@@ -17,6 +31,9 @@ $opt['logoutResponseSigned'] = get_option('onelogin_saml_advanced_settings_logou
 $opt['wantMessagesSigned'] = get_option('onelogin_saml_advanced_settings_want_message_signed', false);
 $opt['wantAssertionsSigned'] = get_option('onelogin_saml_advanced_settings_want_assertion_signed', false);
 $opt['wantAssertionsEncrypted'] = get_option('onelogin_saml_advanced_settings_want_assertion_encrypted', false);
+
+$nameIDformat = get_option('onelogin_saml_advanced_nameidformat', 'unspecified');
+$opt['NameIDFormat'] = $posible_nameidformat_values[$nameIDformat];
 
 $settings = array (
 
@@ -31,7 +48,7 @@ $settings = array (
         'singleLogoutService' => array (
             'url' => get_site_url().'/wp-login.php?saml_sls'
         ),
-        'NameIDFormat' => 'urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress',
+        'NameIDFormat' => $opt['NameIDFormat'],
         'x509cert' => get_option('onelogin_saml_advanced_settings_sp_x509cert'),
         'privateKey' => get_option('onelogin_saml_advanced_settings_sp_privatekey'),
     ),
