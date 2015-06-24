@@ -141,6 +141,21 @@ function saml_acs() {
 		}
 
 		if (!empty($roleMapping) && isset($attrs[$roleMapping])){
+			$multiValued = get_option('onelogin_saml_role_mapping_multivalued_in_one_attribute_value', false);
+			if ($multiValued && count($attrs[$roleMapping]) == 1) {
+				$roleValues = array();
+				$pattern = get_option('onelogin_saml_role_mapping_multivalued_pattern');
+				if (!empty($pattern)) {
+					preg_match_all($pattern, $attrs[$roleMapping][0], $roleValues);
+					if (!empty($roleValues)) {
+    					$attrs[$roleMapping] = $roleValues[1];
+					}
+				} else {
+					$roleValues = explode(';', $attrs[$roleMapping][0]);
+					$attrs[$roleMapping] = $roleValues;
+				}
+			}
+
 			$adminsRole = explode(',', get_option('onelogin_saml_role_mapping_administrator'));
 			$editorsRole = explode(',', get_option('onelogin_saml_role_mapping_editor'));
 			$authorsRole = explode(',', get_option('onelogin_saml_role_mapping_author'));

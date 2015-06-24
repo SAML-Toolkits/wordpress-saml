@@ -103,6 +103,12 @@ require_once (dirname(__FILE__) . "/lib/Saml2/Constants.php");
 			add_settings_field($name, $description, "plugin_setting_string_$name", $option_group, 'role_mapping');
 		}
 
+		register_setting($option_group, 'onelogin_saml_role_mapping_multivalued_in_one_attribute_value');
+		add_settings_field('onelogin_saml_role_mapping_multivalued_in_one_attribute_value', __('Multiple role values in one saml attribute value', 'onelogin-saml-sso'), "plugin_setting_boolean_onelogin_saml_role_mapping_multivalued_in_one_attribute_value", $option_group, 'role_mapping');
+
+		register_setting($option_group, 'onelogin_saml_role_mapping_multivalued_pattern');
+		add_settings_field('onelogin_saml_role_mapping_multivalued_pattern', __('Regular expression for multiple role values', 'onelogin-saml-sso'), "plugin_setting_string_onelogin_saml_role_mapping_multivalued_pattern", $option_group, 'role_mapping');
+
 		add_settings_section('customize_links', __('CUSTOMIZE ACTIONS AND LINKS', 'onelogin-saml-sso'), 'plugin_section_customize_links_text', $option_group);
 
 		register_setting($option_group, 'onelogin_saml_customize_action_prevent_local_login');
@@ -278,6 +284,20 @@ require_once (dirname(__FILE__) . "/lib/Saml2/Constants.php");
 	function plugin_setting_string_onelogin_saml_role_mapping_subscriber() {
 		echo '<input type="text" name="onelogin_saml_role_mapping_subscriber" id="onelogin_saml_role_mapping_subscriber"
 			  value= "'.get_option('onelogin_saml_role_mapping_subscriber').'" size="30">';
+	}
+
+
+	function plugin_setting_boolean_onelogin_saml_role_mapping_multivalued_in_one_attribute_value() {
+		$value = get_option('onelogin_saml_role_mapping_multivalued_in_one_attribute_value');
+		echo '<input type="checkbox" name="onelogin_saml_role_mapping_multivalued_in_one_attribute_value" id="onelogin_saml_role_mapping_multivalued_in_one_attribute_value"
+			  '.($value ? 'checked="checked"': '').'>
+			  <p class="description">'.__("Sometimes role values are provided in an unique attribute statement (instead multiple attribute statements). Active it and the plugin will try to split those values by ;<br>Use the regular pattern in order to extract complex data", 'onelogin-saml-sso').'</p>';
+	}
+
+	function plugin_setting_string_onelogin_saml_role_mapping_multivalued_pattern() {
+		echo '<input type="text" name="onelogin_saml_role_mapping_multivalued_pattern" id="onelogin_saml_role_mapping_multivalued_pattern"
+			  value= "'.get_option('onelogin_saml_role_mapping_multivalued_pattern').'" size="70">
+			  <p class="description">'.__("Regular expression that extract roles from complex multivalued data (require to active the previous boolean).<br> Ex. If the SAMLResponse has a role attribute like: CN=admin;CN=superuser;CN=europe-admin; , use the regular expression /CN=([A-Z0-9\s _-]*);/i to retrieve the values", 'onelogin-saml-sso').'</p>';
 	}
 
 	function plugin_setting_boolean_onelogin_saml_customize_action_prevent_local_login() {
