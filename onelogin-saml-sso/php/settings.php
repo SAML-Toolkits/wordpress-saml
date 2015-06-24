@@ -19,6 +19,15 @@ $posible_nameidformat_values = array(
     'x509subjecname' => OneLogin_Saml2_Constants::NAMEID_X509_SUBJECT_NAME,
     'windowsdomainqualifiedname' => OneLogin_Saml2_Constants::NAMEID_WINDOWS_DOMAIN_QUALIFIED_NAME
 );
+$posible_requestedauthncontext_values = array(
+    'unspecified' => OneLogin_Saml2_Constants::AC_UNSPECIFIED,
+    'password' => OneLogin_Saml2_Constants::AC_PASSWORD,
+    'passwordprotectedtransport' => "urn:oasis:names:tc:SAML:2.0:ac:classes:PasswordProtectedTransport",
+    'x509' => OneLogin_Saml2_Constants::AC_X509,
+    'smartcard' => OneLogin_Saml2_Constants::AC_SMARTCARD,
+    'kerberos' => OneLogin_Saml2_Constants::AC_KERBEROS,
+);
+
 
 $opt['strict'] = get_option('onelogin_saml_advanced_settings_strict_mode', 'on');
 $opt['debug'] = get_option('onelogin_saml_advanced_settings_debug', 'on');
@@ -34,6 +43,17 @@ $opt['wantAssertionsEncrypted'] = get_option('onelogin_saml_advanced_settings_wa
 
 $nameIDformat = get_option('onelogin_saml_advanced_nameidformat', 'unspecified');
 $opt['NameIDFormat'] = $posible_nameidformat_values[$nameIDformat];
+
+
+$requested_authncontext_values = get_option('onelogin_saml_advanced_requestedauthncontext', array());
+if (empty($requested_authncontext_values)) {
+    $opt['requestedAuthnContext'] = false;
+} else {
+    $opt['requestedAuthnContext'] = array();
+    foreach ($requested_authncontext_values as $value) {
+        $opt['requestedAuthnContext'][] = $posible_requestedauthncontext_values[$value];
+    }
+}
 
 $settings = array (
 
@@ -73,5 +93,6 @@ $settings = array (
         'wantMessagesSigned' => $opt['wantMessagesSigned'] == 'on'? true: false,
         'wantAssertionsSigned' => $opt['wantAssertionsSigned'] == 'on'? true: false,
         'wantAssertionsEncrypted' => $opt['wantAssertionsEncrypted'] == 'on'? true: false,
+        'requestedAuthnContext' => $opt['requestedAuthnContext'],
     )
 );

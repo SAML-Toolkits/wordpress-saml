@@ -155,6 +155,9 @@ require_once (dirname(__FILE__) . "/lib/Saml2/Constants.php");
 		register_setting($option_group, 'onelogin_saml_advanced_nameidformat');
 		add_settings_field('onelogin_saml_advanced_nameidformat', __('NameIDFormat', 'onelogin-saml-sso'), "plugin_setting_select_onelogin_saml_advanced_nameidformat", $option_group, 'advanced_settings');
 
+		register_setting($option_group, 'onelogin_saml_advanced_requestedauthncontext');
+		add_settings_field('onelogin_saml_advanced_requestedauthncontext', __('requestedAuthnContext', 'onelogin-saml-sso'), "plugin_setting_select_onelogin_saml_advanced_requestedauthncontext", $option_group, 'advanced_settings');
+
 		register_setting($option_group, 'onelogin_saml_advanced_settings_sp_x509cert');
 		add_settings_field('onelogin_saml_advanced_settings_sp_x509cert', __('Service Provider X.509 Certificate', 'onelogin-saml-sso'), "plugin_setting_string_onelogin_saml_advanced_settings_sp_x509cert", $option_group, 'advanced_settings');
 
@@ -430,6 +433,29 @@ require_once (dirname(__FILE__) . "/lib/Saml2/Constants.php");
 
 		echo '</select>'.
 			 '<p class="description">'.__("Specifies constraints on the name identifier to be used to represent the requested subject.", 'onelogin-saml-sso').'</p>';
+	}
+
+	function plugin_setting_select_onelogin_saml_advanced_requestedauthncontext() {
+		$requestedauthncontext_values = get_option('onelogin_saml_advanced_requestedauthncontext', array());
+
+		$posible_requestedauthncontext_values = array(
+			'unspecified' => OneLogin_Saml2_Constants::AC_UNSPECIFIED,
+			'password' => OneLogin_Saml2_Constants::AC_PASSWORD,
+			'passwordprotectedtransport' =>	"urn:oasis:names:tc:SAML:2.0:ac:classes:PasswordProtectedTransport",
+			'x509' => OneLogin_Saml2_Constants::AC_X509,
+			'smartcard' => OneLogin_Saml2_Constants::AC_SMARTCARD,
+			'kerberos' => OneLogin_Saml2_Constants::AC_KERBEROS,
+		);
+
+		echo '<select multiple="multiple" name="onelogin_saml_advanced_requestedauthncontext[]" id="onelogin_saml_advanced_requestedauthncontext">';
+		echo '<option value=""></option>';
+		foreach ($posible_requestedauthncontext_values as $key => $value) {
+			echo '<option value='.$key.' '.(in_array($key, $requestedauthncontext_values) ? 'selected="selected"': '').' >'.$value.'</option>';
+		}
+
+		echo '</select>'.
+			 '<p class="description">'.__("AuthContext sent in the AuthNRequest. You can select none, one or multiple values", 'onelogin-saml-sso').'</p>';
+
 	}
 
 	function plugin_section_idp_text() {
