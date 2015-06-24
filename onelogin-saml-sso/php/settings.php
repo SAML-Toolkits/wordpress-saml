@@ -51,7 +51,9 @@ if (empty($requested_authncontext_values)) {
 } else {
     $opt['requestedAuthnContext'] = array();
     foreach ($requested_authncontext_values as $value) {
-        $opt['requestedAuthnContext'][] = $posible_requestedauthncontext_values[$value];
+        if (isset($posible_requestedauthncontext_values[$value])) {
+            $opt['requestedAuthnContext'][] = $posible_requestedauthncontext_values[$value];
+        }
     }
 }
 
