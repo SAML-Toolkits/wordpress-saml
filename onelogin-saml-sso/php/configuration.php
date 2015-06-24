@@ -145,7 +145,8 @@ require_once (dirname(__FILE__) . "/lib/Saml2/Constants.php");
 			'onelogin_saml_advanced_settings_logout_response_signed' => __('Sign LogoutResponse', 'onelogin-saml-sso'),
 			'onelogin_saml_advanced_settings_want_message_signed' => __('Reject Unsigned Messages', 'onelogin-saml-sso'),
 			'onelogin_saml_advanced_settings_want_assertion_signed' => __('Reject Unsigned Assertions', 'onelogin-saml-sso'),
-			'onelogin_saml_advanced_settings_want_assertion_encrypted' => __('Reject Unencrypted Assertions', 'onelogin-saml-sso')
+			'onelogin_saml_advanced_settings_want_assertion_encrypted' => __('Reject Unencrypted Assertions', 'onelogin-saml-sso'),
+			'onelogin_saml_advanced_settings_retrieve_parameters_from_server' => __('Retrieve Parameters From Server', 'onelogin-saml-sso')
 		);
 		foreach ($mapping_fields as $name => $description) {
 			register_setting($option_group, $name);
@@ -349,49 +350,49 @@ require_once (dirname(__FILE__) . "/lib/Saml2/Constants.php");
 
 
 	function plugin_setting_boolean_onelogin_saml_advanced_settings_nameid_encrypted() {
-		$value = get_option('onelogin_saml_advanced_settings_nameid_encrypted');		
+		$value = get_option('onelogin_saml_advanced_settings_nameid_encrypted');
 		echo '<input type="checkbox" name="onelogin_saml_advanced_settings_nameid_encrypted" id="onelogin_saml_advanced_settings_nameid_encrypted"
 			  '.($value ? 'checked="checked"': '').'>'.
 			  '<p class="description">'.__('The nameID sent by this SP will be encrypted.', 'onelogin-saml-sso').'</p>';
 	}
 
 	function plugin_setting_boolean_onelogin_saml_advanced_settings_authn_request_signed() {
-		$value = get_option('onelogin_saml_advanced_settings_authn_request_signed');		
+		$value = get_option('onelogin_saml_advanced_settings_authn_request_signed');
 		echo '<input type="checkbox" name="onelogin_saml_advanced_settings_authn_request_signed" id="onelogin_saml_advanced_settings_authn_request_signed"
 			  '.($value ? 'checked="checked"': '').'>'.
 			  '<p class="description">'.__('The samlp:AuthnRequest messages sent by this SP will be signed.', 'onelogin-saml-sso').'</p>';
 	}
 
 	function plugin_setting_boolean_onelogin_saml_advanced_settings_logout_request_signed() {
-		$value = get_option('onelogin_saml_advanced_settings_logout_request_signed');		
+		$value = get_option('onelogin_saml_advanced_settings_logout_request_signed');
 		echo '<input type="checkbox" name="onelogin_saml_advanced_settings_logout_request_signed" id="onelogin_saml_advanced_settings_logout_request_signed"
 			  '.($value ? 'checked="checked"': '').'>'.
 			  '<p class="description">'.__('The samlp:logoutRequest messages sent by this SP will be signed.', 'onelogin-saml-sso').'</p>';
 	}	
 
 	function plugin_setting_boolean_onelogin_saml_advanced_settings_logout_response_signed() {
-		$value = get_option('onelogin_saml_advanced_settings_logout_response_signed');		
+		$value = get_option('onelogin_saml_advanced_settings_logout_response_signed');
 		echo '<input type="checkbox" name="onelogin_saml_advanced_settings_logout_response_signed" id="onelogin_saml_advanced_settings_logout_response_signed"
 			  '.($value ? 'checked="checked"': '').'>'.
 			  '<p class="description">'.__('The samlp:logoutResponse messages sent by this SP will be signed.', 'onelogin-saml-sso').'</p>';
 	}
 
 	function plugin_setting_boolean_onelogin_saml_advanced_settings_want_message_signed() {
-		$value = get_option('onelogin_saml_advanced_settings_want_message_signed');		
+		$value = get_option('onelogin_saml_advanced_settings_want_message_signed');
 		echo '<input type="checkbox" name="onelogin_saml_advanced_settings_want_message_signed" id="onelogin_saml_advanced_settings_want_message_signed"
 			  '.($value ? 'checked="checked"': '').'>'.
 			  '<p class="description">'.__('Reject unsigned samlp:Response, samlp:LogoutRequest and samlp:LogoutResponse received', 'onelogin-saml-sso').'</p>';
 	}
 
 	function plugin_setting_boolean_onelogin_saml_advanced_settings_want_assertion_signed() {
-		$value = get_option('onelogin_saml_advanced_settings_want_assertion_signed');		
+		$value = get_option('onelogin_saml_advanced_settings_want_assertion_signed');
 		echo '<input type="checkbox" name="onelogin_saml_advanced_settings_want_assertion_signed" id="onelogin_saml_advanced_settings_want_assertion_signed"
 			  '.($value ? 'checked="checked"': '').'>'.
 			  '<p class="description">'.__('Reject unsigned saml:Assertion received', 'onelogin-saml-sso').'</p>';
 	}
 
 	function plugin_setting_boolean_onelogin_saml_advanced_settings_want_assertion_encrypted() {
-		$value = get_option('onelogin_saml_advanced_settings_want_assertion_encrypted');		
+		$value = get_option('onelogin_saml_advanced_settings_want_assertion_encrypted');
 		echo '<input type="checkbox" name="onelogin_saml_advanced_settings_want_assertion_encrypted" id="onelogin_saml_advanced_settings_want_assertion_encrypted"
 			  '.($value ? 'checked="checked"': '').'>'.
 			  '<p class="description">'.__('Reject unencrypted saml:Assertion received', 'onelogin-saml-sso').'</p>';
@@ -409,6 +410,13 @@ require_once (dirname(__FILE__) . "/lib/Saml2/Constants.php");
 		echo get_option('onelogin_saml_advanced_settings_sp_privatekey');
 		echo '</textarea>';
 		echo '<p class="description">'.__('Private Key of the SP. Leave this field empty if you gonna provide the private key by the sp.key', 'onelogin-saml-sso');
+	}
+
+	function plugin_setting_boolean_onelogin_saml_advanced_settings_retrieve_parameters_from_server() {
+		$value = get_option('onelogin_saml_advanced_settings_retrieve_parameters_from_server', false);
+		echo '<input type="checkbox" name="onelogin_saml_advanced_settings_retrieve_parameters_from_server" id="onelogin_saml_advanced_settings_retrieve_parameters_from_server"
+			  '.($value ? 'checked="checked"': '').'>'.
+			  '<p class="description">'.__('Sometimes when the app is behind a firewall or proxy, the query parameters can be modified an this affects the signature validation process on HTTP-Redirectbinding. Active this when you noticed signature validation failures, the plugin will try to extract the original query parameters.', 'onelogin-saml-sso').'</p>';
 	}
 
 	function plugin_setting_select_onelogin_saml_advanced_nameidformat() {
