@@ -51,3 +51,15 @@ This SAML plugin eliminates passwords and allows you to authenticate WordPress u
 
 = 2.1.5 =
  * Refactor sso/slo flow
+
+= 2.1.6 =
+ * Update php-saml library to 2.5.0
+ * Remove deprecated method wp_login
+ * SLS inprovement
+
+= 2.1.7 =
+ * Add NameIDFormat support.
+ * Add requestedAuthnContext support.
+ * SessionIndex and nameID is now passed to the IdP
+ * Now retrieveParametersFromServer can be activated
+ * Improve the role/group support when multiple values on a single attribute statement.
