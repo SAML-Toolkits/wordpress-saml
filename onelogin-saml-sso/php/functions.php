@@ -236,9 +236,11 @@ function saml_acs() {
 						$userdata['role'] = 'contributor';
 						break;
 					case 1:
+						$userdata['role'] = 'subscriber';
+						break;
 					case 0:
 					default:
-						$userdata['role'] = 'subscriber';		
+						$userdata['role'] = get_option('default_role');
 						break;
 				}
 			}
