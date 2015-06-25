@@ -258,7 +258,7 @@ require_once (dirname(__FILE__) . "/lib/Saml2/Constants.php");
 	function plugin_setting_string_onelogin_saml_attr_mapping_role() {
 		echo '<input type="text" name="onelogin_saml_attr_mapping_role" id="onelogin_saml_attr_mapping_role"
 			  value= "'.get_option('onelogin_saml_attr_mapping_role').'" size="30">'.
-			  '<p class="description">'.__("The attribute that contains the role of the user, For example 'memberof'. If Wordpress can't figure what role assign to the user, it will assign the default role defined at the general settings.", 'onelogin-saml-sso').'</p>';
+			  '<p class="description">'.__("The attribute that contains the role of the user, For example 'memberOf'. If Wordpress can't figure what role assign to the user, it will assign the default role defined at the general settings.", 'onelogin-saml-sso').'</p>';
 	}
 
 	function plugin_setting_string_onelogin_saml_role_mapping_administrator() {
