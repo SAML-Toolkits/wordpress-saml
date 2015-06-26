@@ -261,6 +261,12 @@ function saml_acs() {
 		if (get_option('onelogin_saml_updateuser')) {
 			$userdata['ID'] = $user_id;
 			unset($userdata['$user_pass']);
+
+			// Prevent to change the role to the superuser (id=1)
+			if ($user_id == 1 && isset($userdata['role'])) {
+				unset($userdata['role']);
+			}
+
 			$user_id = wp_update_user($userdata);
 		}
 	} else if (get_option('onelogin_saml_autocreate')) {

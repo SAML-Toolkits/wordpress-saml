@@ -62,4 +62,7 @@ This SAML plugin eliminates passwords and allows you to authenticate WordPress u
  * Add requestedAuthnContext support.
  * SessionIndex and nameID is now passed to the IdP
  * Now retrieveParametersFromServer can be activated
+
+= 2.1.8 =
  * Improve the role/group support when multiple values on a single attribute statement.
+ * Prevent to auto-update the role of the superuser
