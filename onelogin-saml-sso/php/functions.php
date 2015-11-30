@@ -333,6 +333,7 @@ function saml_sls() {
 				wp_redirect(home_url());
 			}
 		}
+		exit();
 	} else {
 		echo __("SLS endpoint found an error.").$auth->getLastErrorReason();
 		return false;
