@@ -152,12 +152,16 @@ require_once (dirname(__FILE__) . "/lib/Saml2/Constants.php");
 			'onelogin_saml_advanced_settings_want_message_signed' => __('Reject Unsigned Messages', 'onelogin-saml-sso'),
 			'onelogin_saml_advanced_settings_want_assertion_signed' => __('Reject Unsigned Assertions', 'onelogin-saml-sso'),
 			'onelogin_saml_advanced_settings_want_assertion_encrypted' => __('Reject Unencrypted Assertions', 'onelogin-saml-sso'),
-			'onelogin_saml_advanced_settings_retrieve_parameters_from_server' => __('Retrieve Parameters From Server', 'onelogin-saml-sso')
+			'onelogin_saml_advanced_settings_retrieve_parameters_from_server' => __('Retrieve Parameters From Server', 'onelogin-saml-sso'),
+			'onelogin_saml_advanced_settings_use_server_sessions' => __('Use Server Sessions', 'onelogin-saml-sso'),
 		);
 		foreach ($mapping_fields as $name => $description) {
 			register_setting($option_group, $name);
 			add_settings_field($name, $description, "plugin_setting_boolean_$name", $option_group, 'advanced_settings');
 		}
+
+		register_setting($option_group, 'onelogin_saml_advanced_settings_server_session_timeout');
+		add_settings_field('onelogin_saml_advanced_settings_server_session_timeout', __('Server Session Timeout', 'onelogin-saml-sso'), "plugin_setting_string_onelogin_saml_advanced_settings_server_session_timeout", $option_group, 'advanced_settings');
 
 		register_setting($option_group, 'onelogin_saml_advanced_nameidformat');
 		add_settings_field('onelogin_saml_advanced_nameidformat', __('NameIDFormat', 'onelogin-saml-sso'), "plugin_setting_select_onelogin_saml_advanced_nameidformat", $option_group, 'advanced_settings');
@@ -437,6 +441,19 @@ require_once (dirname(__FILE__) . "/lib/Saml2/Constants.php");
 		echo '<input type="checkbox" name="onelogin_saml_advanced_settings_retrieve_parameters_from_server" id="onelogin_saml_advanced_settings_retrieve_parameters_from_server"
 			  '.($value ? 'checked="checked"': '').'>'.
 			  '<p class="description">'.__('Sometimes when the app is behind a firewall or proxy, the query parameters can be modified an this affects the signature validation process on HTTP-Redirectbinding. Active this when you noticed signature validation failures, the plugin will try to extract the original query parameters.', 'onelogin-saml-sso').'</p>';
+	}
+
+	function plugin_setting_boolean_onelogin_saml_advanced_settings_use_server_sessions() {
+		$value = get_option('onelogin_saml_advanced_settings_use_server_sessions', false);
+		echo '<input type="checkbox" name="onelogin_saml_advanced_settings_use_server_sessions" id="onelogin_saml_advanced_settings_use_server_sessions"
+			  '.($value ? 'checked="checked"': '').'>'.
+			  '<p class="description">'.__('Use server sessions to ensure a user may only have one active login at any time, and that their session is cleared on logout.', 'onelogin-saml-sso').'</p>';
+	}
+
+	function plugin_setting_string_onelogin_saml_advanced_settings_server_session_timeout() {
+		echo '<input type="text" name="onelogin_saml_advanced_settings_server_session_timeout" id="onelogin_saml_advanced_settings_server_session_timeout"
+			  value= "'.get_option('onelogin_saml_advanced_settings_server_session_timeout').'" size="30">'.
+			  '<p class="description">'.__('Timeout value in seconds at which point the user session becomes invalid. (Defaults to one year if unset.)', 'onelogin-saml-sso').'</p>';
 	}
 
 	function plugin_setting_select_onelogin_saml_advanced_nameidformat() {

@@ -44,14 +44,35 @@ function saml_user_register() {
 }
 
 function saml_sso() {
-	if (is_user_logged_in()) {
-		return true;
+	$force_authentication = false;
+	$user_id = get_current_user_id();
+	if ($user_id!==0) {
+		if (get_option('onelogin_saml_advanced_settings_use_server_sessions')) {
+			if (isset($_COOKIE['saml_nameid']) && isset($_COOKIE['saml_sessionindex'])) {
+				$idp_suffix = '_' . get_option('onelogin_saml_idp_entityid');
+				$session = get_user_meta($user_id, 'saml_sessionindex' . $idp_suffix, true);
+				$nameid = get_user_meta($user_id, 'saml_nameid' . $idp_suffix, true);
+				$logintime = get_user_meta($user_id, 'saml_login_time' . $idp_suffix, true);
+				$timeout = (int)get_option('onelogin_saml_advanced_settings_server_session_timeout', 0);
+				$timeout = ($timeout == 0) ? YEAR_IN_SECONDS : $timeout;
+				if ($_COOKIE['saml_nameid']===$nameid && $_COOKIE['saml_sessionindex']===$session && time() - $logintime < $timeout ) {
+					return true;
+				}
+				$force_authentication = true;
+			}
+		} else {
+			return true;
+		}
+	}
+	if ( defined('DOING_AJAX') && DOING_AJAX) {
+		http_response_code(401);
+		exit();
 	}
 	$auth = initialize_saml();
 	if (isset($_SERVER['REQUEST_URI'])) {
-		$auth->login($_SERVER['REQUEST_URI']);
+		$auth->login($_SERVER['REQUEST_URI'], [], $force_authentication);
 	} else {
-		$auth->login();
+		$auth->login(null, [], $force_authentication);
 	}
 	exit();
 }
@@ -288,6 +309,15 @@ function saml_acs() {
 	} else if ($user_id) {
 		wp_set_current_user($user_id);
 		wp_set_auth_cookie($user_id);
+		if (get_option('onelogin_saml_advanced_settings_use_server_sessions')) {
+			$idp_suffix = '_' . get_option('onelogin_saml_idp_entityid');
+			delete_user_meta($user_id, 'saml_sessionindex' . $idp_suffix);
+			delete_user_meta($user_id, 'saml_nameid' . $idp_suffix);
+			delete_user_meta($user_id, 'saml_login_time' . $idp_suffix);
+			add_user_meta($user_id, 'saml_sessionindex' . $idp_suffix, $auth->getSessionIndex());
+			add_user_meta($user_id, 'saml_nameid' . $idp_suffix, $auth->getNameId());
+			add_user_meta($user_id, 'saml_login_time' . $idp_suffix, time());
+		}
 		setcookie('saml_login', 1, time() + YEAR_IN_SECONDS, SITECOOKIEPATH );
 				#do_action('wp_login', $user_id);
 		#wp_signon($user_id);
@@ -319,10 +349,30 @@ function saml_sls() {
 	$auth->processSLO(false, null, $retrieve_parameters_from_server);
 		$errors = $auth->getErrors();
 	if (empty($errors)) {
+		$user_id = get_current_user_id();
 		wp_logout();
 		setcookie('saml_login', 0, time() - 3600, SITECOOKIEPATH );
 		setcookie('saml_nameid', null, time() - 3600, SITECOOKIEPATH );
 		setcookie('saml_sessionindex', null, time() - 3600, SITECOOKIEPATH );
+		if (get_option('onelogin_saml_advanced_settings_use_server_sessions')) {
+			$idp_suffix = '_' . get_option('onelogin_saml_idp_entityid');
+			$logintime = get_user_meta($user_id, 'saml_login_time' . $idp_suffix, true);
+			$timeout = (int)get_option('onelogin_saml_advanced_settings_server_session_timeout', 0);
+			$timeout = ($timeout == 0) ? YEAR_IN_SECONDS : $timeout;
+			if (time() - $logintime >= $timeout ) {
+				delete_user_meta($user_id, 'saml_sessionindex' . $idp_suffix);
+				delete_user_meta($user_id, 'saml_nameid' . $idp_suffix);
+				delete_user_meta($user_id, 'saml_login_time' . $idp_suffix);
+			} elseif (isset($_COOKIE['saml_nameid']) && isset($_COOKIE['saml_sessionindex'])) {
+				$session = get_user_meta($user_id, 'saml_sessionindex' . $idp_suffix, true);
+				$nameid = get_user_meta($user_id, 'saml_nameid' . $idp_suffix, true);
+				if ($_COOKIE['saml_nameid']===$nameid && $_COOKIE['saml_sessionindex']===$session) {
+					delete_user_meta($user_id, 'saml_sessionindex' . $idp_suffix);
+					delete_user_meta($user_id, 'saml_nameid' . $idp_suffix);
+					delete_user_meta($user_id, 'saml_login_time' . $idp_suffix);
+				}
+			}
+		}
 
 		if (get_option('onelogin_saml_forcelogin') && get_option('onelogin_saml_customize_stay_in_wordpress_after_slo')) {
 			wp_redirect(home_url().'/wp-login.php?loggedout=true');
