@@ -466,6 +466,10 @@ require_once (dirname(__FILE__) . "/lib/Saml2/Constants.php");
 	function plugin_setting_select_onelogin_saml_advanced_requestedauthncontext() {
 		$requestedauthncontext_values = get_option('onelogin_saml_advanced_requestedauthncontext', array());
 
+		if (!is_array($requestedauthncontext_values)) {
+			$requestedauthncontext_values = array($requestedauthncontext_values);
+		}
+
 		$posible_requestedauthncontext_values = array(
 			'unspecified' => OneLogin_Saml2_Constants::AC_UNSPECIFIED,
 			'password' => OneLogin_Saml2_Constants::AC_PASSWORD,
