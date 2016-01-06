@@ -272,13 +272,13 @@ function saml_acs() {
 	} else if (get_option('onelogin_saml_autocreate')) {
 		if (!validate_username($username)) {
 			echo __("The username provided by the IdP"). ' "'. $username. '" '. __("is not valid and can't create the user at wordpress");
-			return false;			
+			exit();
 		}
 		$userdata['user_pass'] = '@@@nopass@@@';
 		$user_id = wp_insert_user($userdata);
 	} else {
-		echo __("User provided by the IdP "). ' "'. $matcherValue. '" '. __("not exists in wordpress and auto-provisioning is disabled.");
-		return false;
+		echo __("User provided by the IdP "). ' "'. $matcherValue. '" '. __("does not exist in wordpress and auto-provisioning is disabled.");
+		exit();
 	}
 
 	if (is_a($user_id, 'WP_Error')) {
@@ -336,7 +336,7 @@ function saml_sls() {
 		exit();
 	} else {
 		echo __("SLS endpoint found an error.").$auth->getLastErrorReason();
-		return false;
+		exit();
 	}
 }
 
