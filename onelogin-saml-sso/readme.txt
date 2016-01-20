@@ -66,3 +66,8 @@ This SAML plugin eliminates passwords and allows you to authenticate WordPress u
 = 2.1.8 =
  * Improve the role/group support when multiple values on a single attribute statement.
  * Prevent to auto-update the role of the superuser
+
+= 2.2.0 =
+ * Password security issue
+ * Add alternative solution/documentation about custom roles (php/functions.php L167)
+ * Call exit after any error message or redirection
