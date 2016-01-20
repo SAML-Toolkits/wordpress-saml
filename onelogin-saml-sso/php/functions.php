@@ -162,29 +162,72 @@ function saml_acs() {
 			$contributorsRole = explode(',', get_option('onelogin_saml_role_mapping_contributor'));
 			$subscribersRole = explode(',', get_option('onelogin_saml_role_mapping_subscriber'));
 
-			/* In order to use custom roles, you only need to uncomment those lines and replace the values
-			 *  First we assign possible OneLogin roles that we want to map with Wordpress Roles
-			 *  Then we asigned to the $userdata['role'] the name of the Wordpress role
-			 */
-
-			//$customRole1 = array('value1', 'value2');  // value1 and value2 are roles of OneLogin platform that will be mapped to customRole1
-			//$customRole2 = array('value3');  // value3 is a role of OneLogin platformthat will be mapped to customRole2
-
 			$foundCustomizedRole = false;
 
+			/*  In order to use custom roles, you have 2 alternatives */
+
+			/*  Alternative 1 
+			 *  =============
+			 *
+			 *	Uncomment the wollowing lines and replace the values:
+			 *   - First we assign possible OneLogin roles that we want to map with Wordpress Roles
+			 *   - Then we asigned to the $userdata['role'] the name of the Wordpress role
+			 */
+
 			/*
-			foreach ($attrs[$roleMapping] as $samlRole) {
-				if (in_array($samlRole, $customRole1)) {
-					$userdata['role'] = 'customrole1'; // Name of the role -> customrole1
-					$foundCustomized = true;
-					break;
-				} else if (in_array($samlRole, $customRole2)) {
-					$userdata['role'] = 'customrole2'; // Name of the role -> customrole2
-					$foundCustomized = true;
-					break;
+				$customRole1 = array('value1', 'value2');  // value1 and value2 are roles of OneLogin platform that will be mapped to customRole1
+				$customRole2 = array('value3');  // value3 is a role of OneLogin platformthat will be mapped to customRole2
+
+				foreach ($attrs[$roleMapping] as $samlRole) {
+					if (in_array($samlRole, $customRole1)) {
+						$userdata['role'] = 'customrole1'; // Name of the role -> customrole1
+						$foundCustomized = true;
+						break;
+					} else if (in_array($samlRole, $customRole2)) {
+						$userdata['role'] = 'customrole2'; // Name of the role -> customrole2
+						$foundCustomized = true;
+						break;
+					}
 				}
-			}
 			*/
+
+			/*  Alternative 2
+			 *  =============
+			 *
+			 *  - Add the following commented block to a plugin or a themes functions file 
+			 *    replacing CUSTOM_ROLE_NAME with the role name, not the display name the actual unique role name. 
+			 *  - Uncomment the other block
+			 */
+
+			/*
+				function add_custom_rolemapping($custom_roles) { 
+				   
+					$extra_custom_roles = array('CUSTOM_ROLE_NAME1','CUSTOM_ROLE_NAME2'); 
+
+					// combine the two arrays 
+					$custom_roles = array_merge($extra_custom_roles, $custom_roles); 
+
+					return $custom_roles; 
+				}
+
+    		    add_filter('onelogin_custom_roles', 'add_custom_rolemapping'); 
+    		*/
+
+			/*
+				if (has_filter('onelogin_custom_roles')) {
+					$customRoles = array();
+					$customRoles = apply_filters('onelogin_custom_roles', $customRoles);
+					$customRoles = array_unique($customRoles);
+
+					foreach ($attrs[$roleMapping] as $samlRole) {
+						if (in_array($samlRole, $customRoles) && $GLOBALS['wp_roles']->is_role( $samlRole)) {
+							$userdata['role'] = $samlRole;
+							$foundCustomizedRole = true; 
+							break; 
+						}
+					}
+    			}
+    		*/
 
 			if (!$foundCustomizedRole) {
 				$role = 0;
@@ -251,7 +294,7 @@ function saml_acs() {
 
 	if (empty($matcher) || $matcher == 'username') {
 		$matcherValue = $userdata['user_login'];
-		$user_id = username_exists($matcherValue);		
+		$user_id = username_exists($matcherValue);
 	} else {
 		$matcherValue = $userdata['user_email'];
 		$user_id = email_exists($matcherValue);
