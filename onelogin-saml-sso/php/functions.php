@@ -210,8 +210,8 @@ function saml_acs() {
 					return $custom_roles; 
 				}
 
-    		    add_filter('onelogin_custom_roles', 'add_custom_rolemapping'); 
-    		*/
+				add_filter('onelogin_custom_roles', 'add_custom_rolemapping'); 
+			*/
 
 			/*
 				if (has_filter('onelogin_custom_roles')) {
@@ -227,7 +227,7 @@ function saml_acs() {
 						}
 					}
     			}
-    		*/
+			*/
 
 			if (!$foundCustomizedRole) {
 				$role = 0;
