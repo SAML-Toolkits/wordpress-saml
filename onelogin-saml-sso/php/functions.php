@@ -274,7 +274,7 @@ function saml_acs() {
 			echo __("The username provided by the IdP"). ' "'. $username. '" '. __("is not valid and can't create the user at wordpress");
 			exit();
 		}
-		$userdata['user_pass'] = '@@@nopass@@@';
+		$userdata['user_pass'] = wp_generate_password();
 		$user_id = wp_insert_user($userdata);
 	} else {
 		echo __("User provided by the IdP "). ' "'. $matcherValue. '" '. __("does not exist in wordpress and auto-provisioning is disabled.");
