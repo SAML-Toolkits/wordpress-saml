@@ -196,7 +196,6 @@ function saml_acs() {
 			 *
 			 *  - Add the following commented block to a plugin or a themes functions file 
 			 *    replacing CUSTOM_ROLE_NAME with the role name, not the display name the actual unique role name. 
-			 *  - Uncomment the other block
 			 */
 
 			/*
@@ -213,21 +212,19 @@ function saml_acs() {
 				add_filter('onelogin_custom_roles', 'add_custom_rolemapping'); 
 			*/
 
-			/*
-				if (has_filter('onelogin_custom_roles')) {
-					$customRoles = array();
-					$customRoles = apply_filters('onelogin_custom_roles', $customRoles);
-					$customRoles = array_unique($customRoles);
 
-					foreach ($attrs[$roleMapping] as $samlRole) {
-						if (in_array($samlRole, $customRoles) && $GLOBALS['wp_roles']->is_role( $samlRole)) {
-							$userdata['role'] = $samlRole;
-							$foundCustomizedRole = true; 
-							break; 
-						}
-					}
+			if (has_filter('onelogin_custom_roles')) {
+				$customRoles = array();
+				$customRoles = apply_filters('onelogin_custom_roles', $customRoles);
+				$customRoles = array_unique($customRoles);
+				foreach ($attrs[$roleMapping] as $samlRole) {
+					if (in_array($samlRole, $customRoles) && $GLOBALS['wp_roles']->is_role( $samlRole)) {
+						$userdata['role'] = $samlRole;
+						$foundCustomizedRole = true; 
+						break; 						}
+				}
     			}
-			*/
+			
 
 			if (!$foundCustomizedRole) {
 				$role = 0;
