@@ -32,7 +32,7 @@ class OneLogin_Saml2_Metadata
         $validUntilTime =  gmdate('Y-m-d\TH:i:s\Z', $validUntil);
 
         if (!isset($cacheDuration)) {
-            $cacheDuration = time() + self::TIME_CACHED;
+            $cacheDuration = self::TIME_CACHED;
         }
 
         $sls = '';
@@ -113,9 +113,9 @@ METADATA_TEMPLATE;
      *
      * @return string Signed Metadata
      */
-    public static function signMetadata($metadata, $key, $cert)
+    public static function signMetadata($metadata, $key, $cert, $signAlgorithm = XMLSecurityKey::RSA_SHA1)
     {
-        return OneLogin_Saml2_Utils::addSign($metadata, $key, $cert);
+        return OneLogin_Saml2_Utils::addSign($metadata, $key, $cert, $signAlgorithm);
     }
 
     /**
