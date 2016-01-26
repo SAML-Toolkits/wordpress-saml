@@ -67,7 +67,8 @@ require_once (dirname(__FILE__) . "/lib/Saml2/Constants.php");
 			'onelogin_saml_autocreate' => __('Create user if not exists', 'onelogin-saml-sso'),
 			'onelogin_saml_updateuser' => __('Update user data', 'onelogin-saml-sso'),
 			'onelogin_saml_forcelogin' => __('Force SAML login', 'onelogin-saml-sso'),
-			'onelogin_saml_slo' => __('Single Log Out', 'onelogin-saml-sso')
+			'onelogin_saml_slo' => __('Single Log Out', 'onelogin-saml-sso'),
+			'onelogin_saml_keep_local_login' => __('Keep Local login', 'onelogin-saml-sso')
 		);
 		foreach ($options_fields as $name => $description) {
 			register_setting($option_group, $name);
@@ -112,7 +113,7 @@ require_once (dirname(__FILE__) . "/lib/Saml2/Constants.php");
 		add_settings_section('customize_links', __('CUSTOMIZE ACTIONS AND LINKS', 'onelogin-saml-sso'), 'plugin_section_customize_links_text', $option_group);
 
 		register_setting($option_group, 'onelogin_saml_customize_action_prevent_local_login');
-		add_settings_field('onelogin_saml_customize_action_prevent_local_login', __('Prevent local login', 'onelogin-saml-sso'), "plugin_setting_boolean_onelogin_saml_customize_action_prevent_local_login", $option_group, 'customize_links');
+		add_settings_field('onelogin_saml_customize_action_prevent_local_login', __('Prevent use of ?normal', 'onelogin-saml-sso'), "plugin_setting_boolean_onelogin_saml_customize_action_prevent_local_login", $option_group, 'customize_links');
 
 		register_setting($option_group, 'onelogin_saml_customize_action_prevent_reset_password');
 		add_settings_field('onelogin_saml_customize_action_prevent_reset_password', __('Prevent reset password', 'onelogin-saml-sso'), "plugin_setting_boolean_onelogin_saml_customize_action_prevent_reset_password", $option_group, 'customize_links');
@@ -132,6 +133,8 @@ require_once (dirname(__FILE__) . "/lib/Saml2/Constants.php");
 		register_setting($option_group, 'onelogin_saml_customize_links_lost_password');
 		add_settings_field('onelogin_saml_customize_links_lost_password', __('Lost Password', 'onelogin-saml-sso'), "plugin_setting_string_onelogin_saml_customize_links_lost_password", $option_group, 'customize_links');
 
+		register_setting($option_group, 'onelogin_saml_customize_links_saml_login');
+		add_settings_field('onelogin_saml_customize_links_saml_login', __('SAML Link Message', 'onelogin-saml-sso'), "plugin_setting_string_onelogin_saml_customize_links_saml_login", $option_group, 'customize_links');
 
 		add_settings_section('advanced_settings', __('ADVANCED SETTINGS', 'onelogin-saml-sso'), 'plugin_section_advanced_settings_text', $option_group);
 
@@ -215,7 +218,7 @@ require_once (dirname(__FILE__) . "/lib/Saml2/Constants.php");
 		$value = get_option('onelogin_saml_forcelogin');
 		echo '<input type="checkbox" name="onelogin_saml_forcelogin" id="onelogin_saml_forcelogin"
 			  '.($value ? 'checked="checked"': '').'>'.
-			  '<p class="description">'.__('Protect Wordpress and force the user to authenticate at the IdP in order to access', 'onelogin-saml-sso').'</p>';
+			  '<p class="description">'.__('Protect Wordpress and force the user to authenticate at the IdP in order to access when any wordpress page is loaded and no active session', 'onelogin-saml-sso').'</p>';
 	}
 
 	function plugin_setting_boolean_onelogin_saml_slo() {
@@ -223,6 +226,13 @@ require_once (dirname(__FILE__) . "/lib/Saml2/Constants.php");
 		echo '<input type="checkbox" name="onelogin_saml_slo" id="onelogin_saml_slo"
 			  '.($value ? 'checked="checked"': '').'>'.
 			  '<p class="description">'.__('Enable/disable Single Log Out. SLO  is a complex functionality, the most common SLO implementation is based on front-channel (redirections), sometimes if the SLO workflow fails a user can be blocked in an unhandled view. If the admin does not controls the set of apps involved in the SLO process maybe is better to disable this functionality due could carry more problems than benefits.', 'onelogin-saml-sso').'</p>';
+	}
+
+	function plugin_setting_boolean_onelogin_saml_keep_local_login() {
+		$value = get_option('onelogin_saml_keep_local_login');
+		echo '<input type="checkbox" name="onelogin_saml_keep_local_login" id="onelogin_saml_keep_local_login"
+			  '.($value ? 'checked="checked"': '').'>'.
+			  '<p class="description">'.__('Enable/disable the normal login form. If disabled, instead of prompt the login form, WP will excecute directly the SP-initiated SSO flow. If enabled te normal login form is showed and a link to initiate that flow is prompted.', 'onelogin-saml-sso').'</p>';
 	}
 
 	function plugin_setting_select_onelogin_saml_account_matcher() {
@@ -304,7 +314,7 @@ require_once (dirname(__FILE__) . "/lib/Saml2/Constants.php");
 		$value = get_option('onelogin_saml_customize_action_prevent_local_login');
 		echo '<input type="checkbox" name="onelogin_saml_customize_action_prevent_local_login" id="onelogin_saml_customize_action_prevent_local_login"
 			  '.($value ? 'checked="checked"': '').'>
-			  <p class="description">'.__("Check it in order to disable the local login. After that only SAML logins will be allowed.", 'onelogin-saml-sso').'</p>';
+			  <p class="description">'.__("Check it in order to disable the ?normal option in order to offer the local login when it is not enabled.", 'onelogin-saml-sso').'</p>';
 	}
 
 	function plugin_setting_boolean_onelogin_saml_customize_action_prevent_reset_password() {
@@ -345,7 +355,13 @@ require_once (dirname(__FILE__) . "/lib/Saml2/Constants.php");
 		echo '<input type="text" name="onelogin_saml_customize_links_lost_password" id="onelogin_saml_customize_links_lost_password"
 			  value= "'.get_option('onelogin_saml_customize_links_lost_password').'" size="80">
  			  <p class="description">'.__("Override the lost password link. (prevent reset password must be deactivated or always the SAMl SSO will be forced)", 'onelogin-saml-sso').'</p>';
-	}	
+	}
+
+	function plugin_setting_string_onelogin_saml_customize_links_saml_login() {
+		echo '<input type="text" name="onelogin_saml_customize_links_saml_login" id="onelogin_saml_customize_links_saml_login"
+			  value= "'.get_option('onelogin_saml_customize_links_saml_login').'" size="80">
+ 			  <p class="description">'.__("If 'Keep Local login' enabled, this will be showed as message at the SAML Link.", 'onelogin-saml-sso').'</p>';
+	}
 
 	function plugin_setting_boolean_onelogin_saml_advanced_settings_debug() {
 		$value = get_option('onelogin_saml_advanced_settings_debug');
