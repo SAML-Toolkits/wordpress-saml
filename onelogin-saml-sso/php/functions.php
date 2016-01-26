@@ -53,7 +53,7 @@ function saml_sso() {
 		return true;
 	}
 	$auth = initialize_saml();
-	if (isset($_SERVER['REQUEST_URI'])) {
+	if (isset($_SERVER['REQUEST_URI']) && !isset($_GET['saml_sso'])) {
 		$auth->login($_SERVER['REQUEST_URI']);
 	} else {
 		$auth->login();
