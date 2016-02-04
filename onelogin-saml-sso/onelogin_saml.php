@@ -4,7 +4,7 @@ Plugin Name: OneLogin SAML SSO
 Plugin URI: http://support.onelogin.com/entries/383540
 Description: Give users secure one-click access to WordPress from OneLogin. This SAML integration eliminates passwords and allows you to authenticate users against your existing Active Directory or LDAP server as well increase security using YubiKeys or VeriSign VIP Access, browser PKI certificates and OneLogin's flexible security policies. OneLogin is pre-integrated with thousands of apps and handles all of your SSO needs in the cloud and behind the firewall.
 Author: OneLogin, Inc.
-Version: 2.1.8
+Version: 2.3.0
 Author URI: http://www.onelogin.com
 */
 
@@ -43,29 +43,43 @@ if (isset($_COOKIE['saml_login']) && get_option('onelogin_saml_slo')) {
 	add_action('init', 'saml_slo', 1);
 }
 
-$saml_actions = isset($_GET['saml_metadata']);
+// Handle SSO
+if (isset($_GET['saml_sso'])) {
+	add_action('init', 'saml_sso', 1);
+} else {
+	$execute_sso = false;
+	$saml_actions = isset($_GET['saml_metadata']);
 
-$wp_login_page = (strpos($_SERVER['SCRIPT_NAME'], 'wp-login.php') !== FALSE) && $action == 'login' && !isset($_GET['loggedout']);
+	$wp_login_page = (strpos($_SERVER['SCRIPT_NAME'], 'wp-login.php') !== FALSE) && $action == 'login' && !isset($_GET['loggedout']);
 
-$want_to_local_login = isset($_GET['normal']) || (isset($_POST['log']) && isset($_POST['pwd']));
-$want_to_reset = $action == 'lostpassword' || $action == 'rp' || $action == 'resetpass' || (isset($_GET['checkemail']) &&  $_GET['checkemail'] == 'confirm');
+	$want_to_local_login = isset($_GET['normal']) || (isset($_POST['log']) && isset($_POST['pwd']));
+	$want_to_reset = $action == 'lostpassword' || $action == 'rp' || $action == 'resetpass' || (isset($_GET['checkemail']) &&  $_GET['checkemail'] == 'confirm');
 
-$local_wp_actions = $want_to_local_login || $want_to_reset;
+	$local_wp_actions = $want_to_local_login || $want_to_reset;
 
-// plugin hooks into authenticator system
-if (!$local_wp_actions) {
-	if ($wp_login_page) {
-		add_action('init', 'saml_sso', 1);
-	} else if (!$saml_actions && !isset($_GET['loggedout'])) {
-		if (get_option('onelogin_saml_forcelogin')) {
-			add_action('init', 'saml_sso', 1);
+	// plugin hooks into authenticator system
+	if (!$local_wp_actions) {
+		if ($wp_login_page) {
+			$execute_sso = True;
+		} else if (!$saml_actions && !isset($_GET['loggedout'])) {
+			if (get_option('onelogin_saml_forcelogin')) {
+				add_action('init', 'saml_sso', 1);
+			}
+		}
+	} else if ($local_wp_actions) {
+		$prevent_local_login = get_option('onelogin_saml_customize_action_prevent_local_login', false);
+
+		if (($want_to_local_login && $prevent_local_login) || ($want_to_reset && $prevent_reset_password)) {		
+			$execute_sso = True;
 		}
 	}
-} else if ($local_wp_actions) {
-	$prevent_local_login = get_option('onelogin_saml_customize_action_prevent_local_login', false);
 
-	if (($want_to_local_login && $prevent_local_login) || ($want_to_reset && $prevent_reset_password)) {
+
+	$keep_local_login_form = get_option('onelogin_saml_keep_local_login', false);
+	if ($execute_sso && !$keep_local_login_form) {
 		add_action('init', 'saml_sso', 1);
+	} else {
+		add_filter('login_message', 'saml_custom_login_footer');
 	}
 }
 

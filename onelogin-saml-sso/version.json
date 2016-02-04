@@ -1,12 +1,12 @@
 {
     "php-saml": {
-        "version": "2.5.0",
-        "released": "05/06/2015"
+        "version": "2.6.1",
+        "released": "09/10/2015"
     },
     "plugin": {
         "app":      "wordpress",
         "name":     "onelogin-saml-sso",
-        "version":  "2.1.7",
-        "released": "24/06/2015"
+        "version":  "2.3.0",
+        "released": "26/01/2016"
     }
 }

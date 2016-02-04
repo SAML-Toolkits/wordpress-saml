@@ -10,7 +10,7 @@ class OneLogin_Saml2_Auth
     /**
      * Settings data.
      *
-     * @var array
+     * @var OneLogin_Saml2_Settings
      */
     private $_settings;
 
@@ -37,10 +37,20 @@ class OneLogin_Saml2_Auth
 
 
     /**
-     * SessionIndex. When the user is logged, this stored the 
+     * SessionIndex. When the user is logged, this stored it 
      * from the AuthnStatement of the SAML Response
+     * 
+     * @var string
      */
     private $_sessionIndex;
+
+    /**
+     * SessionNotOnOrAfter. When the user is logged, this stored it 
+     * from the AuthnStatement of the SAML Response
+     *
+     * @var DateTime
+     */
+    private $_sessionExpiration;
 
     /**
      * If any error.
@@ -59,7 +69,7 @@ class OneLogin_Saml2_Auth
     /**
      * Initializes the SP SAML instance.
      *
-     * @param array $oldSettings Setting data
+     * @param array|OneLogin_Saml_Settings $oldSettings Setting data. (OneLogin_Saml_Settings is the settings object of the old implementation)
      */
     public function __construct($oldSettings = null)
     {
@@ -69,7 +79,7 @@ class OneLogin_Saml2_Auth
     /**
      * Returns the settings info
      *
-     * @return array  The settings data.
+     * @return OneLogin_Saml2_Settings  The settings data.
      */
     public function getSettings()
     {
@@ -106,6 +116,7 @@ class OneLogin_Saml2_Auth
                 $this->_nameid = $response->getNameId();
                 $this->_authenticated = true;
                 $this->_sessionIndex = $response->getSessionIndex();
+                $this->_sessionExpiration = $response->getSessionNotOnOrAfter();
             } else {
                 $this->_errors[] = 'invalid_response';
                 $this->_errorReason = $response->getError();
@@ -123,9 +134,13 @@ class OneLogin_Saml2_Auth
      * Process the SAML Logout Response / Logout Request sent by the IdP.
      *
      * @param boolean $keepLocalSession When false will destroy the local session, otherwise will keep it
-     * @param string  $requestId        The ID of the LogoutRequest sent by this SP to the IdP
+     * @param string $requestId The ID of the LogoutRequest sent by this SP to the IdP
+     * @param bool $retrieveParametersFromServer
+     * @param callable $cbDeleteSession
+     * @return string|void
+     * @throws \OneLogin_Saml2_Error
      */
-    public function processSLO($keepLocalSession = false, $requestId = null, $retrieveParametersFromServer = false)
+    public function processSLO($keepLocalSession = false, $requestId = null, $retrieveParametersFromServer = false, $cbDeleteSession = null)
     {
         $this->_errors = array();
         if (isset($_GET) && isset($_GET['SAMLResponse'])) {
@@ -137,7 +152,11 @@ class OneLogin_Saml2_Auth
                 $this->_errors[] = 'logout_not_success';
             } else {
                 if (!$keepLocalSession) {
-                    OneLogin_Saml2_Utils::deleteLocalSession();
+                    if ($cbDeleteSession === null) {
+                        OneLogin_Saml2_Utils::deleteLocalSession();
+                    } else {
+                        call_user_func($cbDeleteSession);
+                    }
                 }
             }
         } else if (isset($_GET) && isset($_GET['SAMLRequest'])) {
@@ -147,7 +166,11 @@ class OneLogin_Saml2_Auth
                 $this->_errorReason = $logoutRequest->getError();
             } else {
                 if (!$keepLocalSession) {
-                    OneLogin_Saml2_Utils::deleteLocalSession();
+                    if ($cbDeleteSession === null) {
+                        OneLogin_Saml2_Utils::deleteLocalSession();
+                    } else {
+                        call_user_func($cbDeleteSession);
+                    }
                 }
                 $inResponseTo = $logoutRequest->id;
                 $responseBuilder = new OneLogin_Saml2_LogoutResponse($this->_settings);
@@ -161,12 +184,12 @@ class OneLogin_Saml2_Auth
 
                 $security = $this->_settings->getSecurityData();
                 if (isset($security['logoutResponseSigned']) && $security['logoutResponseSigned']) {
-                    $signature = $this->buildResponseSignature($logoutResponse, $parameters['RelayState']);
-                    $parameters['SigAlg'] = XMLSecurityKey::RSA_SHA1;
+                    $signature = $this->buildResponseSignature($logoutResponse, $parameters['RelayState'], $security['signatureAlgorithm']);
+                    $parameters['SigAlg'] = $security['signatureAlgorithm'];
                     $parameters['Signature'] = $signature;
                 }
 
-                $this->redirectTo($this->getSLOurl(), $parameters);
+                return $this->redirectTo($this->getSLOurl(), $parameters);
             }
         } else {
             $this->_errors[] = 'invalid_binding';
@@ -193,7 +216,7 @@ class OneLogin_Saml2_Auth
             $url = $_REQUEST['RelayState'];
         }
 
-        OneLogin_Saml2_Utils::redirect($url, $parameters);
+        return OneLogin_Saml2_Utils::redirect($url, $parameters);
     }
 
     /**
@@ -234,6 +257,16 @@ class OneLogin_Saml2_Auth
     public function getSessionIndex()
     {
         return $this->_sessionIndex;
+    }
+
+    /**
+     * Returns the SessionNotOnOrAfter
+     *
+     * @return DateTime|null  The SessionNotOnOrAfter of the assertion
+     */
+    public function getSessionExpiration()
+    {
+        return $this->_sessionExpiration;
     }
 
     /**
@@ -300,11 +333,11 @@ class OneLogin_Saml2_Auth
 
         $security = $this->_settings->getSecurityData();
         if (isset($security['authnRequestsSigned']) && $security['authnRequestsSigned']) {
-            $signature = $this->buildRequestSignature($samlRequest, $parameters['RelayState']);
-            $parameters['SigAlg'] = XMLSecurityKey::RSA_SHA1;
+            $signature = $this->buildRequestSignature($samlRequest, $parameters['RelayState'], $security['signatureAlgorithm']);
+            $parameters['SigAlg'] = $security['signatureAlgorithm'];
             $parameters['Signature'] = $signature;
         }
-        $this->redirectTo($this->getSSOurl(), $parameters);
+        return $this->redirectTo($this->getSSOurl(), $parameters);
     }
 
     /**
@@ -344,12 +377,12 @@ class OneLogin_Saml2_Auth
 
         $security = $this->_settings->getSecurityData();
         if (isset($security['logoutRequestSigned']) && $security['logoutRequestSigned']) {
-            $signature = $this->buildRequestSignature($samlRequest, $parameters['RelayState']);
-            $parameters['SigAlg'] = XMLSecurityKey::RSA_SHA1;
+            $signature = $this->buildRequestSignature($samlRequest, $parameters['RelayState'], $security['signatureAlgorithm']);
+            $parameters['SigAlg'] = $security['signatureAlgorithm'];
             $parameters['Signature'] = $signature;
         }
 
-        $this->redirectTo($sloUrl, $parameters);
+        return $this->redirectTo($sloUrl, $parameters);
     }
 
     /**
@@ -381,12 +414,13 @@ class OneLogin_Saml2_Auth
     /**
      * Generates the Signature for a SAML Request
      *
-     * @param string $samlRequest The SAML Request
-     * @param string $relayState  The RelayState
+     * @param string $samlRequest    The SAML Request
+     * @param string $relayState     The RelayState
+     * @param string $signAlgorithm Signature algorithm method
      *
      * @return string A base64 encoded signature
      */
-    public function buildRequestSignature($samlRequest, $relayState)
+    public function buildRequestSignature($samlRequest, $relayState, $signAlgorithm = XMLSecurityKey::RSA_SHA1)
     {
         if (!$this->_settings->checkSPCerts()) {
             throw new OneLogin_Saml2_Error(
@@ -397,12 +431,12 @@ class OneLogin_Saml2_Auth
 
         $key = $this->_settings->getSPkey();
 
-        $objKey = new XMLSecurityKey(XMLSecurityKey::RSA_SHA1, array('type' => 'private'));
+        $objKey = new XMLSecurityKey($signAlgorithm, array('type' => 'private'));
         $objKey->loadKey($key, false);
 
         $msg = 'SAMLRequest='.urlencode($samlRequest);
         $msg .= '&RelayState='.urlencode($relayState);
-        $msg .= '&SigAlg=' . urlencode(XMLSecurityKey::RSA_SHA1);
+        $msg .= '&SigAlg=' . urlencode($signAlgorithm);
         $signature = $objKey->signData($msg);
         return base64_encode($signature);
     }
@@ -410,12 +444,13 @@ class OneLogin_Saml2_Auth
     /**
      * Generates the Signature for a SAML Response
      *
-     * @param string $samlResponse The SAML Response
-     * @param string $relayState   The RelayState     
+     * @param string $samlResponse   The SAML Response
+     * @param string $relayState     The RelayState
+     * @param string $signAlgorithm Signature algorithm method
      *
      * @return string A base64 encoded signature 
      */
-    public function buildResponseSignature($samlResponse, $relayState)
+    public function buildResponseSignature($samlResponse, $relayState, $signAlgorithm = XMLSecurityKey::RSA_SHA1)
     {
         if (!$this->_settings->checkSPCerts()) {
             throw new OneLogin_Saml2_Error(
@@ -426,12 +461,12 @@ class OneLogin_Saml2_Auth
 
         $key = $this->_settings->getSPkey();
 
-        $objKey = new XMLSecurityKey(XMLSecurityKey::RSA_SHA1, array('type' => 'private'));
+        $objKey = new XMLSecurityKey($signAlgorithm, array('type' => 'private'));
         $objKey->loadKey($key, false);
 
         $msg = 'SAMLResponse='.urlencode($samlResponse);
         $msg .= '&RelayState='.urlencode($relayState);
-        $msg .= '&SigAlg=' . urlencode(XMLSecurityKey::RSA_SHA1);
+        $msg .= '&SigAlg=' . urlencode($signAlgorithm);
         $signature = $objKey->signData($msg);
         return base64_encode($signature);
     }
