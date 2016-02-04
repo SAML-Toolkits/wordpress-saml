@@ -23,6 +23,7 @@ This SAML plugin eliminates passwords and allows you to authenticate WordPress u
  * Uncomment out filter based custom role code
  * Add 'Keep Local login' functionality in order to prompt the normal login form + a SAML link instead of directly execute the SP-initiaited SSO flow
  * Fix changelog
+ * Update php-saml library to 2.6.1
 
 = 2.2.0 =
  * Password security issue
