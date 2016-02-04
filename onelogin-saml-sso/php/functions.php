@@ -56,6 +56,10 @@ function saml_sso() {
 	if (is_user_logged_in()) {
 		return true;
 	}
+	if ( defined('DOING_AJAX') && DOING_AJAX) {
+		http_response_code(401);
+		exit();
+	}
 	$auth = initialize_saml();
 	if (isset($_SERVER['REQUEST_URI']) && !isset($_GET['saml_sso'])) {
 		$auth->login($_SERVER['REQUEST_URI']);
