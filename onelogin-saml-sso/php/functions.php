@@ -20,7 +20,11 @@ function saml_checker() {
 }
 
 function saml_custom_login_footer() {
-	$saml_login_message = get_option('onelogin_saml_customize_links_saml_login', "SAML Login");
+	$saml_login_message = get_option('onelogin_saml_customize_links_saml_login');
+	if (empty($saml_login_message)) {
+		$saml_login_message = "SAML Login";
+	}
+
     echo '<div style="font-size: 110%;padding:8px;background: #fff;text-align: center;"><a href="'.get_site_url().'/wp-login.php?saml_sso">'.$saml_login_message.'</a></div>';
 }
 
