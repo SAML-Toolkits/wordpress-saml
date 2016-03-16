@@ -92,16 +92,12 @@ require_once (dirname(__FILE__) . "/lib/Saml2/Constants.php");
 		}
 
 		add_settings_section('role_mapping', __('ROLE MAPPING', 'onelogin-saml-sso'), 'plugin_section_role_mapping_text', $option_group);
-		$mapping_fields = array (
-			'onelogin_saml_role_mapping_administrator' => __('Administrator', 'onelogin-saml-sso'),
-			'onelogin_saml_role_mapping_editor' => __('Editor', 'onelogin-saml-sso'),
-			'onelogin_saml_role_mapping_author' => __('Author', 'onelogin-saml-sso'),
-			'onelogin_saml_role_mapping_contributor' => __('Contributor', 'onelogin-saml-sso'),
-			'onelogin_saml_role_mapping_subscriber' => __('Subscriber', 'onelogin-saml-sso')
-		);
-		foreach ($mapping_fields as $name => $description) {
-			register_setting($option_group, $name);
-			add_settings_field($name, $description, "plugin_setting_string_$name", $option_group, 'role_mapping');
+		add_settings_section('role_precedence', __('ROLE PRECEDENCE', 'onelogin-saml-sso'), 'plugin_section_role_order_text', $option_group);
+		foreach (wp_roles()->get_names() as $role_value => $role_name) {
+			register_setting($option_group, 'onelogin_saml_role_mapping_'.$role_value);
+			add_settings_field('onelogin_saml_role_mapping_'.$role_value, $role_name, "plugin_setting_string_onelogin_saml_role_mapping", $option_group, 'role_mapping', $role_value);
+			register_setting($option_group, 'onelogin_saml_role_order_'.$role_value);
+			add_settings_field('onelogin_saml_role_order_'.$role_value, $role_name, "plugin_setting_string_onelogin_saml_role_order", $option_group, 'role_precedence', $role_value);
 		}
 
 		register_setting($option_group, 'onelogin_saml_role_mapping_multivalued_in_one_attribute_value');
@@ -271,31 +267,15 @@ require_once (dirname(__FILE__) . "/lib/Saml2/Constants.php");
 			  '<p class="description">'.__("The attribute that contains the role of the user, For example 'memberOf'. If Wordpress can't figure what role assign to the user, it will assign the default role defined at the general settings.", 'onelogin-saml-sso').'</p>';
 	}
 
-	function plugin_setting_string_onelogin_saml_role_mapping_administrator() {
-		echo '<input type="text" name="onelogin_saml_role_mapping_administrator" id="onelogin_saml_role_mapping_administrator"
-			  value= "'.get_option('onelogin_saml_role_mapping_administrator').'" size="30">';
+	function plugin_setting_string_onelogin_saml_role_mapping($role_value) {
+		echo '<input type="text" name="onelogin_saml_role_mapping_'.$role_value.'" id="onelogin_saml_role_mapping_'.$role_value.'"
+			  value= "'.get_option('onelogin_saml_role_mapping_'.$role_value).'" size="30">';
 	}
 
-	function plugin_setting_string_onelogin_saml_role_mapping_editor() {
-		echo '<input type="text" name="onelogin_saml_role_mapping_editor" id="onelogin_saml_role_mapping_editor"
-			  value= "'.get_option('onelogin_saml_role_mapping_editor').'" size="30">';
+	function plugin_setting_string_onelogin_saml_role_order($role_value) {
+		echo '<input type="text" name="onelogin_saml_role_order_'.$role_value.'" id="onelogin_saml_role_order_'.$role_value.'"
+			  value= "'.get_option('onelogin_saml_role_order_'.$role_value).'" size="5">';
 	}
-
-	function plugin_setting_string_onelogin_saml_role_mapping_author() {
-		echo '<input type="text" name="onelogin_saml_role_mapping_author" id="onelogin_saml_role_mapping_author"
-			  value= "'.get_option('onelogin_saml_role_mapping_author').'" size="30">';
-	}
-
-	function plugin_setting_string_onelogin_saml_role_mapping_contributor() {
-		echo '<input type="text" name="onelogin_saml_role_mapping_contributor" id="onelogin_saml_role_mapping_contributor"
-			  value= "'.get_option('onelogin_saml_role_mapping_contributor').'" size="30">';
-	}
-
-	function plugin_setting_string_onelogin_saml_role_mapping_subscriber() {
-		echo '<input type="text" name="onelogin_saml_role_mapping_subscriber" id="onelogin_saml_role_mapping_subscriber"
-			  value= "'.get_option('onelogin_saml_role_mapping_subscriber').'" size="30">';
-	}
-
 
 	function plugin_setting_boolean_onelogin_saml_role_mapping_multivalued_in_one_attribute_value() {
 		$value = get_option('onelogin_saml_role_mapping_multivalued_in_one_attribute_value');
@@ -520,6 +500,10 @@ require_once (dirname(__FILE__) . "/lib/Saml2/Constants.php");
 
 	function plugin_section_role_mapping_text() {
 		echo "<p>".__("The IdP can use it's own roles. Set in this section the mapping between IdP and Wordpress roles. Accepts multiple valued comma separated. Example: admin,owner,superuser", 'onelogin-saml-sso')."</p>";
+	}
+
+	function plugin_section_role_order_text() {
+		echo "<p>".__("The IdP may return more than one role. Set in this secion the precedence of the different roles, the smallest integer will be the role chosen.", 'onelogin-saml-sso')."</p>";
 	}
 
 	function plugin_section_customize_links_text() {
