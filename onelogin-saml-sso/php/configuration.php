@@ -5,7 +5,8 @@ if ( !function_exists( 'add_action' ) ) {
 	echo 'Hi there!  I\'m just a plugin, not much I can do when called directly.';
 	exit;
 }
-	
+
+require_once "compatibility.php";
 require_once (dirname(__FILE__) . "/lib/Saml2/Constants.php");
 
 
@@ -68,7 +69,8 @@ require_once (dirname(__FILE__) . "/lib/Saml2/Constants.php");
 			'onelogin_saml_updateuser' => __('Update user data', 'onelogin-saml-sso'),
 			'onelogin_saml_forcelogin' => __('Force SAML login', 'onelogin-saml-sso'),
 			'onelogin_saml_slo' => __('Single Log Out', 'onelogin-saml-sso'),
-			'onelogin_saml_keep_local_login' => __('Keep Local login', 'onelogin-saml-sso')
+			'onelogin_saml_keep_local_login' => __('Keep Local login', 'onelogin-saml-sso'),
+			'onelogin_saml_alternative_acs' => __('Alternative ACS Endpoint', 'onelogin-saml-sso')			
 		);
 		foreach ($options_fields as $name => $description) {
 			register_setting($option_group, $name);
@@ -239,6 +241,13 @@ require_once (dirname(__FILE__) . "/lib/Saml2/Constants.php");
 			  <option value="email" '.($value == 'email'? 'selected="selected"':'').'>'.__("E-mail", 'onelogin-saml-sso').'</option>
 			</select>'.
 			'<p class="description">'.__("Select what field will be used in order to find the user account. If you select the 'email' fieldname the plugin will prevent that the user can change his mail in his profile.", 'onelogin-saml-sso').'</p>';
+	}
+
+	function plugin_setting_boolean_onelogin_saml_alternative_acs() {
+		$value = get_option('onelogin_saml_alternative_acs');
+		echo '<input type="checkbox" name="onelogin_saml_alternative_acs" id="onelogin_saml_alternative_acs"
+			  '.($value ? 'checked="checked"': '').'>'.
+			  '<p class="description">'.__('Enable it if you want to use a different Assertion Consumer endpoint than the /wp-login.php?saml_acs (Required if using WPEngine or any similar hosting service that prevent POST on wp-login.php). If you enable/disable it, after saving the metadata of the SP changes so update the IdP with the new value', 'onelogin-saml-sso').'</p>';
 	}
 
 	function plugin_setting_string_onelogin_saml_attr_mapping_username() {
@@ -503,7 +512,7 @@ require_once (dirname(__FILE__) . "/lib/Saml2/Constants.php");
 	}
 
 	function plugin_section_role_order_text() {
-		echo "<p>".__("The IdP may return more than one role. Set in this secion the precedence of the different roles, the smallest integer will be the role chosen.", 'onelogin-saml-sso')."</p>";
+		echo "<p>".__("In some cases, the IdP returns more than one role. Set in this secion the precedence of the different roles, the smallest integer will be the role chosen.", 'onelogin-saml-sso')."</p>";
 	}
 
 	function plugin_section_customize_links_text() {

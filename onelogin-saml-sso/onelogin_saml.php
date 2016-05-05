@@ -48,7 +48,7 @@ if (isset($_GET['saml_sso'])) {
 	add_action('init', 'saml_sso', 1);
 } else {
 	$execute_sso = false;
-	$saml_actions = isset($_GET['saml_metadata']);
+	$saml_actions = isset($_GET['saml_metadata']) || (strpos($_SERVER['SCRIPT_NAME'], 'alternative_acs.php') !== FALSE);
 
 	$wp_login_page = (strpos($_SERVER['SCRIPT_NAME'], 'wp-login.php') !== FALSE) && $action == 'login' && !isset($_GET['loggedout']);
 

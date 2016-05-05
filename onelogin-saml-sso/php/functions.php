@@ -6,6 +6,9 @@ if ( !function_exists( 'add_action' ) ) {
 	exit;
 }
 
+require_once "compatibility.php";
+
+
 function saml_checker() {
 	if (isset($_GET['saml_acs'])) {
 		saml_acs();
@@ -91,19 +94,21 @@ function saml_slo() {
 
 function saml_role_order_get($role) {
 	static $role_defaults = array(
-		'administrator' => -5,
-		'editor'        => -4,
-		'author'        => -3,
-		'contributor'   => -2,
-		'subscriber'    => -1);
+		'administrator' => 1,
+		'editor'        => 2,
+		'author'        => 3,
+		'contributor'   => 4,
+		'subscriber'    => 5);
 	$rv = get_option('onelogin_saml_role_order_'.$role);
 	if (empty($rv))
-		if (isset($role_defaults[$role]))
+		if (isset($role_defaults[$role])) {
 			return $role_defaults[$role];
-		else
+		} else {
 			return PHP_INT_MAX;
-	else
+		}
+	else {
 		return (int)$rv;
+	}
 }
 
 function saml_role_order_compare($role1, $role2) {
@@ -259,12 +264,12 @@ function saml_acs() {
 		wp_set_current_user($user_id);
 		wp_set_auth_cookie($user_id);
 		setcookie('saml_login', 1, time() + YEAR_IN_SECONDS, SITECOOKIEPATH );
-				#do_action('wp_login', $user_id);
+		#do_action('wp_login', $user_id);
 		#wp_signon($user_id);
 	}
 
 	if (isset($_REQUEST['RelayState'])) {
-		if (!empty($_REQUEST['RelayState']) && (substr($_REQUEST['RelayState'], -strlen('/wp-login.php')) === '/wp-login.php')) {
+		if (!empty($_REQUEST['RelayState']) && ((substr($_REQUEST['RelayState'], -strlen('/wp-login.php')) === '/wp-login.php') || (substr($_REQUEST['RelayState'], -strlen('/alternative_acs.php')) === '/alternative_acs.php'))) {
 			wp_redirect(home_url());
 		} else {
 			if (strpos($_REQUEST['RelayState'], 'redirect_to') !== false) {
