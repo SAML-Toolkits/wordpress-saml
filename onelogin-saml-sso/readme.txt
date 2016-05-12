@@ -19,6 +19,9 @@ This SAML plugin eliminates passwords and allows you to authenticate WordPress u
 
 == Changelog ==
 
+= 2.4.1 =
+ * Update php-saml library to 2.8.0
+
 = 2.4.0 =
  * Use the worpress roles API to generate the options for the mappings a nd use these mappings to set the user role. Add Role precedence support.
  * Add alternative ACS URL (WPEngine compatible)
