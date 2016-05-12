@@ -13,14 +13,14 @@ class OneLogin_Saml2_Metadata
     /**
      * Generates the metadata of the SP based on the settings
      *
-     * @param string    $sp            The SP data
-     * @param string    $authnsign     authnRequestsSigned attribute
-     * @param string    $wsign         wantAssertionsSigned attribute 
-     * @param DateTime  $validUntil    Metadata's valid time
-     * @param Timestamp $cacheDuration Duration of the cache in seconds
-     * @param array     $contacts      Contacts info
-     * @param array     $organization  Organization ingo
-     *
+     * @param array         $sp            The SP data
+     * @param bool|string   $authnsign     authnRequestsSigned attribute
+     * @param bool|string   $wsign         wantAssertionsSigned attribute
+     * @param DateTime|null $validUntil    Metadata's valid time
+     * @param int|null      $cacheDuration Duration of the cache in seconds
+     * @param array         $contacts      Contacts info
+     * @param array         $organization  Organization ingo
+     * @param array         $attributes
      * @return string SAML Metadata XML
      */
     public static function builder($sp, $authnsign = false, $wsign = false, $validUntil = null, $cacheDuration = null, $contacts = array(), $organization = array(), $attributes = array())
@@ -131,12 +131,13 @@ METADATA_TEMPLATE;
      * Adds the x509 descriptors (sign/encriptation) to the metadata
      * The same cert will be used for sign/encrypt
      *
-     * @param string $metadata SAML Metadata XML
-     * @param string $cert     x509 cert
+     * @param string $metadata       SAML Metadata XML
+     * @param string $cert           x509 cert
+     * @param bool   $wantsEncrypted Whether to include the KeyDescriptor for encryption
      *
      * @return string Metadata with KeyDescriptors
      */
-    public static function addX509KeyDescriptors($metadata, $cert)
+    public static function addX509KeyDescriptors($metadata, $cert, $wantsEncrypted = true)
     {
         $xml = new DOMDocument();
         $xml->preserveWhiteSpace = false;
@@ -163,16 +164,20 @@ METADATA_TEMPLATE;
 
         $SPSSODescriptor = $xml->getElementsByTagName('SPSSODescriptor')->item(0);
         $SPSSODescriptor->insertBefore($keyDescriptor->cloneNode(), $SPSSODescriptor->firstChild);
-        $SPSSODescriptor->insertBefore($keyDescriptor->cloneNode(), $SPSSODescriptor->firstChild);
+        if ($wantsEncrypted === true) {
+            $SPSSODescriptor->insertBefore($keyDescriptor->cloneNode(), $SPSSODescriptor->firstChild);
+        }
 
         $signing = $xml->getElementsByTagName('KeyDescriptor')->item(0);
         $signing->setAttribute('use', 'signing');
-
-        $encryption = $xml->getElementsByTagName('KeyDescriptor')->item(1);
-        $encryption->setAttribute('use', 'encryption');
-
         $signing->appendChild($keyInfo);
-        $encryption->appendChild($keyInfo->cloneNode(true));
+
+        if ($wantsEncrypted === true) {
+            $encryption = $xml->getElementsByTagName('KeyDescriptor')->item(1);
+            $encryption->setAttribute('use', 'encryption');
+
+            $encryption->appendChild($keyInfo->cloneNode(true));
+        }
 
         return $xml->saveXML();
     }

@@ -33,15 +33,15 @@ class OneLogin_Saml2_Response
     public $decryptedDocument;
 
     /**
-    * The response contains an encrypted assertion.
-    * @var boolean
-    */
+     * The response contains an encrypted assertion.
+     * @var bool
+     */
     public $encrypted = false;
 
     /**
-    * After validation, if it fail this var has the cause of the problem
-    * @var string
-    */
+     * After validation, if it fail this var has the cause of the problem
+     * @var string
+     */
     private $_error;
 
     /**
@@ -49,6 +49,8 @@ class OneLogin_Saml2_Response
      *
      * @param OneLogin_Saml2_Settings $settings Settings.
      * @param string                  $response A UUEncoded SAML response from the IdP.
+     *
+     * @throws Exception
      */
     public function __construct(OneLogin_Saml2_Settings $settings, $response)
     {
@@ -72,13 +74,14 @@ class OneLogin_Saml2_Response
     }
 
     /**
-    * Determines if the SAML Response is valid using the certificate.
-    *
-    * @param string $requestId The ID of the AuthNRequest sent by this SP to the IdP
-    *
-    * @throws Exception
-    * @return bool Validate the document
-    */
+     * Determines if the SAML Response is valid using the certificate.
+     *
+     * @param string|null $requestId The ID of the AuthNRequest sent by this SP to the IdP
+     *
+     * @return bool Validate the document
+     *
+     * @throws Exception
+     */
     public function isValid($requestId = null)
     {
         $this->_error = null;
@@ -385,15 +388,19 @@ class OneLogin_Saml2_Response
             }
         }
 
-        if (!isset($nameId)) {
-            throw new Exception("Not NameID found in the assertion of the Response");
-        }
-
         $nameIdData = array();
-        $nameIdData['Value'] = $nameId->nodeValue;
-        foreach (array('Format', 'SPNameQualifier', 'NameQualifier') as $attr) {
-            if ($nameId->hasAttribute($attr)) {
-                $nameIdData[$attr] = $nameId->getAttribute($attr);
+
+        if (!isset($nameId)) {
+            $security = $this->_settings->getSecurityData();
+            if ($security['wantNameId']) {
+                throw new Exception("Not NameID found in the assertion of the Response");
+            }
+        } else {
+            $nameIdData['Value'] = $nameId->nodeValue;
+            foreach (array('Format', 'SPNameQualifier', 'NameQualifier') as $attr) {
+                if ($nameId->hasAttribute($attr)) {
+                    $nameIdData[$attr] = $nameId->getAttribute($attr);
+                }
             }
         }
 
@@ -407,15 +414,19 @@ class OneLogin_Saml2_Response
      */
     public function getNameId()
     {
+        $nameIdvalue = null;
         $nameIdData = $this->getNameIdData();
-        return $nameIdData['Value'];
+        if (!empty($nameIdData) && isset($nameIdData['Value'])) {
+            $nameIdvalue = $nameIdData['Value'];
+        }
+        return $nameIdvalue;
     }
 
     /**
      * Gets the SessionNotOnOrAfter from the AuthnStatement.
      * Could be used to set the local session expiration
      * 
-     * @return DateTime|null The SessionNotOnOrAfter value
+     * @return int|null The SessionNotOnOrAfter value
      */
     public function getSessionNotOnOrAfter()
     {
@@ -552,8 +563,9 @@ class OneLogin_Saml2_Response
      *
      * @param string $assertionXpath Xpath Expresion
      *
-     * @throws Exception
      * @return DOMNodeList The queried node
+     *
+     * @throws Exception
      */
     protected function _queryAssertion($assertionXpath)
     {
@@ -577,13 +589,23 @@ class OneLogin_Saml2_Response
             $signatureQuery = '/samlp:Response/ds:Signature/ds:SignedInfo/ds:Reference';
             $assertionReferenceNode = $xpath->query($signatureQuery)->item(0);
             if ($assertionReferenceNode) {
-                $id = substr($assertionReferenceNode->attributes->getNamedItem('URI')->nodeValue, 1);
+                $uri = $assertionReferenceNode->attributes->getNamedItem('URI')->nodeValue;
+                if (empty($uri)) {
+                    $id = $assertionReferenceNode->parentNode->parentNode->parentNode->attributes->getNamedItem('ID')->nodeValue;
+                } else {
+                    $id = substr($assertionReferenceNode->attributes->getNamedItem('URI')->nodeValue, 1);
+                }
                 $nameQuery = "/samlp:Response[@ID='$id']/".($this->encrypted? "saml:EncryptedAssertion/" : "")."saml:Assertion" . $assertionXpath;
             } else {
                 $nameQuery = "/samlp:Response/".($this->encrypted? "saml:EncryptedAssertion/" : "")."saml:Assertion" . $assertionXpath;
             }
         } else {
-            $id = substr($assertionReferenceNode->attributes->getNamedItem('URI')->nodeValue, 1);
+            $uri = $assertionReferenceNode->attributes->getNamedItem('URI')->nodeValue;
+            if (empty($uri)) {
+                $id = $assertionReferenceNode->parentNode->parentNode->parentNode->attributes->getNamedItem('ID')->nodeValue;
+            } else {
+                $id = substr($assertionReferenceNode->attributes->getNamedItem('URI')->nodeValue, 1);
+            }
             $nameQuery = $assertionNode."[@ID='$id']" . $assertionXpath;
         }
 
@@ -605,10 +627,11 @@ class OneLogin_Saml2_Response
     /**
      * Decrypts the Assertion (DOMDocument)
      *
-     * @param string $dom DomDocument
+     * @param DomNode $dom DomDocument
+     *
+     * @return DOMDocument Decrypted Assertion
      *
      * @throws Exception
-     * @return DOMDocument Decrypted Assertion
      */
     protected function _decryptAssertion($dom)
     {
@@ -636,6 +659,9 @@ class OneLogin_Saml2_Response
                 $objencKey = $objKeyInfo->encryptedCtx;
                 $objKeyInfo->loadKey($pem, false, false);
                 $key = $objencKey->decryptKey($objKeyInfo);
+            } else {
+                // symmetric encryption key support
+                $objKeyInfo->loadKey($pem, false, false);
             }
         }
                 
