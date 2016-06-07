@@ -13,3 +13,10 @@ P.S This plugin will be available at wordpress site soon.
 This kind of WP hosting used to cache plugins and protect the wp-login.php view.
 You will need to contact them in order to disable the cache for this SAML plugin and also allow external HTTP POST to
 wp-login.php
+
+
+### If you used this plugin before 2.2.0 with just-in-time provision active ###
+Read: https://wpvulndb.com/vulnerabilities/8508
+
+To mitigate that, place the script at the root of wordpress and execute it (later remove it)
+https://gist.github.com/pitbulk/a8223c90a3534e9a7d5e0a93009a094f
