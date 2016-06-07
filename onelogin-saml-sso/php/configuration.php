@@ -296,7 +296,7 @@ require_once (dirname(__FILE__) . "/lib/Saml2/Constants.php");
 	function plugin_setting_string_onelogin_saml_role_mapping_multivalued_pattern() {
 		echo '<input type="text" name="onelogin_saml_role_mapping_multivalued_pattern" id="onelogin_saml_role_mapping_multivalued_pattern"
 			  value= "'.get_option('onelogin_saml_role_mapping_multivalued_pattern').'" size="70">
-			  <p class="description">'.__("Regular expression that extract roles from complex multivalued data (require to active the previous boolean).<br> Ex. If the SAMLResponse has a role attribute like: CN=admin;CN=superuser;CN=europe-admin; , use the regular expression /CN=([A-Z0-9\s _-]*);/i to retrieve the values", 'onelogin-saml-sso').'</p>';
+			  <p class="description">'.__("Regular expression that extract roles from complex multivalued data (require to active the previous boolean).<br> Ex. If the SAMLResponse has a role attribute like: CN=admin;CN=superuser;CN=europe-admin; , use the regular expression /CN=([A-Z0-9\s _-]*);/i to retrieve the values. Or use /CN=([^,;]*)/", 'onelogin-saml-sso').'</p>';
 	}
 
 	function plugin_setting_boolean_onelogin_saml_customize_action_prevent_local_login() {
