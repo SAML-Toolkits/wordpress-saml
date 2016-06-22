@@ -3,6 +3,9 @@ if ( !function_exists( 'add_action' ) ) {
 	echo 'Hi there!  I\'m just a plugin, not much I can do when called directly.';
 	exit;
 }
+
+require_once "compatibility.php";
+
 ?>
 <!DOCTYPE html>
 <head>
@@ -110,25 +113,27 @@ if (!empty($lacked_attr_mappings)) {
 	print_r(implode('<br>', $lacked_attr_mappings).'</br>');
 }
 
-$role_mappings = array (
-	'onelogin_saml_role_mapping_administrator' => __('Administrator', 'onelogin-saml-sso'),
-	'onelogin_saml_role_mapping_editor' => __('Editor', 'onelogin-saml-sso'),
-	'onelogin_saml_role_mapping_author' => __('Author', 'onelogin-saml-sso'),
-	'onelogin_saml_role_mapping_contributor' => __('Contributor', 'onelogin-saml-sso'),
-	'onelogin_saml_role_mapping_subscriber' => __('Subscriber', 'onelogin-saml-sso')
-);
-
 $lacked_role_mappings = array();
-foreach ($role_mappings as $field => $name) {
-	$value = get_option($field);
+$lacked_role_orders = array();
+foreach (wp_roles()->get_names() as $roleid => $name) {
+	$value = get_option('onelogin_saml_role_mapping_'.$roleid);
 	if (empty($value)) {
 		$lacked_role_mappings[] = $name;
+	}
+	$value = get_option('onelogin_saml_role_order_'.$roleid);
+	if (empty($value)) {
+		$lacked_role_orders[] = $name;
 	}
 }
 
 if (!empty($lacked_role_mappings)) {
 	echo '<br>'.__("Notice that there are roles without mapping:", 'onelogin-saml-sso').'<br>';
 	print_r(implode('<br>', $lacked_role_mappings).'</br>');
+}
+
+if (!empty($lacked_role_orders)) {
+	echo '<br>'.__("Notice that there are roles without ordering:", 'onelogin-saml-sso').'<br>';
+	print_r(implode('<br>', $lacked_role_orders).'</br>');
 }
 ?>
 

@@ -6,6 +6,9 @@ if ( !function_exists( 'add_action' ) ) {
 	exit;
 }
 
+require_once "compatibility.php";
+
+
 function saml_checker() {
 	if (isset($_GET['saml_acs'])) {
 		saml_acs();
@@ -110,6 +113,34 @@ function saml_slo() {
 	}
 }
 
+function saml_role_order_get($role) {
+	static $role_defaults = array(
+		'administrator' => 1,
+		'editor'        => 2,
+		'author'        => 3,
+		'contributor'   => 4,
+		'subscriber'    => 5);
+	$rv = get_option('onelogin_saml_role_order_'.$role);
+	if (empty($rv))
+		if (isset($role_defaults[$role])) {
+			return $role_defaults[$role];
+		} else {
+			return PHP_INT_MAX;
+		}
+	else {
+		return (int)$rv;
+	}
+}
+
+function saml_role_order_compare($role1, $role2) {
+	$r1 = saml_role_order_get($role1);
+	$r2 = saml_role_order_get($role2);
+	if ($r1 > $r2)
+		return 1;
+	else if ($r1 < $r2)
+		return -1;
+	else return 0;
+}
 
 function saml_acs() {
 	$auth = initialize_saml();
@@ -186,136 +217,28 @@ function saml_acs() {
 				}
 			}
 
-			$adminsRole = explode(',', get_option('onelogin_saml_role_mapping_administrator'));
-			$editorsRole = explode(',', get_option('onelogin_saml_role_mapping_editor'));
-			$authorsRole = explode(',', get_option('onelogin_saml_role_mapping_author'));
-			$contributorsRole = explode(',', get_option('onelogin_saml_role_mapping_contributor'));
-			$subscribersRole = explode(',', get_option('onelogin_saml_role_mapping_subscriber'));
+			$all_roles = wp_roles()->get_names();
+			$roles_found = array();
 
-			$foundCustomizedRole = false;
-
-			/*  In order to use custom roles, you have 2 alternatives */
-
-			/*  Alternative 1 
-			 *  =============
-			 *
-			 *	Uncomment the wollowing lines and replace the values:
-			 *   - First we assign possible OneLogin roles that we want to map with Wordpress Roles
-			 *   - Then we asigned to the $userdata['role'] the name of the Wordpress role
-			 */
-
-			/*
-				$customRole1 = array('value1', 'value2');  // value1 and value2 are roles of OneLogin platform that will be mapped to customRole1
-				$customRole2 = array('value3');  // value3 is a role of OneLogin platformthat will be mapped to customRole2
-
-				foreach ($attrs[$roleMapping] as $samlRole) {
-					if (in_array($samlRole, $customRole1)) {
-						$userdata['role'] = 'customrole1'; // Name of the role -> customrole1
-						$foundCustomized = true;
-						break;
-					} else if (in_array($samlRole, $customRole2)) {
-						$userdata['role'] = 'customrole2'; // Name of the role -> customrole2
-						$foundCustomized = true;
-						break;
-					}
-				}
-			*/
-
-			/*  Alternative 2
-			 *  =============
-			 *
-			 *  - Add the following commented block to a plugin or a themes functions file 
-			 *    replacing CUSTOM_ROLE_NAME with the role name, not the display name the actual unique role name. 
-			 *  - Uncomment the other block
-			 */
-
-			/*
-				function add_custom_rolemapping($custom_roles) { 
-				   
-					$extra_custom_roles = array('CUSTOM_ROLE_NAME1','CUSTOM_ROLE_NAME2'); 
-
-					// combine the two arrays 
-					$custom_roles = array_merge($extra_custom_roles, $custom_roles); 
-
-					return $custom_roles; 
+			foreach ($attrs[$roleMapping] as $samlRole) {
+				$samlRole = trim($samlRole);
+				if (empty($samlRole)) {
+					continue;
 				}
 
-				add_filter('onelogin_custom_roles', 'add_custom_rolemapping'); 
-			*/
-
-
-			if (has_filter('onelogin_custom_roles')) {
-				$customRoles = array();
-				$customRoles = apply_filters('onelogin_custom_roles', $customRoles);
-				$customRoles = array_unique($customRoles);
-
-				foreach ($attrs[$roleMapping] as $samlRole) {
-					if (in_array($samlRole, $customRoles) && $GLOBALS['wp_roles']->is_role( $samlRole)) {
-						$userdata['role'] = $samlRole;
-						$foundCustomizedRole = true; 
-						break; 
+				foreach ($all_roles as $role_value => $role_name) {
+					$matchList = explode(',', get_option('onelogin_saml_role_mapping_'.$role_value));
+					if (in_array($samlRole, $matchList)) {
+						$roles_found[$role_value] = true;
 					}
 				}
 			}
 
-
-			if (!$foundCustomizedRole) {
-				$role = 0;
-
-				foreach ($attrs[$roleMapping] as $samlRole) {
-					$samlRole = trim($samlRole);
-					if (empty($samlRole)) {
-						break;	
-					}
-					else if (in_array($samlRole, $adminsRole)) {
-						if ($role < 5) {
-							$role = 5;
-						}
-						break;
-					} else if (in_array($samlRole, $editorsRole)) {
-						if ($role < 4) {
-							$role = 4;
-						}
-						break;
-					} else if (in_array($samlRole, $authorsRole)) {
-						if ($role < 3) {
-							$role = 3;
-						}
-						break;
-					} else if (in_array($samlRole, $contributorsRole)) {
-						if ($role < 2) {
-							$role = 2;
-						}
-						break;
-					} else if (in_array($samlRole, $subscribersRole)) {
-						if ($role < 1) {
-							$role = 1;
-						}
-						break;
-					}
-				}
-
-				switch ($role) {
-					case 5:
-						$userdata['role'] = 'administrator';
-						break;
-					case 4:
-						$userdata['role'] = 'editor';
-						break;
-					case 3:
-						$userdata['role'] = 'author';
-						break;
-					case 2:
-						$userdata['role'] = 'contributor';
-						break;
-					case 1:
-						$userdata['role'] = 'subscriber';
-						break;
-					case 0:
-					default:
-						$userdata['role'] = get_option('default_role');
-						break;
-				}
+			$userdata['role'] = get_option('default_role');
+			uksort($roles_found, 'saml_role_order_compare');
+			foreach ($roles_found as $role_value => $__role_found) {
+				$userdata['role'] = $role_value;
+				break;
 			}
 		}
 	}
@@ -371,12 +294,12 @@ function saml_acs() {
 			add_user_meta($user_id, 'saml_login_time' . $idp_suffix, time());
 		}
 		setcookie('saml_login', 1, time() + YEAR_IN_SECONDS, SITECOOKIEPATH );
-				#do_action('wp_login', $user_id);
+		#do_action('wp_login', $user_id);
 		#wp_signon($user_id);
 	}
 
 	if (isset($_REQUEST['RelayState'])) {
-		if (!empty($_REQUEST['RelayState']) && (substr($_REQUEST['RelayState'], -strlen('/wp-login.php')) === '/wp-login.php')) {
+		if (!empty($_REQUEST['RelayState']) && ((substr($_REQUEST['RelayState'], -strlen('/wp-login.php')) === '/wp-login.php') || (substr($_REQUEST['RelayState'], -strlen('/alternative_acs.php')) === '/alternative_acs.php'))) {
 			wp_redirect(home_url());
 		} else {
 			if (strpos($_REQUEST['RelayState'], 'redirect_to') !== false) {

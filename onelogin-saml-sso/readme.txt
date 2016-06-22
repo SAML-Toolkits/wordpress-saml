@@ -2,7 +2,7 @@
 Contributors: onelogin
 Tags: sso, saml, single sign on, password, active directory, ldap, identity, onelogin, yubico, yubikey, vip access, otp
 Requires at least: 2.1.2
-Tested up to: 4.4.1
+Tested up to: 4.5.1
 Stable tag: trunk
 
 This plugin provides single sign-on via SAML and gives users one-click access to their WordPress accounts from identity providers like OneLogin.
@@ -17,7 +17,21 @@ This SAML plugin eliminates passwords and allows you to authenticate WordPress u
 * Increase security using browser PKI certificates or two-factor authentication from *Yubico* or *VeriSign*
 * Easily prevent access from former employees and contractors
 
+If you used this plugin before 2.2.0 with just-in-time provision active, Read: https://wpvulndb.com/vulnerabilities/8508
+To mitigate that bug, place the script at the root of wordpress and execute it (later remove it) https://gist.github.com/pitbulk/a8223c90a3534e9a7d5e0a93009a094f
+
 == Changelog ==
+
+= 2.4.1 =
+ * Update php-saml library to 2.8.0
+
+= 2.4.0 =
+ * Use the worpress roles API to generate the options for the mappings a nd use these mappings to set the user role. Add Role precedence support.
+ * Add alternative ACS URL (WPEngine compatible)
+ * Update php-saml library to 2.7.0
+
+= 2.3.1 =
+ * Fix SAML link
 
 = 2.3.0 =
  * Uncomment out filter based custom role code
