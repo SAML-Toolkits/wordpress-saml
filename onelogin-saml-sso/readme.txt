@@ -22,6 +22,9 @@ To mitigate that bug, place the script at the root of wordpress and execute it (
 
 == Changelog ==
 
+= 2.4.2 =
+ * Update php-saml library to 2.9.0 (it includes SAML Signature Wrapping attack prevention).
+
 = 2.4.1 =
  * Update php-saml library to 2.8.0
 
