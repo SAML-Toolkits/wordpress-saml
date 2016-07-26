@@ -230,7 +230,7 @@ require_once (dirname(__FILE__) . "/lib/Saml2/Constants.php");
 		$value = get_option('onelogin_saml_keep_local_login');
 		echo '<input type="checkbox" name="onelogin_saml_keep_local_login" id="onelogin_saml_keep_local_login"
 			  '.($value ? 'checked="checked"': '').'>'.
-			  '<p class="description">'.__('Enable/disable the normal login form. If disabled, instead of prompt the login form, WP will excecute directly the SP-initiated SSO flow. If enabled te normal login form is showed and a link to initiate that flow is prompted.', 'onelogin-saml-sso').'</p>';
+			  '<p class="description">'.__('Enable/disable the normal login form. If disabled, instead of prompt the login form, WP will excecute directly the SP-initiated SSO flow. If enabled the normal login form is showed and a link to initiate that flow is prompted.', 'onelogin-saml-sso').'</p>';
 	}
 
 	function plugin_setting_select_onelogin_saml_account_matcher() {
