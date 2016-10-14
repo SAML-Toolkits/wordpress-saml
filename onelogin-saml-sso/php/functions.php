@@ -291,8 +291,13 @@ function saml_acs() {
 function saml_sls() {
 	$auth = initialize_saml();
 	$retrieve_parameters_from_server = get_option('onelogin_saml_advanced_settings_retrieve_parameters_from_server', false);
-	$auth->processSLO(false, null, $retrieve_parameters_from_server);
-		$errors = $auth->getErrors();
+	if (isset($_GET) && isset($_GET['SAMLRequest'])) {
+		// Close session before send the LogoutResponse to the IdP
+		$auth->processSLO(false, null, $retrieve_parameters_from_server, 'wp_logout');
+	} else {
+		$auth->processSLO(false, null, $retrieve_parameters_from_server);
+	}
+	$errors = $auth->getErrors();
 	if (empty($errors)) {
 		wp_logout();
 		setcookie('saml_login', 0, time() - 3600, SITECOOKIEPATH );
