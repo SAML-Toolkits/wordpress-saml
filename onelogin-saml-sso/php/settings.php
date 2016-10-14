@@ -86,6 +86,7 @@ $settings = array (
             'url' => get_option('onelogin_saml_idp_slo'),
         ),
         'x509cert' => get_option('onelogin_saml_idp_x509cert'),
+        'lowercaseUrlencoding' => get_option('onelogin_saml_advanced_idp_lowercase_url_encoding', false),
     ),
 
     'security' => array (

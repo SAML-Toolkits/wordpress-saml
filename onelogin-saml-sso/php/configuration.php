@@ -145,6 +145,9 @@ require_once (dirname(__FILE__) . "/lib/Saml2/Constants.php");
 		register_setting($option_group, 'onelogin_saml_advanced_settings_sp_entity_id');
 		add_settings_field('onelogin_saml_advanced_settings_sp_entity_id', __('Service Provider Entity Id', 'onelogin-saml-sso'), "plugin_setting_string_onelogin_saml_advanced_settings_sp_entity_id", $option_group, 'advanced_settings');
 
+		register_setting($option_group, 'onelogin_saml_advanced_idp_lowercase_url_encoding');
+		add_settings_field('onelogin_saml_advanced_idp_lowercase_url_encoding', __('Lowercase URL encoding?', 'onelogin-saml-sso'), "plugin_setting_string_saml_advanced_idp_lowercase_url_encoding", $option_group, 'advanced_settings');
+
 		$mapping_fields = array (
 			'onelogin_saml_advanced_settings_nameid_encrypted' => __('Encrypt nameID', 'onelogin-saml-sso'),
 			'onelogin_saml_advanced_settings_authn_request_signed' => __('Sign AuthnRequest', 'onelogin-saml-sso'),
@@ -197,7 +200,14 @@ require_once (dirname(__FILE__) . "/lib/Saml2/Constants.php");
 		echo '</textarea>';
 		echo '<p class="description">'.__('Public x509 certificate of the IdP.  ("X.509 certificate")', 'onelogin-saml-sso');
 	}
-	
+
+	function plugin_setting_string_saml_advanced_idp_lowercase_url_encoding() {
+		$value = get_option('onelogin_saml_advanced_idp_lowercase_url_encoding');
+		echo '<input type="checkbox" name="" id="onelogin_saml_advanced_idp_lowercase_url_encoding"
+			  '.($value ? 'checked="checked"': '').'>'.
+			  '<p class="description">'.__('Some IdPs like ADFS can use lowercase URL encoding, but the plugin expects uppercase URL enconding, enable it to fix incompatibility issues.', 'onelogin-saml-sso').'</p>';
+	}
+
 	function plugin_setting_boolean_onelogin_saml_autocreate() {
 		$value = get_option('onelogin_saml_autocreate');
 		echo '<input type="checkbox" name="onelogin_saml_autocreate" id="onelogin_saml_autocreate"
@@ -283,7 +293,7 @@ require_once (dirname(__FILE__) . "/lib/Saml2/Constants.php");
 
 	function plugin_setting_string_onelogin_saml_role_order($role_value) {
 		echo '<input type="text" name="onelogin_saml_role_order_'.$role_value.'" id="onelogin_saml_role_order_'.$role_value.'"
-			  value= "'.get_option('onelogin_saml_role_order_'.$role_value).'" size="5">';
+			  value= "'.get_option('onelogin_saml_role_order_'.$role_value).'" size="3">';
 	}
 
 	function plugin_setting_boolean_onelogin_saml_role_mapping_multivalued_in_one_attribute_value() {
