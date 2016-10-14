@@ -22,6 +22,12 @@ To mitigate that bug, place the script at the root of wordpress and execute it (
 
 == Changelog ==
 
+= 2.4.3 =
+ * Update php-saml library to [2.10.0](https://github.com/onelogin/php-saml/releases/tag/v2.10.0) (it includes SAML Signature Wrapping attack prevention and other security improvements).
+* Fix Idp initiated sign out issue (WP session not closed) [#25](https://github.com/onelogin/wordpress-saml/issues/25)
+* Fix Ordering issue with Auth Check for SAML Validation  [#23](https://github.com/onelogin/wordpress-saml/issues/23) 
+* Be able to enable lowercase URL encoding (Compatibility issue with ADFS when validating Signatures
+
 = 2.4.2 =
  * Update php-saml library to 2.9.0 (it includes SAML Signature Wrapping attack prevention).
 
