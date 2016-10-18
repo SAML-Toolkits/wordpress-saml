@@ -22,6 +22,10 @@ To mitigate that bug, place the script at the root of wordpress and execute it (
 
 == Changelog ==
 
+= 2.4.4 =
+* Relax Destination check.
+*  On SLS, Print errors, not lastError (it will be printed if debug enabled)
+
 = 2.4.3 =
  * Update php-saml library to [2.10.0](https://github.com/onelogin/php-saml/releases/tag/v2.10.0) (it includes SAML Signature Wrapping attack prevention and other security improvements).
 * Fix Idp initiated sign out issue (WP session not closed) [#25](https://github.com/onelogin/wordpress-saml/issues/25)
