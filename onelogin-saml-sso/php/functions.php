@@ -315,7 +315,8 @@ function saml_sls() {
 		}
 		exit();
 	} else {
-		echo __("SLS endpoint found an error.").$auth->getLastErrorReason();
+		echo __("SLS endpoint found an error.");
+		echo implode("<br>", $errors);
 		exit();
 	}
 }
