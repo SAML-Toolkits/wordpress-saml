@@ -185,9 +185,7 @@ class OneLogin_Saml2_Response
                 // Check destination
                 if ($this->document->documentElement->hasAttribute('Destination')) {
                     $destination = trim($this->document->documentElement->getAttribute('Destination'));
-                    if (empty($destination)) {
-                        throw new Exception("The response has an empty Destination value");
-                    } else {
+                    if (!empty($destination)) {
                         if (strpos($destination, $currentURL) !== 0) {
                             $currentURLNoRouted = OneLogin_Saml2_Utils::getSelfURLNoQuery();
 
