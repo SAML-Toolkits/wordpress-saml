@@ -321,8 +321,13 @@ function saml_acs() {
 function saml_sls() {
 	$auth = initialize_saml();
 	$retrieve_parameters_from_server = get_option('onelogin_saml_advanced_settings_retrieve_parameters_from_server', false);
-	$auth->processSLO(false, null, $retrieve_parameters_from_server);
-		$errors = $auth->getErrors();
+	if (isset($_GET) && isset($_GET['SAMLRequest'])) {
+		// Close session before send the LogoutResponse to the IdP
+		$auth->processSLO(false, null, $retrieve_parameters_from_server, 'wp_logout');
+	} else {
+		$auth->processSLO(false, null, $retrieve_parameters_from_server);
+	}
+	$errors = $auth->getErrors();
 	if (empty($errors)) {
 		$user_id = get_current_user_id();
 		wp_logout();
@@ -360,7 +365,8 @@ function saml_sls() {
 		}
 		exit();
 	} else {
-		echo __("SLS endpoint found an error.").$auth->getLastErrorReason();
+		echo __("SLS endpoint found an error.");
+		echo implode("<br>", $errors);
 		exit();
 	}
 }

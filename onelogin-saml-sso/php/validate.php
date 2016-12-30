@@ -4,6 +4,12 @@ if ( !function_exists( 'add_action' ) ) {
 	exit;
 }
 
+if (!current_user_can('delete_plugins')) {
+     header("HTTP/1.0 403 Forbidden");
+     echo '<h1>'.__("Access Forbidden!", 'onelogin-saml-sso').'</h1>';
+     exit();
+}
+
 require_once "compatibility.php";
 
 ?>
@@ -15,12 +21,6 @@ require_once "compatibility.php";
 <body>
 
 <?php
-
-if (!current_user_can('delete_plugins')) {
-     header("HTTP/1.0 403 Forbidden");
-     echo '<h1>'.__("Access Forbidden!", 'onelogin-saml-sso').'</h1>';
-     exit();
-}
 
 echo '<h1>'.__('OneLogin SSO/SAML Settings validation', 'onelogin-saml-sso').'</h1>';
 
