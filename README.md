@@ -5,9 +5,6 @@ Uses the new Onelogin PHP-SAML Toolkit. Review its [dependences](https://github.
 In order to install it, move the onelogin-saml-sso inside the wp-content/plugins folder.
 Once moved, activate the plugin and configure it.
 
-
-P.S This plugin will be available at wordpress site soon.
-
 ### Using the SAML Plugin in WPengine or similar ###
 
 This kind of WP hosting used to cache plugins and protect the wp-login.php view.
@@ -22,5 +19,5 @@ Version 2.4.3 includes a security patch that contains extra validations that wil
 ### If you used this plugin before 2.2.0 with just-in-time provision active ###
 Read: https://wpvulndb.com/vulnerabilities/8508
 
-To mitigate that, place the script at the root of wordpress and execute it (later remove it)
+To mitigate that, place the script at the root of WordPress and execute it (later remove it)
 https://gist.github.com/pitbulk/a8223c90a3534e9a7d5e0a93009a094f
