@@ -57,7 +57,7 @@ if (empty($requested_authncontext_values)) {
     }
 }
 
-$acs_endpoint = get_site_url() . (get_option('onelogin_saml_alternative_acs', false) ? '/wp-content/plugins/onelogin-saml-sso/alternative_acs.php' : '/wp-login.php?saml_acs');
+$acs_endpoint = get_site_url() . (get_option('onelogin_saml_alternative_acs', false) ? plugins_url( 'alternative_acs.php', dirname( __FILE__ ) ) : '/wp-login.php?saml_acs');
 
 $settings = array (
 
