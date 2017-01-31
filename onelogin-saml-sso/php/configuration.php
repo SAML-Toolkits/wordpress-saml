@@ -226,7 +226,7 @@ require_once (dirname(__FILE__) . "/lib/Saml2/Constants.php");
 		$value = get_option('onelogin_saml_forcelogin');
 		echo '<input type="checkbox" name="onelogin_saml_forcelogin" id="onelogin_saml_forcelogin"
 			  '.($value ? 'checked="checked"': '').'>'.
-			  '<p class="description">'.__('Protect WordPress and force the user to authenticate at the IdP in order to access when any wordpress page is loaded and no active session', 'onelogin-saml-sso').'</p>';
+			  '<p class="description">'.__('Protect WordPress and force the user to authenticate at the IdP in order to access when any WordPress page is loaded and no active session.', 'onelogin-saml-sso').'</p>';
 	}
 
 	function plugin_setting_boolean_onelogin_saml_slo() {
