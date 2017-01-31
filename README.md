@@ -22,5 +22,5 @@ Version 2.4.3 includes a security patch that contains extra validations that wil
 ### If you used this plugin before 2.2.0 with just-in-time provision active ###
 Read: https://wpvulndb.com/vulnerabilities/8508
 
-To mitigate that, place the script at the root of wordpress and execute it (later remove it)
+To mitigate that, place the script at the root of WordPress and execute it (later remove it)
 https://gist.github.com/pitbulk/a8223c90a3534e9a7d5e0a93009a094f
