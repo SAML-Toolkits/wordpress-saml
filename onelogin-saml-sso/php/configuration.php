@@ -123,7 +123,7 @@ require_once (dirname(__FILE__) . "/lib/Saml2/Constants.php");
 		add_settings_field('onelogin_saml_customize_action_prevent_change_mail', __('Prevent change mail', 'onelogin-saml-sso'), "plugin_setting_boolean_onelogin_saml_customize_action_prevent_change_mail", $option_group, 'customize_links');
 
 		register_setting($option_group, 'onelogin_saml_customize_stay_in_wordpress_after_slo');
-		add_settings_field('onelogin_saml_customize_stay_in_wordpress_after_slo', __('Stay in Wordpress after SLO', 'onelogin-saml-sso'), "plugin_setting_boolean_onelogin_saml_customize_stay_in_wordpress_after_slo", $option_group, 'customize_links');
+		add_settings_field('onelogin_saml_customize_stay_in_wordpress_after_slo', __('Stay in WordPress after SLO', 'onelogin-saml-sso'), "plugin_setting_boolean_onelogin_saml_customize_stay_in_wordpress_after_slo", $option_group, 'customize_links');
 
 		register_setting($option_group, 'onelogin_saml_customize_links_user_registration');
 		add_settings_field('onelogin_saml_customize_links_user_registration', __('User Registration', 'onelogin-saml-sso'), "plugin_setting_string_onelogin_saml_customize_links_user_registration", $option_group, 'customize_links');
@@ -212,21 +212,21 @@ require_once (dirname(__FILE__) . "/lib/Saml2/Constants.php");
 		$value = get_option('onelogin_saml_autocreate');
 		echo '<input type="checkbox" name="onelogin_saml_autocreate" id="onelogin_saml_autocreate"
 			  '.($value ? 'checked="checked"': '').'>'.
-			  '<p class="description">'.__('Auto-provisioning. If user not exists,  Wordpress will create a new user with the data provided by the IdP.<br>Review the Mapping section.', 'onelogin-saml-sso').'</p>';
+			  '<p class="description">'.__('Auto-provisioning. If user not exists,  WordPress will create a new user with the data provided by the IdP.<br>Review the Mapping section.', 'onelogin-saml-sso').'</p>';
 	}
 
 	function plugin_setting_boolean_onelogin_saml_updateuser() {
 		$value = get_option('onelogin_saml_updateuser');
 		echo '<input type="checkbox" name="onelogin_saml_updateuser" id="onelogin_saml_updateuser"
 			  '.($value ? 'checked="checked"': '').'>'.
-			  '<p class="description">'.__('Auto-update. Wordpress will update the account of the user with the data provided by the IdP.<br>Review the Mapping section.', 'onelogin-saml-sso').'</p>';
+			  '<p class="description">'.__('Auto-update. WordPress will update the account of the user with the data provided by the IdP.<br>Review the Mapping section.', 'onelogin-saml-sso').'</p>';
 	}
 
 	function plugin_setting_boolean_onelogin_saml_forcelogin() {
 		$value = get_option('onelogin_saml_forcelogin');
 		echo '<input type="checkbox" name="onelogin_saml_forcelogin" id="onelogin_saml_forcelogin"
 			  '.($value ? 'checked="checked"': '').'>'.
-			  '<p class="description">'.__('Protect Wordpress and force the user to authenticate at the IdP in order to access when any wordpress page is loaded and no active session', 'onelogin-saml-sso').'</p>';
+			  '<p class="description">'.__('Protect WordPress and force the user to authenticate at the IdP in order to access when any wordpress page is loaded and no active session', 'onelogin-saml-sso').'</p>';
 	}
 
 	function plugin_setting_boolean_onelogin_saml_slo() {
@@ -283,7 +283,7 @@ require_once (dirname(__FILE__) . "/lib/Saml2/Constants.php");
 	function plugin_setting_string_onelogin_saml_attr_mapping_role() {
 		echo '<input type="text" name="onelogin_saml_attr_mapping_role" id="onelogin_saml_attr_mapping_role"
 			  value= "'.get_option('onelogin_saml_attr_mapping_role').'" size="30">'.
-			  '<p class="description">'.__("The attribute that contains the role of the user, For example 'memberOf'. If Wordpress can't figure what role assign to the user, it will assign the default role defined at the general settings.", 'onelogin-saml-sso').'</p>';
+			  '<p class="description">'.__("The attribute that contains the role of the user, For example 'memberOf'. If WordPress can't figure what role assign to the user, it will assign the default role defined at the general settings.", 'onelogin-saml-sso').'</p>';
 	}
 
 	function plugin_setting_string_onelogin_saml_role_mapping($role_value) {
@@ -320,28 +320,28 @@ require_once (dirname(__FILE__) . "/lib/Saml2/Constants.php");
 		$value = get_option('onelogin_saml_customize_action_prevent_reset_password');
 		echo '<input type="checkbox" name="onelogin_saml_customize_action_prevent_reset_password" id="onelogin_saml_customize_action_prevent_reset_password"
 			  '.($value ? 'checked="checked"': '').'>
-			  <p class="description">'.__("Check it in order to disable the ability of reset the password on Wordpress.", 'onelogin-saml-sso').'</p>';
+			  <p class="description">'.__("Check it in order to disable the ability of reset the password on WordPress.", 'onelogin-saml-sso').'</p>';
 	}
 
 	function plugin_setting_boolean_onelogin_saml_customize_action_prevent_change_password() {
 		$value = get_option('onelogin_saml_customize_action_prevent_change_password');
 		echo '<input type="checkbox" name="onelogin_saml_customize_action_prevent_change_password" id="onelogin_saml_customize_action_prevent_change_password"
 			  '.($value ? 'checked="checked"': '').'>
-			  <p class="description">'.__("Check it in order to disable the ability of change the password on Wordpress.", 'onelogin-saml-sso').'</p>';
+			  <p class="description">'.__("Check it in order to disable the ability of change the password on WordPress.", 'onelogin-saml-sso').'</p>';
 	}
 
 	function plugin_setting_boolean_onelogin_saml_customize_action_prevent_change_mail() {
 		$value = get_option('onelogin_saml_customize_action_prevent_change_mail');
 		echo '<input type="checkbox" name="onelogin_saml_customize_action_prevent_change_mail" id="onelogin_saml_customize_action_prevent_change_mail"
 			  '.($value ? 'checked="checked"': '').'>
-			  <p class="description">'.__("Check it in order to disable the ability of change the mail on Wordpress (we recommend that if you are using mail as the account matcher field.", 'onelogin-saml-sso').'</p>';
+			  <p class="description">'.__("Check it in order to disable the ability of change the mail on WordPress (we recommend that if you are using mail as the account matcher field.", 'onelogin-saml-sso').'</p>';
 	}
 
 	function plugin_setting_boolean_onelogin_saml_customize_stay_in_wordpress_after_slo() {
 		$value = get_option('onelogin_saml_customize_stay_in_wordpress_after_slo');
 		echo '<input type="checkbox" name="onelogin_saml_customize_stay_in_wordpress_after_slo" id="onelogin_saml_customize_stay_in_wordpress_after_slo"
 			  '.($value ? 'checked="checked"': '').'>
-			  <p class="description">'.__("If SLO and Force SAML login are enabled, after the SLO process you will be redirected to the WP main page and a SAML SSO process will start, to prevent that check this and you will stay at the Wordpress Login Form. ", 'onelogin-saml-sso').'</p>';
+			  <p class="description">'.__("If SLO and Force SAML login are enabled, after the SLO process you will be redirected to the WP main page and a SAML SSO process will start, to prevent that check this and you will stay at the WordPress Login Form. ", 'onelogin-saml-sso').'</p>';
 	}
 
 	function plugin_setting_string_onelogin_saml_customize_links_user_registration() {
@@ -373,7 +373,7 @@ require_once (dirname(__FILE__) . "/lib/Saml2/Constants.php");
 		$value = get_option('onelogin_saml_advanced_settings_strict_mode');
 		echo '<input type="checkbox" name="onelogin_saml_advanced_settings_strict_mode" id="onelogin_saml_advanced_settings_strict_mode"
 			  '.($value ? 'checked="checked"': '').'>'.
-			  '<p class="description">'.__("If Strict mode is Enabled, then Wordpress will reject unsigned or unencrypted messages if it expects them signed or encrypted.
+			  '<p class="description">'.__("If Strict mode is Enabled, then WordPress will reject unsigned or unencrypted messages if it expects them signed or encrypted.
 			   Also will reject the messages if not strictly follow the SAML standard: Destination, NameId, Conditions ... are validated too.", 'onelogin-saml-sso').'</p>';
 	}
 
@@ -506,7 +506,7 @@ require_once (dirname(__FILE__) . "/lib/Saml2/Constants.php");
 	}
 
 	function plugin_section_idp_text() {
-		echo "<p>".__("Set here some info related to the IdP that will be connected with our Wordpress. You can find this values at the Onelogin's platform in the Wordpress App at the Single Sign-On tab", 'onelogin-saml-sso')."</p>";
+		echo "<p>".__("Set here some info related to the IdP that will be connected with our WordPress. You can find this values at the Onelogin's platform in the WordPress App at the Single Sign-On tab", 'onelogin-saml-sso')."</p>";
 	}
 
 	function plugin_section_options_text() {
@@ -514,11 +514,11 @@ require_once (dirname(__FILE__) . "/lib/Saml2/Constants.php");
 	}
 
 	function plugin_section_attr_mapping_text() {
-		echo "<p>".__("Sometimes the names of the attributes sent by the IdP not match the names used by Wordpress for the user accounts. In this section we can set the mapping between IdP fields and Wordpress fields. Notice that this mapping could be also set at Onelogin's IdP", 'onelogin-saml-sso')."</p>";
+		echo "<p>".__("Sometimes the names of the attributes sent by the IdP not match the names used by WordPress for the user accounts. In this section we can set the mapping between IdP fields and WordPress fields. Notice that this mapping could be also set at Onelogin's IdP", 'onelogin-saml-sso')."</p>";
 	}
 
 	function plugin_section_role_mapping_text() {
-		echo "<p>".__("The IdP can use it's own roles. Set in this section the mapping between IdP and Wordpress roles. Accepts multiple valued comma separated. Example: admin,owner,superuser", 'onelogin-saml-sso')."</p>";
+		echo "<p>".__("The IdP can use it's own roles. Set in this section the mapping between IdP and WordPress roles. Accepts multiple valued comma separated. Example: admin,owner,superuser", 'onelogin-saml-sso')."</p>";
 	}
 
 	function plugin_section_role_order_text() {
@@ -526,7 +526,7 @@ require_once (dirname(__FILE__) . "/lib/Saml2/Constants.php");
 	}
 
 	function plugin_section_customize_links_text() {
-		echo "<p>".__("When we enable the SAML SSO to be integrated with a IdP some Wordpress actions and links could be changed. In this section you will be able to enable or disable the ability of change the mail, change the password and reset the password. Also can override the user registration and the lost password links", 'onelogin-saml-sso')."</p>";
+		echo "<p>".__("When we enable the SAML SSO to be integrated with a IdP some WordPress actions and links could be changed. In this section you will be able to enable or disable the ability of change the mail, change the password and reset the password. Also can override the user registration and the lost password links", 'onelogin-saml-sso')."</p>";
 	}
 
 	function plugin_section_advanced_settings_text() {
