@@ -44,11 +44,10 @@ require_once (dirname(__FILE__) . "/lib/Saml2/Constants.php");
 		$helpText = '<p>' . __('This plugin provides single sign-on via SAML and gives users one-click access to their WordPress accounts from identity providers like OneLogin', 'onelogin-saml-sso') . '</p>' .
 			'<p><strong>' . __('For more information', 'onelogin-saml-sso') . '</strong> '.__("access to the", 'onelogin-saml-sso').' <a href="https://onelogin.zendesk.com/hc/en-us/articles/201173454-Configuring-SAML-for-WordPress" target="_blank">'.__("Plugin Info", 'onelogin-saml-sso').'</a> ' .
 			__("or visit", 'onelogin-saml-sso') . ' <a href="http://onelogin.com/" target="_blank">OneLogin, Inc.</a>' . '</p>';
-		
-		if (function_exists('add_contextual_help')) {
-			@add_contextual_help($current_screen, $helpText);
-		}
 
+		$current_screen = convert_to_screen($current_screen);
+		WP_Screen::add_old_compat_help($current_screen, $helpText);
+		
 		$option_group = 'onelogin_saml_configuration';
 
 		add_settings_section('idp', __('IDENTITY PROVIDER SETTINGS', 'onelogin-saml-sso'), 'plugin_section_idp_text', $option_group);
