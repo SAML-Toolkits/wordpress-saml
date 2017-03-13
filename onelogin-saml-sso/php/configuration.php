@@ -14,6 +14,7 @@ require_once (dirname(__FILE__) . "/extlib/xmlseclibs/xmlseclibs.php");
 	function onelogin_saml_configuration_render() {
 		$title = __("SSO/SAML Settings", 'onelogin-saml-sso');
 		$saml_metadata = apply_filters( 'onelogin_saml_metadata', 'saml_metadata' );
+		$saml_validate_config = apply_filters( 'onelogin_saml_validate_config', 'saml_validate_config' );
 		?>
 			<div class="wrap">
 				<?php screen_icon(); ?>
@@ -22,7 +23,7 @@ require_once (dirname(__FILE__) . "/extlib/xmlseclibs/xmlseclibs.php");
 				</div>
 				<div class="alignright">
 					<a href="<?php echo get_site_url( null, '/wp-login.php?' . $saml_metadata ); ?>" target="blank"><?php echo __("Go to the metadata of this SP", 'onelogin-saml-sso');?></a><br>
-					<a href="<?php echo get_site_url().'/wp-login.php?saml_validate_config'; ?>" target="blank"><?php echo __("Once configured, validate here your OneLogin SSO/SAML Settings", 'onelogin-saml-sso');?></a>
+					<a href="<?php echo get_site_url( null, '/wp-login.php?' . $saml_validate_config ); ?>" target="blank"><?php echo __("Once configured, validate here your OneLogin SSO/SAML Settings", 'onelogin-saml-sso');?></a>
 				</div>
 				<div style="clear:both"></div>
 				<h2><?php echo esc_html( $title ); ?></h2>
