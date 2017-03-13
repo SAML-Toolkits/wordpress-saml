@@ -21,11 +21,11 @@ function saml_checker() {
 	if ( isset( $_GET[ $saml_acs ] ) ) {
 		saml_acs();
 	}
-	else if (isset($_GET['saml_sls'])) {
+	else if (isset($_GET[ $saml_sls ])) {
 		saml_sls();
-	} else if (isset($_GET['saml_metadata'])) {
+	} else if (isset($_GET[ $saml_metadata ])) {
 		saml_metadata();
-	} else if (isset($_GET['saml_validate_config'])) {
+	} else if (isset($_GET[ $saml_validate_config ])) {
 		saml_validate_config();
 	}
 }
