@@ -2,7 +2,7 @@
 Contributors: onelogin
 Tags: sso, saml, single sign on, password, active directory, ldap, identity, onelogin, yubico, yubikey, vip access, otp
 Requires at least: 2.1.2
-Tested up to: 4.5.1
+Tested up to: 4.7.3
 Stable tag: trunk
 
 This plugin provides single sign-on via SAML and gives users one-click access to their WordPress accounts from identity providers like OneLogin.
@@ -21,6 +21,14 @@ If you used this plugin before 2.2.0 with just-in-time provision active, Read: h
 To mitigate that bug, place the script at the root of wordpress and execute it (later remove it) https://gist.github.com/pitbulk/a8223c90a3534e9a7d5e0a93009a094f
 
 == Changelog ==
+
+= 2.4.5 =
+* Update php-saml library to 2.10.5
+* Fixes some grammatical error
+* Use WP to determine wp-content path
+* Avoid double site URL concatenation
+* Replace deprecated add_contextual_help method
+* Signature & Digest algorithm support
 
 = 2.4.4 =
 * Relax Destination check.
