@@ -10,7 +10,11 @@ require_once "compatibility.php";
 
 
 function saml_checker() {
-	if (isset($_GET['saml_acs'])) {
+	/**
+	 * Allow saml_acs URL query variable to be customized.
+	 */
+	$saml_acs = apply_filters( 'onelogin_saml_acs', 'saml_acs' );
+	if ( isset( $_GET[ $saml_acs ] ) ) {
 		saml_acs();
 	}
 	else if (isset($_GET['saml_sls'])) {
