@@ -11,9 +11,13 @@ require_once "compatibility.php";
 
 function saml_checker() {
 	/**
-	 * Allow saml_acs URL query variable to be customized.
+	 * Allow saml_acs query variables to be customized.
 	 */
-	$saml_acs = apply_filters( 'onelogin_saml_acs', 'saml_acs' );
+	$saml_acs             = apply_filters( 'onelogin_saml_acs', 'saml_acs' );
+	$saml_sls             = apply_filters( 'onelogin_saml_sls', 'saml_sls' );
+	$saml_metadata        = apply_filters( 'onelogin_saml_metadata', 'saml_metadata' );
+	$saml_validate_config = apply_filters( 'onelogin_saml_validate_config', 'saml_validate_config' );
+
 	if ( isset( $_GET[ $saml_acs ] ) ) {
 		saml_acs();
 	}
