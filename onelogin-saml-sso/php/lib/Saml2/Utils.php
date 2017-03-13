@@ -16,6 +16,28 @@ class OneLogin_Saml2_Utils
      */
     private static $_proxyVars = false;
 
+
+    /**
+     * @var string
+     */
+    private static $_host;
+
+    /**
+     * @var string
+     */
+    private static $_protocol;
+
+    /**
+     * @var int
+     */
+    private static $_port;
+
+    /**
+     * @var string
+     */
+    private static $_baseurlpath;
+
+
     /**
      * Translates any string. Accepts args
      *
@@ -130,7 +152,7 @@ class OneLogin_Saml2_Utils
      * @param string  $cert  A x509 unformated cert
      * @param bool    $heads True if we want to include head and footer
      *
-     * @return string $x509 Formated cert
+     * @return string $x509 Formatted cert
      */
 
     public static function formatCert($cert, $heads = true)
@@ -155,7 +177,7 @@ class OneLogin_Saml2_Utils
      * @param string  $key   A private key
      * @param bool    $heads True if we want to include head and footer
      *
-     * @return string $rsaKey Formated private key
+     * @return string $rsaKey Formatted private key
      */
 
     public static function formatPrivateKey($key, $heads = true)
@@ -233,7 +255,7 @@ class OneLogin_Saml2_Utils
         }
 
         /* Verify that the URL is to a http or https site. */
-        if (!preg_match('@^https?://@i', $url)) {
+        if (!preg_match('@^https?:\/\/@i', $url)) {
             throw new OneLogin_Saml2_Error(
                 'Redirect to invalid URL: ' . $url,
                 OneLogin_Saml2_Error::REDIRECT_INVALID_URL
@@ -281,6 +303,41 @@ class OneLogin_Saml2_Utils
     }
 
     /**
+     * @param $baseurl string The base url to be used when constructing URLs
+     */
+    public static function setBaseURL($baseurl)
+    {
+        if (!empty($baseurl)) {
+            $baseurlpath = '/';
+            if (preg_match('#^https?:\/\/([^\/]*)\/?(.*)#i', $baseurl, $matches)) {
+                if (strpos($baseurl, 'https://') === false) {
+                    self::setSelfProtocol('http');
+                    $port = '80';
+                } else {
+                    self::setSelfProtocol('https');
+                    $port = '443';
+                }
+
+                $currentHost = $matches[1];
+                if (false !== strpos($currentHost, ':')) {
+                    list($currentHost, $possiblePort) = explode(':', $matches[1], 2);
+                    if (is_numeric($possiblePort)) {
+                        $port = $possiblePort;
+                    }
+                }
+
+                if (isset($matches[2]) && !empty($matches[2])) {
+                    $baseurlpath = $matches[2];
+                }
+
+                self::setSelfHost($currentHost);
+                self::setSelfPort($port);
+                self::setBaseURLPath($baseurlpath);
+            }
+        }
+    }
+
+    /**
      * @param $proxyVars bool Whether to use `X-Forwarded-*` headers to determine port/domain/protocol
      */
     public static function setProxyVars($proxyVars)
@@ -324,11 +381,43 @@ class OneLogin_Saml2_Utils
     }
 
     /**
+     * @param $host string The host to use when constructing URLs
+     */
+    public static function setSelfHost($host)
+    {
+        self::$_host = $host;
+    }
+
+    /**
+     * @param $baseurlpath string The baseurl path to use when constructing URLs
+     */
+    public static function setBaseURLPath($baseurlpath)
+    {
+        if (empty($baseurlpath) || $baseurlpath == '/') {
+            $baseurlpath = '/';
+        } else {
+            self::$_baseurlpath = '/' . trim($baseurlpath, '/') . '/';
+        }
+    }
+
+    /**
+     * return string The baseurlpath to be used when constructing URLs
+     */
+    public static function getBaseURLPath()
+    {
+        return self::$_baseurlpath;
+    }
+
+    /**
      * @return string The raw host name
      */
     protected static function getRawHost()
     {
-        if (array_key_exists('HTTP_HOST', $_SERVER)) {
+        if (self::$_host) {
+            $currentHost = self::$_host;
+        } elseif (self::getProxyVars() && array_key_exists('HTTP_X_FORWARDED_HOST', $_SERVER)) {
+            $currentHost = $_SERVER['HTTP_X_FORWARDED_HOST'];
+        } elseif (array_key_exists('HTTP_HOST', $_SERVER)) {
             $currentHost = $_SERVER['HTTP_HOST'];
         } elseif (array_key_exists('SERVER_NAME', $_SERVER)) {
             $currentHost = $_SERVER['SERVER_NAME'];
@@ -340,6 +429,40 @@ class OneLogin_Saml2_Utils
             }
         }
         return $currentHost;
+    }
+
+    /**
+     * @param $port int The port number to use when constructing URLs
+     */
+    public static function setSelfPort($port)
+    {
+        self::$_port = $port;
+    }
+
+    /**
+     * @param $protocol string The protocol to identify as using, usually http or https
+     */
+    public static function setSelfProtocol($protocol)
+    {
+        self::$_protocol = $protocol;
+    }
+
+    /**
+     * @return string http|https
+     */
+    public static function getSelfProtocol()
+    {
+        $protocol = 'http';
+        if (self::$_protocol) {
+            $protocol = self::$_protocol;
+        } elseif (self::getSelfPort() == 443) {
+            $protocol = 'https';
+        } elseif (self::getProxyVars() && isset($_SERVER['HTTP_X_FORWARDED_PROTO'])) {
+            $protocol = $_SERVER['HTTP_X_FORWARDED_PROTO'];
+        } elseif (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') {
+            $protocol = 'https';
+        }
+        return $protocol;
     }
 
     /**
@@ -365,7 +488,9 @@ class OneLogin_Saml2_Utils
     public static function getSelfPort()
     {
         $portnumber = null;
-        if (self::getProxyVars() && isset($_SERVER["HTTP_X_FORWARDED_PORT"])) {
+        if (self::$_port) {
+            $portnumber = self::$_port;
+        } else if (self::getProxyVars() && isset($_SERVER["HTTP_X_FORWARDED_PORT"])) {
             $portnumber = $_SERVER["HTTP_X_FORWARDED_PORT"];
         } else if (isset($_SERVER["SERVER_PORT"])) {
             $portnumber = $_SERVER["SERVER_PORT"];
@@ -390,10 +515,7 @@ class OneLogin_Saml2_Utils
      */
     public static function isHTTPS()
     {
-        $isHttps =  (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off')
-                    || (self::getSelfPort() == 443)
-                    || (self::getProxyVars() && isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] == 'https');
-        return $isHttps;
+        return self::getSelfProtocol() == 'https';
     }
 
     /**
@@ -403,12 +525,19 @@ class OneLogin_Saml2_Utils
      */
     public static function getSelfURLNoQuery()
     {
+        $selfURLNoQuery = self::getSelfURLhost();
 
-        $selfURLhost = self::getSelfURLhost();
-        $selfURLNoQuery = $selfURLhost . $_SERVER['SCRIPT_NAME'];
+        $infoWithBaseURLPath = self::buildWithBaseURLPath($_SERVER['SCRIPT_NAME']);
+        if (!empty($infoWithBaseURLPath)) {
+            $selfURLNoQuery .= $infoWithBaseURLPath;
+        } else {
+            $selfURLNoQuery .= $_SERVER['SCRIPT_NAME'];
+        }
+
         if (isset($_SERVER['PATH_INFO'])) {
             $selfURLNoQuery .= $_SERVER['PATH_INFO'];
         }
+
         return $selfURLNoQuery;
     }
 
@@ -419,9 +548,9 @@ class OneLogin_Saml2_Utils
      */
     public static function getSelfRoutedURLNoQuery()
     {
-
         $selfURLhost = self::getSelfURLhost();
         $route = '';
+
         if (!empty($_SERVER['REQUEST_URI'])) {
             $route = $_SERVER['REQUEST_URI'];
             if (!empty($_SERVER['QUERY_STRING'])) {
@@ -430,6 +559,11 @@ class OneLogin_Saml2_Utils
                     $route = substr($route, 0, -1);
                 }
             }
+        }
+
+        $infoWithBaseURLPath = self::buildWithBaseURLPath($route);
+        if (!empty($infoWithBaseURLPath)) {
+            $route = $infoWithBaseURLPath;
         }
 
         $selfRoutedURLNoQuery = $selfURLhost . $route;
@@ -449,12 +583,40 @@ class OneLogin_Saml2_Utils
         if (!empty($_SERVER['REQUEST_URI'])) {
             $requestURI = $_SERVER['REQUEST_URI'];
             if ($requestURI[0] !== '/') {
-                if (preg_match('#^https?://[^/]*(/.*)#i', $requestURI, $matches)) {
+                if (preg_match('#^https?:\/\/[^\/]*(\/.*)#i', $requestURI, $matches)) {
                     $requestURI = $matches[1];
                 }
             }
         }
+
+        $infoWithBaseURLPath = self::buildWithBaseURLPath($requestURI);
+        if (!empty($infoWithBaseURLPath)) {
+            $requestURI = $infoWithBaseURLPath;
+        }
+
         return $selfURLhost . $requestURI;
+    }
+
+    /**
+     * Returns the part of the URL with the BaseURLPath.
+     *
+     * @return string
+     */
+    protected static function buildWithBaseURLPath($info)
+    {
+        $result = '';
+        $baseURLPath = self::getBaseURLPath();
+        if (!empty($baseURLPath)) {
+            $result = $baseURLPath;
+            if (!empty($info)) {
+                $path = explode('/', $info);
+                $extractedInfo = array_pop($path);
+                if (!empty($extractedInfo)) {
+                    $result .= $extractedInfo;
+                }
+            } 
+        }
+        return $result;
     }
 
     /**
@@ -718,7 +880,7 @@ class OneLogin_Saml2_Utils
      *
      * @param string $x509cert x509 cert
      *
-     * @return null|string Formated fingerprint
+     * @return null|string Formatted fingerprint
      */
     public static function calculateX509Fingerprint($x509cert, $alg='sha1')
     {
@@ -766,7 +928,7 @@ class OneLogin_Saml2_Utils
      *
      * @param string $fingerprint fingerprint
      *
-     * @return string Formated fingerprint
+     * @return string Formatted fingerprint
      */
     public static function formatFingerPrint($fingerprint)
     {
@@ -843,12 +1005,18 @@ class OneLogin_Saml2_Utils
 
         $statusEntry = self::query($dom, '/samlp:Response/samlp:Status');
         if ($statusEntry->length != 1) {
-            throw new Exception('Missing valid Status on response');
+            throw new OneLogin_Saml2_ValidationError(
+                "Missing Status on response",
+                OneLogin_Saml2_ValidationError::MISSING_STATUS
+            );
         }
 
         $codeEntry = self::query($dom, '/samlp:Response/samlp:Status/samlp:StatusCode', $statusEntry->item(0));
         if ($codeEntry->length != 1) {
-            throw new Exception('Missing valid Status Code on response');
+            throw new OneLogin_Saml2_ValidationError(
+                "Missing Status Code on response",
+                OneLogin_Saml2_ValidationError::MISSING_STATUS_CODE
+            );
         }
         $code = $codeEntry->item(0)->getAttribute('Value');
         $status['code'] = $code;
@@ -888,12 +1056,18 @@ class OneLogin_Saml2_Utils
 
         $symmetricKey = $enc->locateKey($encryptedData);
         if (!$symmetricKey) {
-            throw new Exception('Could not locate key algorithm in encrypted data.');
+            throw new OneLogin_Saml2_ValidationError(
+                'Could not locate key algorithm in encrypted data.',
+                OneLogin_Saml2_ValidationError::KEY_ALGORITHM_ERROR
+            );
         }
 
         $symmetricKeyInfo = $enc->locateKeyInfo($symmetricKey);
         if (!$symmetricKeyInfo) {
-            throw new Exception('Could not locate <dsig:KeyInfo> for the encrypted key.');
+            throw new OneLogin_Saml2_ValidationError(
+                "Could not locate <dsig:KeyInfo> for the encrypted key.",
+                OneLogin_Saml2_ValidationError::KEYINFO_NOT_FOUND_IN_ENCRYPTED_DATA
+            );
         }
 
         $inputKeyAlgo = $inputKey->getAlgorithm();
@@ -905,11 +1079,12 @@ class OneLogin_Saml2_Utils
             }
 
             if ($inputKeyAlgo !== $symKeyInfoAlgo) {
-                throw new Exception(
+                throw new OneLogin_Saml2_ValidationError(
                     'Algorithm mismatch between input key and key used to encrypt ' .
                     ' the symmetric key for the message. Key was: ' .
                     var_export($inputKeyAlgo, true) . '; message was: ' .
-                    var_export($symKeyInfoAlgo, true)
+                    var_export($symKeyInfoAlgo, true),
+                    OneLogin_Saml2_ValidationError::KEY_ALGORITHM_ERROR
                 );
             }
 
@@ -918,7 +1093,10 @@ class OneLogin_Saml2_Utils
             $keySize = $symmetricKey->getSymmetricKeySize();
             if ($keySize === null) {
                 // To protect against "key oracle" attacks
-                throw new Exception('Unknown key size for encryption algorithm: ' . var_export($symmetricKey->type, true));
+                throw new OneLogin_Saml2_ValidationError(
+                    'Unknown key size for encryption algorithm: ' . var_export($symmetricKey->type, true),
+                    OneLogin_Saml2_ValidationError::KEY_ALGORITHM_ERROR                                        
+                );
             }
 
             $key = $encKey->decryptKey($symmetricKeyInfo);
@@ -939,10 +1117,11 @@ class OneLogin_Saml2_Utils
         } else {
             $symKeyAlgo = $symmetricKey->getAlgorithm();
             if ($inputKeyAlgo !== $symKeyAlgo) {
-                throw new Exception(
+                throw new OneLogin_Saml2_ValidationError(
                     'Algorithm mismatch between input key and key in message. ' .
                     'Key was: ' . var_export($inputKeyAlgo, true) . '; message was: ' .
-                    var_export($symKeyAlgo, true)
+                    var_export($symKeyAlgo, true),
+                    OneLogin_Saml2_ValidationError::KEY_ALGORITHM_ERROR                                        
                 );
             }
             $symmetricKey = $inputKey;
@@ -956,12 +1135,18 @@ class OneLogin_Saml2_Utils
         $newDoc->formatOutput = true;
         $newDoc = self::loadXML($newDoc, $xml);
         if (!$newDoc) {
-            throw new Exception('Failed to parse decrypted XML.');
+            throw new OneLogin_Saml2_ValidationError(
+                'Failed to parse decrypted XML.',
+                OneLogin_Saml2_ValidationError::INVALID_XML_FORMAT                                        
+            );
         }
  
         $decryptedElement = $newDoc->firstChild->firstChild;
         if ($decryptedElement === null) {
-            throw new Exception('Missing encrypted element.');
+            throw new OneLogin_Saml2_ValidationError(
+                'Missing encrypted element.',
+                OneLogin_Saml2_ValidationError::MISSING_ENCRYPTED_ELEMENT                                        
+            );
         }
 
         return $decryptedElement;
@@ -1005,12 +1190,13 @@ class OneLogin_Saml2_Utils
      * @param string             $key           The private key
      * @param string             $cert          The public
      * @param string             $signAlgorithm Signature algorithm method
+     * @param string             $digestAlgorithm Digest algorithm method
      *
      * @return string
      *
      * @throws Exception
      */
-    public static function addSign($xml, $key, $cert, $signAlgorithm = XMLSecurityKey::RSA_SHA1)
+    public static function addSign($xml, $key, $cert, $signAlgorithm = XMLSecurityKey::RSA_SHA1, $digestAlgorithm = XMLSecurityDSig::SHA1)
     {
         if ($xml instanceof DOMDocument) {
             $dom = $xml;
@@ -1035,7 +1221,7 @@ class OneLogin_Saml2_Utils
 
         $objXMLSecDSig->addReferenceList(
             array($rootNode),
-            XMLSecurityDSig::SHA1,
+            $digestAlgorithm,
             array('http://www.w3.org/2000/09/xmldsig#enveloped-signature', XMLSecurityDSig::EXC_C14N),
             array('id_name' => 'ID')
         );

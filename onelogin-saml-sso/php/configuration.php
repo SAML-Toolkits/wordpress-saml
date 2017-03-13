@@ -8,6 +8,7 @@ if ( !function_exists( 'add_action' ) ) {
 
 require_once "compatibility.php";
 require_once (dirname(__FILE__) . "/lib/Saml2/Constants.php");
+require_once (dirname(__FILE__) . "/extlib/xmlseclibs/xmlseclibs.php");
 
 
 	function onelogin_saml_configuration_render() {
@@ -173,6 +174,12 @@ require_once (dirname(__FILE__) . "/lib/Saml2/Constants.php");
 
 		register_setting($option_group, 'onelogin_saml_advanced_settings_sp_privatekey');
 		add_settings_field('onelogin_saml_advanced_settings_sp_privatekey', __('Service Provider Private Key', 'onelogin-saml-sso'), "plugin_setting_string_onelogin_saml_advanced_settings_sp_privatekey", $option_group, 'advanced_settings');
+
+		register_setting($option_group, 'onelogin_saml_advanced_signaturealgorithm');
+		add_settings_field('onelogin_saml_advanced_signaturealgorithm', __('Signature Algorithm', 'onelogin-saml-sso'), "plugin_setting_select_onelogin_saml_advanced_signaturealgorithm", $option_group, 'advanced_settings');
+
+		register_setting($option_group, 'onelogin_saml_advanced_digestalgorithm');
+		add_settings_field('onelogin_saml_advanced_digestalgorithm', __('Digest Algorithm', 'onelogin-saml-sso'), "plugin_setting_select_onelogin_saml_advanced_digestalgorithm", $option_group, 'advanced_settings');
 	}
 
 	function plugin_setting_string_onelogin_saml_idp_entityid() {
@@ -502,6 +509,45 @@ require_once (dirname(__FILE__) . "/lib/Saml2/Constants.php");
 		echo '</select>'.
 			 '<p class="description">'.__("AuthContext sent in the AuthNRequest. You can select none, one or multiple values", 'onelogin-saml-sso').'</p>';
 
+	}
+
+	function plugin_setting_select_onelogin_saml_advanced_signaturealgorithm() {
+		$signaturealgorithm_value = get_option('onelogin_saml_advanced_signaturealgorithm');
+		$posible_signaturealgorithm_values = array(
+			'RSA_SHA1' => XMLSecurityKey::RSA_SHA1,
+			'DSA_SHA1' => XMLSecurityKey::DSA_SHA1,
+			'RSA_SHA256' => XMLSecurityKey::RSA_SHA256,
+			'RSA_SHA384' => XMLSecurityKey::RSA_SHA384,
+			'RSA_SHA512' => XMLSecurityKey::RSA_SHA512
+		);
+
+		echo '<select name="onelogin_saml_advanced_signaturealgorithm" id="onelogin_saml_advanced_signaturealgorithm">';
+
+		foreach ($posible_signaturealgorithm_values as $key => $value) {
+			echo '<option value='.$key.' '.($key == $signaturealgorithm_value ? 'selected="selected"': '').' >'.$value.'</option>';
+		}
+
+		echo '</select>'.
+			 '<p class="description">'.__("Algorithm that will be used on signing process").'</p>';
+	}
+
+	function plugin_setting_select_onelogin_saml_advanced_digestalgorithm() {
+		$digestalgorithm_value = get_option('onelogin_saml_advanced_digestalgorithm');
+		$posible_digestalgorithm_values = array(
+			'SHA1' => XMLSecurityDSig::SHA1,
+			'SHA256' => XMLSecurityDSig::SHA256,
+			'SHA384' => XMLSecurityDSig::SHA384,
+			'SHA512' => XMLSecurityDSig::SHA512
+		);
+
+		echo '<select name="onelogin_saml_advanced_digestalgorithm" id="onelogin_saml_advanced_digestalgorithm">';
+
+		foreach ($posible_digestalgorithm_values as $key => $value) {
+			echo '<option value='.$key.' '.($key == $digestalgorithm_value ? 'selected="selected"': '').' >'.$value.'</option>';
+		}
+
+		echo '</select>'.
+			 '<p class="description">'.__("Algorithm that will be used on digest process").'</p>';
 	}
 
 	function plugin_section_idp_text() {

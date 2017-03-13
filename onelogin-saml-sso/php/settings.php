@@ -86,7 +86,6 @@ $settings = array (
             'url' => get_option('onelogin_saml_idp_slo'),
         ),
         'x509cert' => get_option('onelogin_saml_idp_x509cert'),
-        'lowercaseUrlencoding' => get_option('onelogin_saml_advanced_idp_lowercase_url_encoding', false),
     ),
 
     'security' => array (
@@ -99,5 +98,10 @@ $settings = array (
         'wantAssertionsSigned' => $opt['wantAssertionsSigned'] == 'on'? true: false,
         'wantAssertionsEncrypted' => $opt['wantAssertionsEncrypted'] == 'on'? true: false,
         'requestedAuthnContext' => $opt['requestedAuthnContext'],
+        'relaxDestinationValidation' => true,
+        'lowercaseUrlencoding' => get_option('
+            onelogin_saml_advanced_idp_lowercase_url_encoding', false),
+        'signatureAlgorithm' => get_option('onelogin_saml_advanced_signaturealgorithm', 'http://www.w3.org/2000/09/xmldsig#rsa-sha1'),
+        'digestAlgorithm' => get_option('onelogin_saml_advanced_digestalgorithm', 'http://www.w3.org/2000/09/xmldsig#sha1'),
     )
 );
