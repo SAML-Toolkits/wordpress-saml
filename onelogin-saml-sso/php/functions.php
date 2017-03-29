@@ -10,7 +10,8 @@ require_once "compatibility.php";
 
 
 function saml_checker() {
-	if (isset($_GET['saml_acs'])) {
+	//As we only support POST binding for saml_acs, let's skip if the HTTP request is not a POST. 
+	if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_GET['saml_acs'])) {
 		saml_acs();
 	}
 	else if (isset($_GET['saml_sls'])) {
