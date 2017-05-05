@@ -39,7 +39,7 @@ if ($prevent_reset_password) {
 $action = isset($_REQUEST['action']) ? $_REQUEST['action'] : 'login';
 
 // Handle SLO
-if (isset($_COOKIE['saml_login']) && get_option('onelogin_saml_slo')) { 
+if (isset($_COOKIE['saml_login']) && get_option('onelogin_saml_slo')) {
 	add_action('init', 'saml_slo', 1);
 }
 
@@ -48,7 +48,8 @@ if (isset($_GET['saml_sso'])) {
 	add_action('init', 'saml_sso', 1);
 } else {
 	$execute_sso = false;
-	$saml_actions = isset($_GET['saml_metadata']) || (strpos($_SERVER['SCRIPT_NAME'], 'alternative_acs.php') !== FALSE);
+	$saml_metadata = apply_filters( 'onelogin_saml_metadata', 'saml_metadata' );
+	$saml_actions = isset($_GET[ $saml_metadata ]) || (strpos($_SERVER['SCRIPT_NAME'], 'alternative_acs.php') !== FALSE);
 
 	$wp_login_page = (strpos($_SERVER['SCRIPT_NAME'], 'wp-login.php') !== FALSE) && $action == 'login' && !isset($_GET['loggedout']);
 
@@ -69,7 +70,7 @@ if (isset($_GET['saml_sso'])) {
 	} else if ($local_wp_actions) {
 		$prevent_local_login = get_option('onelogin_saml_customize_action_prevent_local_login', false);
 
-		if (($want_to_local_login && $prevent_local_login) || ($want_to_reset && $prevent_reset_password)) {		
+		if (($want_to_local_login && $prevent_local_login) || ($want_to_reset && $prevent_reset_password)) {
 			$execute_sso = True;
 		}
 	}

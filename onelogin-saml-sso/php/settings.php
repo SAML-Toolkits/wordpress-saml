@@ -57,7 +57,12 @@ if (empty($requested_authncontext_values)) {
     }
 }
 
-$acs_endpoint = get_option('onelogin_saml_alternative_acs', false) ? plugins_url( 'alternative_acs.php', dirname( __FILE__ ) ) : wp_login_url() . '?saml_acs';
+/**
+ * Allow saml_acs URL query variable to be customized.
+ */
+$saml_acs = apply_filters( 'onelogin_saml_acs', 'saml_acs' );
+$saml_sls = apply_filters( 'onelogin_saml_acs', 'saml_sls' );
+$acs_endpoint = get_option( 'onelogin_saml_alternative_acs', false ) ? plugins_url( 'alternative_acs.php', dirname( __FILE__ ) ) : wp_login_url() . '?' . $saml_acs;
 
 $settings = array (
 
@@ -70,7 +75,7 @@ $settings = array (
             'url' => $acs_endpoint
         ),
         'singleLogoutService' => array (
-            'url' => get_site_url().'/wp-login.php?saml_sls'
+            'url' => get_site_url( null, '/wp-login.php?' . $saml_sls )
         ),
         'NameIDFormat' => $opt['NameIDFormat'],
         'x509cert' => get_option('onelogin_saml_advanced_settings_sp_x509cert'),

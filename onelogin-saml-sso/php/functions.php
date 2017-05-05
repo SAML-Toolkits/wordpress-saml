@@ -10,14 +10,22 @@ require_once "compatibility.php";
 
 
 function saml_checker() {
-	if (isset($_GET['saml_acs'])) {
+	/**
+	 * Allow saml_acs query variables to be customized.
+	 */
+	$saml_acs             = apply_filters( 'onelogin_saml_acs', 'saml_acs' );
+	$saml_sls             = apply_filters( 'onelogin_saml_sls', 'saml_sls' );
+	$saml_metadata        = apply_filters( 'onelogin_saml_metadata', 'saml_metadata' );
+	$saml_validate_config = apply_filters( 'onelogin_saml_validate_config', 'saml_validate_config' );
+
+	if ( isset( $_GET[ $saml_acs ] ) ) {
 		saml_acs();
 	}
-	else if (isset($_GET['saml_sls'])) {
+	else if (isset($_GET[ $saml_sls ])) {
 		saml_sls();
-	} else if (isset($_GET['saml_metadata'])) {
+	} else if (isset($_GET[ $saml_metadata ])) {
 		saml_metadata();
-	} else if (isset($_GET['saml_validate_config'])) {
+	} else if (isset($_GET[ $saml_validate_config ])) {
 		saml_validate_config();
 	}
 }
