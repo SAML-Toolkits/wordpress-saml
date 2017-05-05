@@ -24,8 +24,8 @@ require_once "compatibility.php";
 
 echo '<h1>'.__('OneLogin SSO/SAML Settings validation', 'onelogin-saml-sso').'</h1>';
 
-echo __('Debug mode', 'onelogin-saml-sso').' '. ($settings['strict']?'<strong>on</strong>. '.__("In production turn it off", 'onelogin-saml-sso'):'<strong>off</strong>').'<br>';
-echo __('Strict mode', 'onelogin-saml-sso').' '. ($settings['debug']?'<strong>on</strong>':'<strong>off</strong>. '.__("In production we recommend to turn it on.", 'onelogin-saml-sso')).'<br>';
+echo __('Debug mode', 'onelogin-saml-sso').' '. ($settings['debug']?'<strong>on</strong>. '.__("In production turn it off", 'onelogin-saml-sso'):'<strong>off</strong>').'<br>';
+echo __('Strict mode', 'onelogin-saml-sso').' '. ($settings['strict']?'<strong>on</strong>':'<strong>off</strong>. '.__("In production we recommend to turn it on.", 'onelogin-saml-sso')).'<br>';
 
 $spPrivatekey = $settings['sp']['x509cert'];
 $spCert = $settings['sp']['privateKey'];
