@@ -322,10 +322,12 @@ function saml_sls() {
 }
 
 function saml_metadata() {
-	$auth = initialize_saml();
-	$settings = $auth->getSettings();
-	$metadata = $settings->getSPMetadata();
-	
+	require_once plugin_dir_path(__FILE__).'_toolkit_loader.php';
+	require plugin_dir_path(__FILE__).'settings.php';
+
+	$samlSettings = new OneLogin_Saml2_Settings($settings, true);
+	$metadata = $samlSettings->getSPMetadata();
+
 	header('Content-Type: text/xml');
 	echo $metadata;
 	exit();

@@ -29,6 +29,7 @@ To mitigate that bug, place the script at the root of wordpress and execute it (
 * Avoid double site URL concatenation
 * Replace deprecated add_contextual_help method
 * Signature & Digest algorithm support
+* On SP metadata publication validate only SP part.
 
 = 2.4.4 =
 * Relax Destination check.
