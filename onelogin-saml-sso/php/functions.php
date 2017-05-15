@@ -12,7 +12,7 @@ require_once "compatibility.php";
 function saml_checker() {
 	if (isset($_GET['saml_acs'])) {
 		if (empty($_POST['SAMLResponse'])) {
-			print_r("That ACS endpoints expects a SAMLResponse value sent using HTTP-POST binding. Nothing was found");
+			print_r("That ACS endpoint expects a SAMLResponse value sent using HTTP-POST binding. Nothing was found");
 			exit();
 		}
 		saml_acs();
