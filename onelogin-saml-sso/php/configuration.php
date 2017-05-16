@@ -48,7 +48,7 @@ require_once (dirname(__FILE__) . "/extlib/xmlseclibs/xmlseclibs.php");
 
 		$current_screen = convert_to_screen($current_screen);
 		WP_Screen::add_old_compat_help($current_screen, $helpText);
-		
+
 		$option_group = 'onelogin_saml_configuration';
 
 		add_settings_section('idp', __('IDENTITY PROVIDER SETTINGS', 'onelogin-saml-sso'), 'plugin_section_idp_text', $option_group);
@@ -70,7 +70,7 @@ require_once (dirname(__FILE__) . "/extlib/xmlseclibs/xmlseclibs.php");
 			'onelogin_saml_forcelogin' => __('Force SAML login', 'onelogin-saml-sso'),
 			'onelogin_saml_slo' => __('Single Log Out', 'onelogin-saml-sso'),
 			'onelogin_saml_keep_local_login' => __('Keep Local login', 'onelogin-saml-sso'),
-			'onelogin_saml_alternative_acs' => __('Alternative ACS Endpoint', 'onelogin-saml-sso')			
+			'onelogin_saml_alternative_acs' => __('Alternative ACS Endpoint', 'onelogin-saml-sso')
 		);
 		foreach ($options_fields as $name => $description) {
 			register_setting($option_group, $name);
@@ -80,7 +80,7 @@ require_once (dirname(__FILE__) . "/extlib/xmlseclibs/xmlseclibs.php");
 		register_setting($option_group, 'onelogin_saml_account_matcher');
 		add_settings_field('onelogin_saml_account_matcher', __('Match Wordpress account by', 'onelogin-saml-sso'), "plugin_setting_select_onelogin_saml_account_matcher", $option_group, 'options');
 
-		add_settings_section('attr_mapping', __('ATTRIBUTE MAPPING', 'onelogin-saml-sso'), 'plugin_section_attr_mapping_text', $option_group);		
+		add_settings_section('attr_mapping', __('ATTRIBUTE MAPPING', 'onelogin-saml-sso'), 'plugin_section_attr_mapping_text', $option_group);
 		$mapping_fields = array (
 			'onelogin_saml_attr_mapping_username' => __('Username', 'onelogin-saml-sso') . ' *',
 			'onelogin_saml_attr_mapping_mail' => __('E-mail', 'onelogin-saml-sso') . ' *',
@@ -183,7 +183,7 @@ require_once (dirname(__FILE__) . "/extlib/xmlseclibs/xmlseclibs.php");
 	}
 
 	function plugin_setting_string_onelogin_saml_idp_entityid() {
-		echo '<input type="text" name="onelogin_saml_idp_entityid" id="onelogin_saml_idp_entityid" 
+		echo '<input type="text" name="onelogin_saml_idp_entityid" id="onelogin_saml_idp_entityid"
 			  value= "'.get_option('onelogin_saml_idp_entityid').'" size="80">'.
 			  '<p class="description">'.__('Identifier of the IdP entity. ("Issuer URL")', 'onelogin-saml-sso').'</p>';
 	}
@@ -409,7 +409,7 @@ require_once (dirname(__FILE__) . "/extlib/xmlseclibs/xmlseclibs.php");
 		echo '<input type="checkbox" name="onelogin_saml_advanced_settings_logout_request_signed" id="onelogin_saml_advanced_settings_logout_request_signed"
 			  '.($value ? 'checked="checked"': '').'>'.
 			  '<p class="description">'.__('The samlp:logoutRequest messages sent by this SP will be signed.', 'onelogin-saml-sso').'</p>';
-	}	
+	}
 
 	function plugin_setting_boolean_onelogin_saml_advanced_settings_logout_response_signed() {
 		$value = get_option('onelogin_saml_advanced_settings_logout_response_signed');
@@ -514,11 +514,11 @@ require_once (dirname(__FILE__) . "/extlib/xmlseclibs/xmlseclibs.php");
 	function plugin_setting_select_onelogin_saml_advanced_signaturealgorithm() {
 		$signaturealgorithm_value = get_option('onelogin_saml_advanced_signaturealgorithm');
 		$posible_signaturealgorithm_values = array(
-			'RSA_SHA1' => XMLSecurityKey::RSA_SHA1,
-			'DSA_SHA1' => XMLSecurityKey::DSA_SHA1,
-			'RSA_SHA256' => XMLSecurityKey::RSA_SHA256,
-			'RSA_SHA384' => XMLSecurityKey::RSA_SHA384,
-			'RSA_SHA512' => XMLSecurityKey::RSA_SHA512
+			XMLSecurityKey::RSA_SHA1 => XMLSecurityKey::RSA_SHA1,
+			XMLSecurityKey::DSA_SHA1 => XMLSecurityKey::DSA_SHA1,
+			XMLSecurityKey::RSA_SHA256 => XMLSecurityKey::RSA_SHA256,
+			XMLSecurityKey::RSA_SHA384 => XMLSecurityKey::RSA_SHA384,
+			XMLSecurityKey::RSA_SHA512 => XMLSecurityKey::RSA_SHA512
 		);
 
 		echo '<select name="onelogin_saml_advanced_signaturealgorithm" id="onelogin_saml_advanced_signaturealgorithm">';
@@ -534,10 +534,10 @@ require_once (dirname(__FILE__) . "/extlib/xmlseclibs/xmlseclibs.php");
 	function plugin_setting_select_onelogin_saml_advanced_digestalgorithm() {
 		$digestalgorithm_value = get_option('onelogin_saml_advanced_digestalgorithm');
 		$posible_digestalgorithm_values = array(
-			'SHA1' => XMLSecurityDSig::SHA1,
-			'SHA256' => XMLSecurityDSig::SHA256,
-			'SHA384' => XMLSecurityDSig::SHA384,
-			'SHA512' => XMLSecurityDSig::SHA512
+			XMLSecurityDSig::SHA1 => XMLSecurityDSig::SHA1,
+			XMLSecurityDSig::SHA256 => XMLSecurityDSig::SHA256,
+			XMLSecurityDSig::SHA384 => XMLSecurityDSig::SHA384,
+			XMLSecurityDSig::SHA512 => XMLSecurityDSig::SHA512
 		);
 
 		echo '<select name="onelogin_saml_advanced_digestalgorithm" id="onelogin_saml_advanced_digestalgorithm">';
