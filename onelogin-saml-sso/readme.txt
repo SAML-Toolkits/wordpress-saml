@@ -22,6 +22,9 @@ To mitigate that bug, place the script at the root of wordpress and execute it (
 
 == Changelog ==
 
+= 2.4.7 =
+* Fix Signature & Digest algorithm support
+
 = 2.4.6 =
 * Fix validate page (debug/strict values were showed wrong)
 * Avoid error 500 when accesing ACS URL directly, instead print error.
