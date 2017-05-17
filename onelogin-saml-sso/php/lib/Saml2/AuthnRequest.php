@@ -125,7 +125,7 @@ REQUESTEDAUTHN;
     Destination="{$idpData['singleSignOnService']['url']}"
     ProtocolBinding="{$spData['assertionConsumerService']['binding']}"
     AssertionConsumerServiceURL="{$spData['assertionConsumerService']['url']}">
-    <saml:Issuer>{$spData['entityId']}</saml:Issuer>
+    <saml:Issuer xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion">{$spData['entityId']}</saml:Issuer>
 {$nameIdPolicyStr}
 {$requestedAuthnStr}
 </samlp:AuthnRequest>
