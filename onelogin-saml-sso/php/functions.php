@@ -17,7 +17,7 @@ function saml_checker() {
 		}
 		saml_acs();
 	}
-	else if (isset($_GET['saml_sls'])) {
+	else if (isset($_GET['saml_sls']) || isset($_GET['SAMLResponse'])) {
 		saml_sls();
 	} else if (isset($_GET['saml_metadata'])) {
 		saml_metadata();
