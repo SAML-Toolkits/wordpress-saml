@@ -60,6 +60,10 @@ function saml_user_register() {
 }
 
 function saml_sso() {
+	if ( defined( 'WP_CLI' ) && WP_CLI ) {
+		return true;
+	}
+	
 	if (is_user_logged_in()) {
 		return true;
 	}
