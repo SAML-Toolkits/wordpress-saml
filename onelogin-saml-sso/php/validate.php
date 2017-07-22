@@ -35,7 +35,7 @@ try {
 	echo '<br>'.__("SAML settings are", 'onelogin-saml-sso').' <strong>ok</strong>.<br>';
 } catch (Exception $e) {
 	echo '<br>'.__("Found errors while validating SAML settings info.", 'onelogin-saml-sso');
-	print_r($e->getMessage());
+	echo esc_html($e->getMessage());
 	echo '<br>';
 }
 
@@ -54,7 +54,7 @@ if ($slo) {
 $fileSystemKeyExists = file_exists(plugin_dir_path(__FILE__).'certs/sp.key');
 $fileSystemCertExists = file_exists(plugin_dir_path(__FILE__).'certs/sp.crt');
 if ($fileSystemKeyExists) {
-	$privatekey_url = plugins_url('php/certs/sp.key', dirname(__FILE__));
+	$privatekey_url = plugins_url('php/certs/sp.key', __DIR__);
 	echo '<br>'.__("There is a private key stored at the filesystem. Protect the 'certs' path. Nobody should be allowed to access:", 'onelogin-saml-sso').'<br>'.$privatekey_url.'<br>';
 }
 
@@ -103,14 +103,14 @@ foreach ($attr_mappings as $field => $name) {
 		}
 		if ($account_matcher == 'email' && $field == 'onelogin_saml_attr_mapping_mail') {
 			echo '<br>'.__("E-mail mapping is required in order to enable the SAML Single Sign On", 'onelogin-saml-sso').'<br>';
-		}		
+		}
 		$lacked_attr_mappings[] = $name;
 	}
 }
 
 if (!empty($lacked_attr_mappings)) {
 	echo '<br>'.__("Notice that there are attributes without mapping:", 'onelogin-saml-sso').'<br>';
-	print_r(implode('<br>', $lacked_attr_mappings).'</br>');
+	echo implode('<br>', $lacked_attr_mappings).'</br>';
 }
 
 $lacked_role_mappings = array();
@@ -128,12 +128,12 @@ foreach (wp_roles()->get_names() as $roleid => $name) {
 
 if (!empty($lacked_role_mappings)) {
 	echo '<br>'.__("Notice that there are roles without mapping:", 'onelogin-saml-sso').'<br>';
-	print_r(implode('<br>', $lacked_role_mappings).'</br>');
+	echo implode('<br>', $lacked_role_mappings).'</br>';
 }
 
 if (!empty($lacked_role_orders)) {
 	echo '<br>'.__("Notice that there are roles without ordering:", 'onelogin-saml-sso').'<br>';
-	print_r(implode('<br>', $lacked_role_orders).'</br>');
+	echo implode('<br>', $lacked_role_orders).'</br>';
 }
 ?>
 
