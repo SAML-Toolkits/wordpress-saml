@@ -5,7 +5,7 @@
     "version": "composer",
     "require": {
         "php": ">=5.6",
-        "onelogin/php-saml": "dev-3.0.0"
+        "onelogin/php-saml": "dev-composer"
     },
     "homepage": "https://support.onelogin.com/hc/en-us/articles/204353160-Configuring-SAML-for-WordPress",
     "license": "MIT",
