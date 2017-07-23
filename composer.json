@@ -2,7 +2,7 @@
     "name": "onelogin/wordpress-saml",
     "description": "OneLogin SAML plugin for Wordpress.",
     "type": "wordpress-plugin",
-    "version": "3.0.0-composer",
+    "version": "composer",
     "require": {
         "php": ">=5.6",
         "onelogin/php-saml": "^3.0"
