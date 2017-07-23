@@ -22,6 +22,13 @@ To mitigate that bug, place the script at the root of wordpress and execute it (
 
 == Changelog ==
 
+= 3.0.0-composer =
+
+* Composer version of the wordpress-saml plugin (split from 2.4.7 + input sanitize + allow wp-cli)
+
+-----------------------
+
+
 = 2.4.7 =
 * Fix Signature & Digest algorithm support
 

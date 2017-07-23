@@ -1,5 +1,11 @@
 <?php
 
+namespace Onelogin\php;
+
+use OneLogin_Saml2_Constants;
+use RobRichards\XMLSecLibs\XMLSecurityKey;
+use RobRichards\XMLSecLibs\XMLSecurityDSig;
+
 // Make sure we don't expose any info if called directly
 if ( !function_exists( 'add_action' ) ) {
 	echo 'Hi there!  I\'m just a plugin, not much I can do when called directly.';
@@ -7,8 +13,6 @@ if ( !function_exists( 'add_action' ) ) {
 }
 
 require_once "compatibility.php";
-require_once (dirname(__FILE__) . "/lib/Saml2/Constants.php");
-require_once (dirname(__FILE__) . "/extlib/xmlseclibs/xmlseclibs.php");
 
 
 	function onelogin_saml_configuration_render() {

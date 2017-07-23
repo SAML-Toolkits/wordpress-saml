@@ -1,5 +1,11 @@
 <?php
 
+namespace Onelogin\php;
+
+use OneLogin_Saml2_Auth;
+use OneLogin_Saml2_Settings;
+
+
 // Make sure we don't expose any info if called directly
 if ( !function_exists( 'add_action' ) ) {
 	echo 'Hi there!  I\'m just a plugin, not much I can do when called directly.';
@@ -336,7 +342,6 @@ function saml_sls() {
 }
 
 function saml_metadata() {
-	require_once plugin_dir_path(__FILE__).'_toolkit_loader.php';
 	require plugin_dir_path(__FILE__).'settings.php';
 
 	$samlSettings = new OneLogin_Saml2_Settings($settings, true);
@@ -350,18 +355,16 @@ function saml_metadata() {
 
 function saml_validate_config() {
 	saml_load_translations();
-	require_once plugin_dir_path(__FILE__).'_toolkit_loader.php';
 	require plugin_dir_path(__FILE__).'settings.php';
 	require_once plugin_dir_path(__FILE__)."validate.php";
 	exit();
 }
 
 function initialize_saml() {
-	require_once plugin_dir_path(__FILE__).'_toolkit_loader.php';
 	require plugin_dir_path(__FILE__).'settings.php';
 
 	try {
-		$auth = new Onelogin_Saml2_Auth($settings);
+		$auth = new OneLogin_Saml2_Auth($settings);
 	} catch (Exception $e) {
 		echo '<br>'.__("The Onelogin SSO/SAML plugin is not correctly configured.", 'onelogin-saml-sso').'<br>';
 		echo esc_html($e->getMessage());
