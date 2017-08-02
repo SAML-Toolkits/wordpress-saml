@@ -22,6 +22,12 @@ To mitigate that bug, place the script at the root of wordpress and execute it (
 
 == Changelog ==
 
+= 2.5.0 =
+* Update php-saml library to 2.11.0
+* Allow WP-CLI to work
+* Sanitize SAML settings input
+* Add support to SAML NameId Format
+
 = 2.4.7 =
 * Fix Signature & Digest algorithm support
 
