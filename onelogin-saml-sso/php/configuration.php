@@ -211,7 +211,7 @@ require_once (dirname(__FILE__) . "/extlib/xmlseclibs/xmlseclibs.php");
 		$value = get_option('onelogin_saml_advanced_idp_lowercase_url_encoding');
 		echo '<input type="checkbox" name="" id="onelogin_saml_advanced_idp_lowercase_url_encoding"
 			  '.($value ? 'checked="checked"': '').'>'.
-			  '<p class="description">'.__('Some IdPs like ADFS can use lowercase URL encoding, but the plugin expects uppercase URL enconding, enable it to fix incompatibility issues.', 'onelogin-saml-sso').'</p>';
+			  '<p class="description">'.__('Some IdPs like ADFS can use lowercase URL encoding, but the plugin expects uppercase URL encoding, enable it to fix incompatibility issues.', 'onelogin-saml-sso').'</p>';
 	}
 
 	function plugin_setting_boolean_onelogin_saml_autocreate() {
