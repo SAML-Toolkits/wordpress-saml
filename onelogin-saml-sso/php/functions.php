@@ -401,7 +401,7 @@ class preventLocalChanges
 			<script>
 				jQuery(document).ready(function ($) {
 					if ($('input[name=email]').length) {
-						$('input[name=email]').attr("disabled", "disabled");
+						$('input[name=email]').attr("readonly", "readonly");
 					}
 
 				});
