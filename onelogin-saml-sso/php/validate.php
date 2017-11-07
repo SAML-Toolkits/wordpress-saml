@@ -55,7 +55,7 @@ $fileSystemKeyExists = file_exists(plugin_dir_path(__FILE__).'certs/sp.key');
 $fileSystemCertExists = file_exists(plugin_dir_path(__FILE__).'certs/sp.crt');
 if ($fileSystemKeyExists) {
 	$privatekey_url = plugins_url('php/certs/sp.key', __DIR__);
-	echo '<br>'.__("There is a private key stored at the filesystem. Protect the 'certs' path. Nobody should be allowed to access:", 'onelogin-saml-sso').'<br>'.$privatekey_url.'<br>';
+	echo '<br>'.__("There is a private key stored at the filesystem. Protect the 'certs' path. Nobody should be allowed to access:", 'onelogin-saml-sso').'<br>'.esc_html( $privatekey_url ).'<br>';
 }
 
 if ($spPrivatekey && !empty($spPrivatekey)) {
@@ -110,7 +110,7 @@ foreach ($attr_mappings as $field => $name) {
 
 if (!empty($lacked_attr_mappings)) {
 	echo '<br>'.__("Notice that there are attributes without mapping:", 'onelogin-saml-sso').'<br>';
-	echo implode('<br>', $lacked_attr_mappings).'</br>';
+	echo wp_kses( implode('<br>',$lacked_attr_mappings), array( 'br' => array() ) ).'</br>';
 }
 
 $lacked_role_mappings = array();
@@ -128,12 +128,12 @@ foreach (wp_roles()->get_names() as $roleid => $name) {
 
 if (!empty($lacked_role_mappings)) {
 	echo '<br>'.__("Notice that there are roles without mapping:", 'onelogin-saml-sso').'<br>';
-	echo implode('<br>', $lacked_role_mappings).'</br>';
+	echo wp_kses( implode('<br>', $lacked_role_mappings ), array( 'br' => array() ) ).'</br>';
 }
 
 if (!empty($lacked_role_orders)) {
 	echo '<br>'.__("Notice that there are roles without ordering:", 'onelogin-saml-sso').'<br>';
-	echo implode('<br>', $lacked_role_orders).'</br>';
+	echo wp_kses( implode('<br>', $lacked_role_orders), array( 'br' => array() ) ).'</br>';
 }
 ?>
 

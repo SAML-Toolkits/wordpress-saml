@@ -32,7 +32,7 @@ function saml_custom_login_footer() {
 		$saml_login_message = "SAML Login";
 	}
 
-    echo '<div style="font-size: 110%;padding:8px;background: #fff;text-align: center;"><a href="'.get_site_url().'/wp-login.php?saml_sso">'.esc_html($saml_login_message).'</a></div>';
+    echo '<div style="font-size: 110%;padding:8px;background: #fff;text-align: center;"><a href="'.esc_url( get_site_url().'/wp-login.php?saml_sso') .'">'.esc_html($saml_login_message).'</a></div>';
 }
 
 function saml_load_translations() {
@@ -372,7 +372,7 @@ function initialize_saml() {
 	} catch (Exception $e) {
 		echo '<br>'.__("The Onelogin SSO/SAML plugin is not correctly configured.", 'onelogin-saml-sso').'<br>';
 		echo esc_html($e->getMessage());
-		echo '<br>'.__("If you are the administrator", 'onelogin-saml-sso').', <a href="'.get_site_url().'/wp-login.php?normal">'.__("access using your wordpress credentials", 'onelogin-saml-sso').'</a> '.__("and fix the problem", 'onelogin-saml-sso');
+		echo '<br>'.__("If you are the administrator", 'onelogin-saml-sso').', <a href="'.esc_url( get_site_url().'/wp-login.php?normal').'">'.__("access using your wordpress credentials", 'onelogin-saml-sso').'</a> '.__("and fix the problem", 'onelogin-saml-sso');
 		exit();
 	}
 
