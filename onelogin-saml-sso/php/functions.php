@@ -47,7 +47,7 @@ function saml_lostpassword() {
 	$target = get_option('onelogin_saml_customize_links_lost_password');
 	if (!empty($target)) {
 		wp_redirect($target);
-		return false;
+		exit;
 	}
 }
 
@@ -55,7 +55,7 @@ function saml_user_register() {
 	$target = get_option('onelogin_saml_customize_links_user_registration');
 	if (!empty($target)) {
 		wp_redirect($target);
-		return false;
+		exit;
 	}
 }
 
