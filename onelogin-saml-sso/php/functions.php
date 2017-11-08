@@ -291,10 +291,8 @@ function saml_acs() {
 			wp_redirect(home_url());
 		} else {
 			if (strpos($_REQUEST['RelayState'], 'redirect_to') !== false) {
-				$urlinfo = parse_url($_REQUEST['RelayState']);
-				$parameters = array();
-				parse_str($urlinfo['query'], $parameters);
-				$target = urldecode($parameters['redirect_to']);
+				$query = wp_parse_url($_REQUEST['RelayState'], PHP_URL_QUERY);
+				parse_str( $query, $parameters );
 				wp_redirect(urldecode($parameters['redirect_to']));
 			}  else {
 				wp_redirect($_REQUEST['RelayState']);
