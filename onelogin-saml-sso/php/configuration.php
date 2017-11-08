@@ -17,11 +17,11 @@ require_once (dirname(__FILE__) . "/extlib/xmlseclibs/xmlseclibs.php");
 			<div class="wrap">
 				<?php screen_icon(); ?>
 				<div class="alignleft">
-					<a href="http://www.onelogin.com"><img src="<?php echo plugins_url('onelogin.png', dirname(__FILE__));?>"></a>
+					<a href="http://www.onelogin.com"><img src="<?php echo esc_url( plugins_url('onelogin.png', dirname(__FILE__)) );?>"></a>
 				</div>
 				<div class="alignright">
-					<a href="<?php echo get_site_url().'/wp-login.php?saml_metadata'; ?>" target="blank"><?php echo __("Go to the metadata of this SP", 'onelogin-saml-sso');?></a><br>
-					<a href="<?php echo get_site_url().'/wp-login.php?saml_validate_config'; ?>" target="blank"><?php echo __("Once configured, validate here your OneLogin SSO/SAML Settings", 'onelogin-saml-sso');?></a>
+					<a href="<?php echo esc_url( get_site_url().'/wp-login.php?saml_metadata' ); ?>" target="blank"><?php echo __("Go to the metadata of this SP", 'onelogin-saml-sso');?></a><br>
+					<a href="<?php echo esc_url( get_site_url().'/wp-login.php?saml_validate_config' ); ?>" target="blank"><?php echo __("Once configured, validate here your OneLogin SSO/SAML Settings", 'onelogin-saml-sso');?></a>
 				</div>
 				<div style="clear:both"></div>
 				<h2><?php echo esc_html( $title ); ?></h2>
@@ -184,7 +184,7 @@ require_once (dirname(__FILE__) . "/extlib/xmlseclibs/xmlseclibs.php");
 
 	function plugin_setting_string_onelogin_saml_idp_entityid() {
 		echo '<input type="text" name="onelogin_saml_idp_entityid" id="onelogin_saml_idp_entityid"
-			  value= "'.esc_html(get_option('onelogin_saml_idp_entityid')).'" size="80">'.
+			  value= "'.esc_attr(get_option('onelogin_saml_idp_entityid')).'" size="80">'.
 			  '<p class="description">'.__('Identifier of the IdP entity. ("Issuer URL")', 'onelogin-saml-sso').'</p>';
 	}
 
@@ -273,37 +273,37 @@ require_once (dirname(__FILE__) . "/extlib/xmlseclibs/xmlseclibs.php");
 
 	function plugin_setting_string_onelogin_saml_attr_mapping_mail() {
 		echo '<input type="text" name="onelogin_saml_attr_mapping_mail" id="onelogin_saml_attr_mapping_mail"
-			  value= "'.esc_html(get_option('onelogin_saml_attr_mapping_mail')).'" size="30">';
+			  value= "'.esc_attr(get_option('onelogin_saml_attr_mapping_mail')).'" size="30">';
 	}
 
 	function plugin_setting_string_onelogin_saml_attr_mapping_firstname() {
 		echo '<input type="text" name="onelogin_saml_attr_mapping_firstname" id="onelogin_saml_attr_mapping_firstname"
-			  value= "'.esc_html(get_option('onelogin_saml_attr_mapping_firstname')).'" size="30">';
+			  value= "'.esc_attr(get_option('onelogin_saml_attr_mapping_firstname')).'" size="30">';
 	}
 
 	function plugin_setting_string_onelogin_saml_attr_mapping_lastname() {
 		echo '<input type="text" name="onelogin_saml_attr_mapping_lastname" id="onelogin_saml_attr_mapping_lastname"
-			  value= "'.esc_html(get_option('onelogin_saml_attr_mapping_lastname')).'" size="30">';
+			  value= "'.esc_attr(get_option('onelogin_saml_attr_mapping_lastname')).'" size="30">';
 	}
 
 	function plugin_setting_string_onelogin_saml_attr_mapping_role() {
 		echo '<input type="text" name="onelogin_saml_attr_mapping_role" id="onelogin_saml_attr_mapping_role"
-			  value= "'.esc_html(get_option('onelogin_saml_attr_mapping_role')).'" size="30">'.
+			  value= "'.esc_attr(get_option('onelogin_saml_attr_mapping_role')).'" size="30">'.
 			  '<p class="description">'.__("The attribute that contains the role of the user, For example 'memberOf'. If WordPress can't figure what role assign to the user, it will assign the default role defined at the general settings.", 'onelogin-saml-sso').'</p>';
 	}
 
 	function plugin_setting_string_onelogin_saml_role_mapping($role_value) {
-		echo '<input type="text" name="onelogin_saml_role_mapping_'.$role_value.'" id="onelogin_saml_role_mapping_'.$role_value.'"
-			  value= "'.esc_html(get_option('onelogin_saml_role_mapping_'.$role_value)).'" size="30">';
+		echo '<input type="text" name="onelogin_saml_role_mapping_'.esc_attr($role_value).'" id="onelogin_saml_role_mapping_'.esc_attr($role_value).'"
+			  value= "'.esc_attr(get_option('onelogin_saml_role_mapping_'.$role_value)).'" size="30">';
 	}
 
 	function plugin_setting_string_onelogin_saml_role_order($role_value) {
-		echo '<input type="text" name="onelogin_saml_role_order_'.$role_value.'" id="onelogin_saml_role_order_'.$role_value.'"
-			  value= "'.esc_html(get_option('onelogin_saml_role_order_'.$role_value)).'" size="3">';
+		echo '<input type="text" name="onelogin_saml_role_order_'.esc_attr($role_value).'" id="onelogin_saml_role_order_'.esc_attr($role_value).'"
+			  value= "'.esc_attr(get_option('onelogin_saml_role_order_'.$role_value)).'" size="3">';
 	}
 
 	function plugin_setting_boolean_onelogin_saml_role_mapping_multivalued_in_one_attribute_value() {
-		$value = esc_html(get_option('onelogin_saml_role_mapping_multivalued_in_one_attribute_value'));
+		$value = get_option('onelogin_saml_role_mapping_multivalued_in_one_attribute_value');
 		echo '<input type="checkbox" name="onelogin_saml_role_mapping_multivalued_in_one_attribute_value" id="onelogin_saml_role_mapping_multivalued_in_one_attribute_value"
 			  '.($value ? 'checked="checked"': '').'>
 			  <p class="description">'.__("Sometimes role values are provided in an unique attribute statement (instead multiple attribute statements). If that is the case, activate this and the plugin will try to split those values by ;<br>Use a regular expression pattern in order to extract complex data.", 'onelogin-saml-sso').'</p>';
@@ -311,7 +311,7 @@ require_once (dirname(__FILE__) . "/extlib/xmlseclibs/xmlseclibs.php");
 
 	function plugin_setting_string_onelogin_saml_role_mapping_multivalued_pattern() {
 		echo '<input type="text" name="onelogin_saml_role_mapping_multivalued_pattern" id="onelogin_saml_role_mapping_multivalued_pattern"
-			  value= "'.esc_html(get_option('onelogin_saml_role_mapping_multivalued_pattern')).'" size="70">
+			  value= "'.esc_attr(get_option('onelogin_saml_role_mapping_multivalued_pattern')).'" size="70">
 			  <p class="description">'.__("Regular expression that extract roles from complex multivalued data (required to active the previous option).<br> E.g. If the SAMLResponse has a role attribute like: CN=admin;CN=superuser;CN=europe-admin; , use the regular expression <code>/CN=([A-Z0-9\s _-]*);/i</code> to retrieve the values. Or use <code>/CN=([^,;]*)/</code>", 'onelogin-saml-sso').'</p>';
 	}
 
@@ -477,7 +477,7 @@ require_once (dirname(__FILE__) . "/extlib/xmlseclibs/xmlseclibs.php");
 		echo '<select name="onelogin_saml_advanced_nameidformat" id="onelogin_saml_advanced_nameidformat">';
 
 		foreach ($posible_nameidformat_values as $key => $value) {
-			echo '<option value='.$key.' '.($key == $nameidformat_value ? 'selected="selected"': '').' >'.$value.'</option>';
+			echo '<option value='.esc_attr($key).' '.($key == $nameidformat_value ? 'selected="selected"': '').' >'.esc_html($value).'</option>';
 		}
 
 		echo '</select>'.
@@ -503,7 +503,7 @@ require_once (dirname(__FILE__) . "/extlib/xmlseclibs/xmlseclibs.php");
 		echo '<select multiple="multiple" name="onelogin_saml_advanced_requestedauthncontext[]" id="onelogin_saml_advanced_requestedauthncontext">';
 		echo '<option value=""></option>';
 		foreach ($posible_requestedauthncontext_values as $key => $value) {
-			echo '<option value='.$key.' '.(in_array($key, $requestedauthncontext_values) ? 'selected="selected"': '').' >'.$value.'</option>';
+			echo '<option value='.esc_attr($key).' '.(in_array($key, $requestedauthncontext_values) ? 'selected="selected"': '').' >'.esc_html($value).'</option>';
 		}
 
 		echo '</select>'.
@@ -524,7 +524,7 @@ require_once (dirname(__FILE__) . "/extlib/xmlseclibs/xmlseclibs.php");
 		echo '<select name="onelogin_saml_advanced_signaturealgorithm" id="onelogin_saml_advanced_signaturealgorithm">';
 
 		foreach ($posible_signaturealgorithm_values as $key => $value) {
-			echo '<option value='.$key.' '.($key == $signaturealgorithm_value ? 'selected="selected"': '').' >'.$value.'</option>';
+			echo '<option value='.esc_attr($key).' '.($key == $signaturealgorithm_value ? 'selected="selected"': '').' >'.esc_html($value).'</option>';
 		}
 
 		echo '</select>'.
@@ -543,7 +543,7 @@ require_once (dirname(__FILE__) . "/extlib/xmlseclibs/xmlseclibs.php");
 		echo '<select name="onelogin_saml_advanced_digestalgorithm" id="onelogin_saml_advanced_digestalgorithm">';
 
 		foreach ($posible_digestalgorithm_values as $key => $value) {
-			echo '<option value='.$key.' '.($key == $digestalgorithm_value ? 'selected="selected"': '').' >'.$value.'</option>';
+			echo '<option value='.esc_attr($key).' '.($key == $digestalgorithm_value ? 'selected="selected"': '').' >'.esc_html($value).'</option>';
 		}
 
 		echo '</select>'.
