@@ -1,15 +1,4 @@
 <?php
-
-/* 
- * includes capabilities for a "remember me" login flag passed as a SAML Attribute.
- * To use, pass a value of 'yes' in a SAML Attribute (for example, coming from a 'remember me'
- * checkbox on a custom login), then map that attribute
- * name to the WordPress Dashboard SSO Settings here:
- * Wordpress Settings => SSO/SAML Settings => Attribute Mapping => Remember Me
- 
- * Other affected files: /php/functions.php
-*/
-
 // Make sure we don't expose any info if called directly
 if ( !function_exists( 'add_action' ) ) {
 	echo 'Hi there!  I\'m just a plugin, not much I can do when called directly.';
