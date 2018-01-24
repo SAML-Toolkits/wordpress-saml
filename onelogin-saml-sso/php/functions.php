@@ -1,12 +1,4 @@
 <?php
-/* 
- * includes capabilities for a "remember me" login flag passed as a SAML Attribute.
- * To use, pass a value of 'yes' in a SAML Attribute, then map that attribute
- * name in the WordPress Dashboard SSO Settings here:
- * Wordpress Settings => SSO/SAML Settings => Attribute Mapping => Remember Me
- 
- * Other affected files: /php/configuration.php
-*/
 
 // Make sure we don't expose any info if called directly
 if ( !function_exists( 'add_action' ) ) {
@@ -289,21 +281,12 @@ function saml_acs() {
 	} else if ($user_id) {
 		wp_set_current_user($user_id);
 		
+		$rememberme = false;
 		$remembermeMapping = get_option('onelogin_saml_attr_mapping_rememberme');
-		if ( !empty($remembermeMapping) && isset($attrs[$remembermeMapping]) && !empty($attrs[$remembermeMapping][0])) {
-			$rememberme = $attrs[$remembermeMapping][0];
+		if (!empty($remembermeMapping) && isset($attrs[$remembermeMapping]) && !empty($attrs[$remembermeMapping][0])) {
+    			$rememberme = in_array($attrs[$remembermeMapping][0], array(1, true, '1', 'yes', 'on')) ? true : false;
 		}
-		   
-		if ( isset($rememberme) ) {
-			// ** Value of 'yes' is assumed to be passed here, if other, need to edit this. 
-			if ( $rememberme == 'yes' ) {
-				wp_set_auth_cookie($user_id, true);
-			} else {
-				wp_set_auth_cookie($user_id);
-			}
-		} else {
-			wp_set_auth_cookie($user_id);
-		}
+		wp_set_auth_cookie($user_id, $rememberme);
 
 		setcookie(SAML_LOGIN_COOKIE, 1, time() + YEAR_IN_SECONDS, SITECOOKIEPATH );
 	}
