@@ -1,5 +1,4 @@
 <?php
-
 // Make sure we don't expose any info if called directly
 if ( !function_exists( 'add_action' ) ) {
 	echo 'Hi there!  I\'m just a plugin, not much I can do when called directly.';
@@ -86,7 +85,8 @@ require_once (dirname(__FILE__) . "/extlib/xmlseclibs/xmlseclibs.php");
 			'onelogin_saml_attr_mapping_mail' => __('E-mail', 'onelogin-saml-sso') . ' *',
 			'onelogin_saml_attr_mapping_firstname' => __('First Name', 'onelogin-saml-sso'),
 			'onelogin_saml_attr_mapping_lastname' => __('Last Name', 'onelogin-saml-sso'),
-			'onelogin_saml_attr_mapping_role' => __('Role', 'onelogin-saml-sso')
+			'onelogin_saml_attr_mapping_role' => __('Role', 'onelogin-saml-sso'),
+			'onelogin_saml_attr_mapping_rememberme' => __('Remember Me', 'onelogin-saml-sso')
 		);
 		foreach ($mapping_fields as $name => $description) {
 			register_setting($option_group, $name);
@@ -284,6 +284,11 @@ require_once (dirname(__FILE__) . "/extlib/xmlseclibs/xmlseclibs.php");
 	function plugin_setting_string_onelogin_saml_attr_mapping_lastname() {
 		echo '<input type="text" name="onelogin_saml_attr_mapping_lastname" id="onelogin_saml_attr_mapping_lastname"
 			  value= "'.esc_attr(get_option('onelogin_saml_attr_mapping_lastname')).'" size="30">';
+	}
+
+	function plugin_setting_string_onelogin_saml_attr_mapping_rememberme() {
+		echo '<input type="text" name="onelogin_saml_attr_mapping_rememberme" id="onelogin_saml_attr_mapping_rememberme"
+			  value= "'.esc_html(get_option('onelogin_saml_attr_mapping_rememberme')).'" size="30">';
 	}
 
 	function plugin_setting_string_onelogin_saml_attr_mapping_role() {
