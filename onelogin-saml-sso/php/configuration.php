@@ -369,7 +369,7 @@ require_once (dirname(__FILE__) . "/extlib/xmlseclibs/xmlseclibs.php");
 
 	function plugin_setting_string_onelogin_saml_customize_links_saml_login() {
 		echo '<input type="text" name="onelogin_saml_customize_links_saml_login" id="onelogin_saml_customize_links_saml_login"
-			  value= "'.esc_url(get_option('onelogin_saml_customize_links_saml_login')).'" size="80">
+			  value= "'.esc_attr(get_option('onelogin_saml_customize_links_saml_login')).'" size="80">
  			  <p class="description">'.__("If 'Keep Local login' enabled, this will be showed as message at the SAML link.", 'onelogin-saml-sso').'</p>';
 	}
 
