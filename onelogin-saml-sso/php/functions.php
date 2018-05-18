@@ -260,6 +260,18 @@ function saml_acs() {
 	}
 
 	if ($user_id) {
+		if (is_multisite() && !is_user_member_of_blog($user_id, $blog_id)) {
+    	    if (get_option('onelogin_saml_autocreate')) {
+    	    	//Exist's but is not user to the current blog id
+    	    	$blog_id = get_current_blog_id();
+        		$result = add_user_to_blog($blog_id, $user_id, $userdata['role']);
+        	} else {
+        		$user_id = null;
+				echo __("User provided by the IdP "). ' "'. esc_attr($matcherValue). '" '. __("does not exist in this wordpress site and auto-provisioning is disabled.");
+				exit();
+        	}
+        }
+
 		if (get_option('onelogin_saml_updateuser')) {
 			$userdata['ID'] = $user_id;
 			unset($userdata['$user_pass']);
@@ -301,8 +313,6 @@ function saml_acs() {
 
 		setcookie(SAML_LOGIN_COOKIE, 1, time() + YEAR_IN_SECONDS, SITECOOKIEPATH );
 	}
-
-	do_action( 'onelogin_saml_attrs', $attrs, wp_get_current_user(), get_current_user_id() );
 
 	if (isset($_REQUEST['RelayState'])) {
 		if (!empty($_REQUEST['RelayState']) && ((substr($_REQUEST['RelayState'], -strlen('/wp-login.php')) === '/wp-login.php') || (substr($_REQUEST['RelayState'], -strlen('/alternative_acs.php')) === '/alternative_acs.php'))) {

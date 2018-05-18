@@ -28,6 +28,7 @@ To mitigate that bug, place the script at the root of wordpress and execute it (
 * Fix bug on escaping value for customize_links_saml_login
 * If password is disabled.. turn field readonly.. not disable it
 * Add ability to expose attributes that come from saml via a WordPress
+* On multi-site environment, provision users on specific site if JIT enabled on that site.
 
 = 2.5.0 =
 * Update php-saml library to 2.11.0
