@@ -8,7 +8,6 @@ if ( !function_exists( 'add_action' ) ) {
 
 require_once "compatibility.php";
 
-
 function saml_checker() {
 	if (isset($_GET['saml_acs'])) {
 		if (empty($_POST['SAMLResponse'])) {
@@ -68,6 +67,10 @@ function saml_sso() {
 		return true;
 	}
 	$auth = initialize_saml();
+	if ($auth == false) {
+		wp_redirect(home_url());
+		exit();
+	}
 	if (isset($_SERVER['REQUEST_URI']) && !isset($_GET['saml_sso'])) {
 		$auth->login($_SERVER['REQUEST_URI']);
 	} else {
@@ -99,6 +102,10 @@ function saml_slo() {
 			}
 
 			$auth = initialize_saml();
+			if ($auth == false) {
+				wp_redirect(home_url());
+				exit();
+			}
 			$auth->logout(home_url(), array(), $nameId, $sessionIndex, false, $nameIdFormat);
 			return false;
 		}
@@ -136,6 +143,10 @@ function saml_role_order_compare($role1, $role2) {
 
 function saml_acs() {
 	$auth = initialize_saml();
+	if ($auth == false) {
+		wp_redirect(home_url());
+		exit();
+	}
 
 	$auth->processResponse();
 
@@ -311,6 +322,11 @@ function saml_acs() {
 
 function saml_sls() {
 	$auth = initialize_saml();
+	if ($auth == false) {
+		wp_redirect(home_url());
+		exit();
+	}
+
 	$retrieve_parameters_from_server = get_option('onelogin_saml_advanced_settings_retrieve_parameters_from_server', false);
 	if (isset($_GET) && isset($_GET['SAMLRequest'])) {
 		// Close session before send the LogoutResponse to the IdP
@@ -370,6 +386,10 @@ function initialize_saml() {
 	require_once plugin_dir_path(__FILE__).'_toolkit_loader.php';
 	require plugin_dir_path(__FILE__).'settings.php';
 
+	if (!is_saml_enabled()) {
+		return false;
+	}
+
 	try {
 		$auth = new Onelogin_Saml2_Auth($settings);
 	} catch (Exception $e) {
@@ -380,6 +400,23 @@ function initialize_saml() {
 	}
 
 	return $auth;
+}
+
+function is_saml_enabled() {
+	$saml_enabled = get_option('onelogin_saml_enabled', null);
+	if ($saml_enabled == null) {
+		// If no data was saved about enable/disable saml, then
+		// check if entityId also is null and then consider the
+		// plugin disabled
+		if (get_option('onelogin_saml_idp_entityid', null) == null) {
+			$saml_enabled = false;
+		} else {
+			$saml_enabled = true;
+		}
+	} else {
+		$saml_enabled = $saml_enabled == 'on'? true : false;
+	}
+	return $saml_enabled;
 }
 
 // Prevent that the user change important fields

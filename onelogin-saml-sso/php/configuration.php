@@ -50,6 +50,11 @@ require_once (dirname(__FILE__) . "/extlib/xmlseclibs/xmlseclibs.php");
 
 		$option_group = 'onelogin_saml_configuration';
 
+		add_settings_section('status', __('STATUS', 'onelogin-saml-sso'), 'plugin_section_status_text', $option_group);
+
+		register_setting($option_group, 'onelogin_saml_enabled');
+		add_settings_field('onelogin_saml_enabled', __('Enable', 'onelogin-saml-sso'), "plugin_setting_boolean_onelogin_saml_enabled", $option_group, 'status');
+
 		add_settings_section('idp', __('IDENTITY PROVIDER SETTINGS', 'onelogin-saml-sso'), 'plugin_section_idp_text', $option_group);
 		$idp_fields = array (
 			'onelogin_saml_idp_entityid' => __('IdP Entity Id', 'onelogin-saml-sso') . ' *',
@@ -180,6 +185,13 @@ require_once (dirname(__FILE__) . "/extlib/xmlseclibs/xmlseclibs.php");
 
 		register_setting($option_group, 'onelogin_saml_advanced_digestalgorithm');
 		add_settings_field('onelogin_saml_advanced_digestalgorithm', __('Digest Algorithm', 'onelogin-saml-sso'), "plugin_setting_select_onelogin_saml_advanced_digestalgorithm", $option_group, 'advanced_settings');
+	}
+
+	function plugin_setting_boolean_onelogin_saml_enabled() {
+		$value = get_option('onelogin_saml_enabled');
+		echo '<input type="checkbox" name="onelogin_saml_enabled" id="onelogin_saml_enabled"
+			  '.($value ? 'checked="checked"': '').'>'.
+			  '<p class="description">'.__("Check it in order to enable the SAML plugin.", 'onelogin-saml-sso').'</p>';
 	}
 
 	function plugin_setting_string_onelogin_saml_idp_entityid() {
