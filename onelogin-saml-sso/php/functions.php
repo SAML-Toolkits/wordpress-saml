@@ -420,12 +420,12 @@ function initialize_saml() {
 }
 
 function is_saml_enabled() {
-	$saml_enabled = get_option('onelogin_saml_enabled', null);
-	if ($saml_enabled == null) {
+	$saml_enabled = get_option('onelogin_saml_enabled', 'not defined');
+	if ($saml_enabled == 'not defined') {
 		// If no data was saved about enable/disable saml, then
-		// check if entityId also is null and then consider the
+		// check if entityId also is not defined and then consider the
 		// plugin disabled
-		if (get_option('onelogin_saml_idp_entityid', null) == null) {
+		if (get_option('onelogin_saml_idp_entityid', 'not defined') == 'not defined') {
 			$saml_enabled = false;
 		} else {
 			$saml_enabled = true;
