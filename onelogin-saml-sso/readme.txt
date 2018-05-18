@@ -21,6 +21,9 @@ If you used this plugin before 2.2.0 with just-in-time provision active, Read: h
 To mitigate that bug, place the script at the root of wordpress and execute it (later remove it) https://gist.github.com/pitbulk/a8223c90a3534e9a7d5e0a93009a094f
 
 == Changelog ==
+= 2.7.0 =
+* Make NameID optional
+
 = 2.6.0 =
 * Update php-saml to 2.13.0
 * Add Status setting in order to enable or disable the plugin (Required on multi-sites environment since the plugin is enabled globally for the network)
