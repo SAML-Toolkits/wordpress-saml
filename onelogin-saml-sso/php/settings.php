@@ -97,6 +97,7 @@ $settings = array (
         'wantMessagesSigned' => $opt['wantMessagesSigned'] == 'on'? true: false,
         'wantAssertionsSigned' => $opt['wantAssertionsSigned'] == 'on'? true: false,
         'wantAssertionsEncrypted' => $opt['wantAssertionsEncrypted'] == 'on'? true: false,
+        'wantNameId' => false,
         'requestedAuthnContext' => $opt['requestedAuthnContext'],
         'relaxDestinationValidation' => true,
         'lowercaseUrlencoding' => get_option('

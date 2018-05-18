@@ -167,7 +167,12 @@ function saml_acs() {
 	$attrs = $auth->getAttributes();
 
 	if (empty($attrs)) {
-		$username = $auth->getNameId();
+		$nameid = $auth->getNameId();
+		if (empty($nameid)) {
+			echo __("The SAMLResponse may contain NameID or AttributeStatement");
+			exit();
+		}
+		$username = $nameid;
 		$email = $username;
 	} else {
 		$usernameMapping = get_option('onelogin_saml_attr_mapping_username');
