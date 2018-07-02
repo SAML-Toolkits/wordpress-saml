@@ -21,6 +21,11 @@ If you used this plugin before 2.2.0 with just-in-time provision active, Read: h
 To mitigate that bug, place the script at the root of wordpress and execute it (later remove it) https://gist.github.com/pitbulk/a8223c90a3534e9a7d5e0a93009a094f
 
 == Changelog ==
+
+= 2.8.0 =
+* Update php-saml to 2.14.0
+* Remove the use of screen_icon method
+
 = 2.7.1 =
 * Fix is_saml_enabled method
 
