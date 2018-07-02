@@ -288,7 +288,9 @@ class OneLogin_Saml2_Settings
      * Loads settings info from the settings file
      *
      * @return bool True if the settings info is valid
+     *
      * @throws OneLogin_Saml2_Error
+     *
      * @suppress PhanUndeclaredVariable
      */
     private function _loadSettingsFromFile()
@@ -598,12 +600,9 @@ class OneLogin_Saml2_Settings
                 $errors[] = 'sp_sls_url_invalid';
             }
 
-            if (isset($security['signMetadata']) && is_array($security['signMetadata'])) {
-                if (!isset($security['signMetadata']['keyFileName'])
-                    || !isset($security['signMetadata']['certFileName'])
-                ) {
-                    $errors[] = 'sp_signMetadata_invalid';
-                }
+            if (isset($security['signMetadata']) && is_array($security['signMetadata']) &&
+                (!isset($security['signMetadata']['keyFileName']) || !isset($security['signMetadata']['certFileName']))) {
+                $errors[] = 'sp_signMetadata_invalid';
             }
 
             if (((isset($security['authnRequestsSigned']) && $security['authnRequestsSigned'] == true)
@@ -800,20 +799,28 @@ class OneLogin_Saml2_Settings
     /**
      * Gets the SP metadata. The XML representation.
      *
+     * @param bool $alwaysPublishEncryptionCert When 'true', the returned metadata
+     *   will always include an 'encryption' KeyDescriptor. Otherwise, the 'encryption'
+     *   KeyDescriptor will only be included if $advancedSettings['security']['wantNameIdEncrypted']
+     *   or $advancedSettings['security']['wantAssertionsEncrypted'] are enabled.
+     * @param DateTime|null $validUntil    Metadata's valid time
+     * @param int|null      $cacheDuration Duration of the cache in seconds
+     *
      * @return string  SP metadata (xml)
+     *
      * @throws Exception
      * @throws OneLogin_Saml2_Error
      */
-    public function getSPMetadata()
+    public function getSPMetadata($alwaysPublishEncryptionCert = false, $validUntil = null, $cacheDuration = null)
     {
-        $metadata = OneLogin_Saml2_Metadata::builder($this->_sp, $this->_security['authnRequestsSigned'], $this->_security['wantAssertionsSigned'], null, null, $this->getContacts(), $this->getOrganization());
+        $metadata = OneLogin_Saml2_Metadata::builder($this->_sp, $this->_security['authnRequestsSigned'], $this->_security['wantAssertionsSigned'], $validUntil, $cacheDuration, $this->getContacts(), $this->getOrganization());
 
         $certNew = $this->getSPcertNew();
         if (!empty($certNew)) {
             $metadata = OneLogin_Saml2_Metadata::addX509KeyDescriptors(
                 $metadata,
                 $certNew,
-                $this->_security['wantNameIdEncrypted'] || $this->_security['wantAssertionsEncrypted']
+                $alwaysPublishEncryptionCert || $this->_security['wantNameIdEncrypted'] || $this->_security['wantAssertionsEncrypted']
             );
         }
 
@@ -822,7 +829,7 @@ class OneLogin_Saml2_Settings
             $metadata = OneLogin_Saml2_Metadata::addX509KeyDescriptors(
                 $metadata,
                 $cert,
-                $this->_security['wantNameIdEncrypted'] || $this->_security['wantAssertionsEncrypted']
+                $alwaysPublishEncryptionCert || $this->_security['wantNameIdEncrypted'] || $this->_security['wantAssertionsEncrypted']
             );
         }
 
@@ -893,6 +900,8 @@ class OneLogin_Saml2_Settings
      * @param string $xml Metadata's XML that will be validate
      *
      * @return Array The list of found errors
+     *
+     * @throws Exception
      */
     public function validateMetadata($xml)
     {
@@ -1002,11 +1011,12 @@ class OneLogin_Saml2_Settings
      * Activates or deactivates the strict mode.
      *
      * @param bool $value Strict parameter
+     *
      * @throws Exception
      */
     public function setStrict($value)
     {
-        if (! (is_bool($value))) {
+        if (!is_bool($value)) {
             throw new Exception('Invalid value passed to setStrict()');
         }
 
@@ -1035,6 +1045,8 @@ class OneLogin_Saml2_Settings
 
     /**
      * Set a baseurl value.
+     *
+     * @param $baseurl
      */
     public function setBaseURL($baseurl)
     {

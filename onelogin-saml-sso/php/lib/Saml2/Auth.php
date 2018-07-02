@@ -129,7 +129,7 @@ class OneLogin_Saml2_Auth
      * (SAMLResponse, LogoutResponse). If the SAMLResponse was
      * encrypted, by default tries to return the decrypted XML
      *
-     * @var string
+     * @var string|\DomDocument|null
      */
     private $_lastResponse;
 
@@ -137,6 +137,8 @@ class OneLogin_Saml2_Auth
      * Initializes the SP SAML instance.
      *
      * @param array|object|null $oldSettings Setting data (You can provide a OneLogin_Saml_Settings, the settings object of the Saml folder implementation)
+     *
+     * @throws OneLogin_Saml2_Error
      */
     public function __construct($oldSettings = null)
     {
@@ -157,11 +159,12 @@ class OneLogin_Saml2_Auth
      * Set the strict mode active/disable
      *
      * @param bool $value Strict parameter
+     *
      * @throws OneLogin_Saml2_Error
      */
     public function setStrict($value)
     {
-        if (! (is_bool($value))) {
+        if (!is_bool($value)) {
             throw new OneLogin_Saml2_Error(
                 'Invalid value passed to setStrict()',
                 OneLogin_Saml2_Error::SETTINGS_INVALID_SYNTAX
@@ -177,12 +180,13 @@ class OneLogin_Saml2_Auth
      * @param string|null $requestId The ID of the AuthNRequest sent by this SP to the IdP
      *
      * @throws OneLogin_Saml2_Error
+     * @throws OneLogin_Saml2_ValidationError
      */
     public function processResponse($requestId = null)
     {
         $this->_errors = array();
         $this->_errorReason = null;
-        if (isset($_POST) && isset($_POST['SAMLResponse'])) {
+        if (isset($_POST['SAMLResponse'])) {
             // AuthnResponse -- HTTP_POST Binding
             $response = new OneLogin_Saml2_Response($this->_settings, $_POST['SAMLResponse']);
             $this->_lastResponse = $response->getXMLDocument();
@@ -215,13 +219,13 @@ class OneLogin_Saml2_Auth
     /**
      * Process the SAML Logout Response / Logout Request sent by the IdP.
      *
-     * @param bool        $keepLocalSession              When false will destroy the local session, otherwise will keep it
-     * @param string|null $requestId                     The ID of the LogoutRequest sent by this SP to the IdP
-     * @param bool        $retrieveParametersFromServer
-     * @param callable    $cbDeleteSession
-     * @param bool        $stay                          True if we want to stay (returns the url string) False to redirect
+     * @param bool        $keepLocalSession             When false will destroy the local session, otherwise will keep it
+     * @param string|null $requestId                    The ID of the LogoutRequest sent by this SP to the IdP
+     * @param bool        $retrieveParametersFromServer True if we want to use parameters from $_SERVER to validate the signature
+     * @param callable    $cbDeleteSession              Callback to be executed to delete session
+     * @param bool        $stay                         True if we want to stay (returns the url string) False to redirect
      *
-     * @return string|void
+     * @return string|null
      *
      * @throws OneLogin_Saml2_Error
      */
@@ -229,7 +233,7 @@ class OneLogin_Saml2_Auth
     {
         $this->_errors = array();
         $this->_errorReason = null;
-        if (isset($_GET) && isset($_GET['SAMLResponse'])) {
+        if (isset($_GET['SAMLResponse'])) {
             $logoutResponse = new OneLogin_Saml2_LogoutResponse($this->_settings, $_GET['SAMLResponse']);
             $this->_lastResponse = $logoutResponse->getXML();
             if (!$logoutResponse->isValid($requestId, $retrieveParametersFromServer)) {
@@ -247,7 +251,7 @@ class OneLogin_Saml2_Auth
                     }
                 }
             }
-        } else if (isset($_GET) && isset($_GET['SAMLRequest'])) {
+        } else if (isset($_GET['SAMLRequest'])) {
             $logoutRequest = new OneLogin_Saml2_LogoutRequest($this->_settings, $_GET['SAMLRequest']);
             $this->_lastRequest = $logoutRequest->getXML();
             if (!$logoutRequest->isValid($retrieveParametersFromServer)) {
@@ -296,10 +300,13 @@ class OneLogin_Saml2_Auth
      * Redirects the user to the url past by parameter
      * or to the url that we defined in our SSO Request.
      *
-     * @param string $url        The target URL to redirect the user.
-     * @param array  $parameters Extra parameters to be passed as part of the url
-     * @param bool   $stay       True if we want to stay (returns the url string) False to redirect
+     * @param string $url The target URL to redirect the user.
+     * @param array $parameters Extra parameters to be passed as part of the url
+     * @param bool $stay True if we want to stay (returns the url string) False to redirect
+     *
      * @return string|null
+     *
+     * @throws OneLogin_Saml2_Error
      */
     public function redirectTo($url = '', $parameters = array(), $stay = false)
     {
@@ -386,7 +393,7 @@ class OneLogin_Saml2_Auth
     /**
      * Returns the SessionNotOnOrAfter
      *
-     * @return DateTime|null  The SessionNotOnOrAfter of the assertion
+     * @return int|null  The SessionNotOnOrAfter of the assertion
      */
     public function getSessionExpiration()
     {
@@ -452,14 +459,16 @@ class OneLogin_Saml2_Auth
     /**
      * Initiates the SSO process.
      *
-     * @param string|null $returnTo        The target URL the user should be returned to after login.
-     * @param array       $parameters      Extra parameters to be added to the GET
-     * @param bool        $forceAuthn      When true the AuthNReuqest will set the ForceAuthn='true'
-     * @param bool        $isPassive       When true the AuthNReuqest will set the Ispassive='true'
-     * @param bool        $stay            True if we want to stay (returns the url string) False to redirect
-     * @param bool        $setNameIdPolicy When true the AuthNReuqest will set a nameIdPolicy element
+     * @param string|null $returnTo The target URL the user should be returned to after login.
+     * @param array $parameters Extra parameters to be added to the GET
+     * @param bool $forceAuthn When true the AuthNRequest will set the ForceAuthn='true'
+     * @param bool $isPassive When true the AuthNRequest will set the Ispassive='true'
+     * @param bool $stay True if we want to stay (returns the url string) False to redirect
+     * @param bool $setNameIdPolicy When true the AuthNRueqest will set a nameIdPolicy element
      *
      * @return string|null If $stay is True, it return a string with the SLO URL + LogoutRequest + parameters
+     *
+     * @throws OneLogin_Saml2_Error
      */
     public function login($returnTo = null, $parameters = array(), $forceAuthn = false, $isPassive = false, $stay = false, $setNameIdPolicy = true)
     {
@@ -560,7 +569,7 @@ class OneLogin_Saml2_Auth
     /**
      * Gets the SLO url.
      *
-     * @return string The url of the Single Logout Service
+     * @return string|null The url of the Single Logout Service
      */
     public function getSLOurl()
     {
@@ -591,7 +600,6 @@ class OneLogin_Saml2_Auth
      *
      * @return string A base64 encoded signature
      *
-     * @throws Exception
      * @throws OneLogin_Saml2_Error
      */
     public function buildRequestSignature($samlRequest, $relayState, $signAlgorithm = XMLSecurityKey::RSA_SHA1)
@@ -634,7 +642,6 @@ class OneLogin_Saml2_Auth
      *
      * @return string A base64 encoded signature
      *
-     * @throws Exception
      * @throws OneLogin_Saml2_Error
      */
     public function buildResponseSignature($samlResponse, $relayState, $signAlgorithm = XMLSecurityKey::RSA_SHA1)
