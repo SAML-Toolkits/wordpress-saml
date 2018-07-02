@@ -14,7 +14,6 @@ require_once (dirname(__FILE__) . "/extlib/xmlseclibs/xmlseclibs.php");
 		$title = __("SSO/SAML Settings", 'onelogin-saml-sso');
 		?>
 			<div class="wrap">
-				<?php screen_icon(); ?>
 				<div class="alignleft">
 					<a href="http://www.onelogin.com"><img src="<?php echo esc_url( plugins_url('onelogin.png', dirname(__FILE__)) );?>"></a>
 				</div>
@@ -565,6 +564,10 @@ require_once (dirname(__FILE__) . "/extlib/xmlseclibs/xmlseclibs.php");
 
 		echo '</select>'.
 			 '<p class="description">'.__("Algorithm that will be used on digest process").'</p>';
+	}
+
+	function plugin_section_status_text() {
+		echo "<p>".__("Use this flag for enable or disable the SAML support.", 'onelogin-saml-sso')."</p>";
 	}
 
 	function plugin_section_idp_text() {
