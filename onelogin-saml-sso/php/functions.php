@@ -265,7 +265,7 @@ function saml_acs() {
 	}
 
 	if ($user_id) {
-		if (is_multisite() && !is_user_member_of_blog($user_id, $blog_id)) {
+		if (is_multisite() && !is_user_member_of_blog($user_id)) {
     	    if (get_option('onelogin_saml_autocreate')) {
     	    	//Exist's but is not user to the current blog id
     	    	$blog_id = get_current_blog_id();
