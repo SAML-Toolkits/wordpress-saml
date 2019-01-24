@@ -101,5 +101,4 @@ if (isset($_GET['saml_sso'])) {
 	}
 }
 
-add_action('user_register', 'saml_user_register', 1);
 add_action('register_form', 'saml_user_register', 1);
