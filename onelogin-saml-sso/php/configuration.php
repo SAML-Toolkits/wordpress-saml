@@ -5,8 +5,14 @@ if ( !function_exists( 'add_action' ) ) {
 	exit;
 }
 
+
 require_once "_toolkit_loader.php";
 require_once "compatibility.php";
+
+use OneLogin\Saml2\Constants;
+use RobRichards\XMLSecLibs\XMLSecurityDSig;
+use RobRichards\XMLSecLibs\XMLSecurityKey;
+
 
 	function onelogin_saml_configuration_render() {
 		$title = __("SSO/SAML Settings", 'onelogin-saml-sso');
@@ -477,15 +483,15 @@ require_once "compatibility.php";
 	function plugin_setting_select_onelogin_saml_advanced_nameidformat() {
 		$nameidformat_value = get_option('onelogin_saml_advanced_nameidformat');
 		$posible_nameidformat_values = array(
-			'unspecified' => OneLogin_Saml2_Constants::NAMEID_UNSPECIFIED,
-			'emailAddress' => OneLogin_Saml2_Constants::NAMEID_EMAIL_ADDRESS,
-			'transient' => OneLogin_Saml2_Constants::NAMEID_TRANSIENT,
-			'persistent' => OneLogin_Saml2_Constants::NAMEID_PERSISTENT,
-			'entity' => OneLogin_Saml2_Constants::NAMEID_ENTITY,
-			'encrypted' => OneLogin_Saml2_Constants::NAMEID_ENCRYPTED,
-			'kerberos' => OneLogin_Saml2_Constants::NAMEID_KERBEROS,
-			'x509subjecname' => OneLogin_Saml2_Constants::NAMEID_X509_SUBJECT_NAME,
-			'windowsdomainqualifiedname' => OneLogin_Saml2_Constants::NAMEID_WINDOWS_DOMAIN_QUALIFIED_NAME
+			'unspecified' => Constants::NAMEID_UNSPECIFIED,
+			'emailAddress' => Constants::NAMEID_EMAIL_ADDRESS,
+			'transient' => Constants::NAMEID_TRANSIENT,
+			'persistent' => Constants::NAMEID_PERSISTENT,
+			'entity' => Constants::NAMEID_ENTITY,
+			'encrypted' => Constants::NAMEID_ENCRYPTED,
+			'kerberos' => Constants::NAMEID_KERBEROS,
+			'x509subjecname' => Constants::NAMEID_X509_SUBJECT_NAME,
+			'windowsdomainqualifiedname' => Constants::NAMEID_WINDOWS_DOMAIN_QUALIFIED_NAME
 		);
 
 		echo '<select name="onelogin_saml_advanced_nameidformat" id="onelogin_saml_advanced_nameidformat">';
@@ -506,12 +512,12 @@ require_once "compatibility.php";
 		}
 
 		$posible_requestedauthncontext_values = array(
-			'unspecified' => OneLogin_Saml2_Constants::AC_UNSPECIFIED,
-			'password' => OneLogin_Saml2_Constants::AC_PASSWORD,
+			'unspecified' => Constants::AC_UNSPECIFIED,
+			'password' => Constants::AC_PASSWORD,
 			'passwordprotectedtransport' =>	"urn:oasis:names:tc:SAML:2.0:ac:classes:PasswordProtectedTransport",
-			'x509' => OneLogin_Saml2_Constants::AC_X509,
-			'smartcard' => OneLogin_Saml2_Constants::AC_SMARTCARD,
-			'kerberos' => OneLogin_Saml2_Constants::AC_KERBEROS,
+			'x509' => Constants::AC_X509,
+			'smartcard' => Constants::AC_SMARTCARD,
+			'kerberos' => Constants::AC_KERBEROS,
 		);
 
 		echo '<select multiple="multiple" name="onelogin_saml_advanced_requestedauthncontext[]" id="onelogin_saml_advanced_requestedauthncontext">';
