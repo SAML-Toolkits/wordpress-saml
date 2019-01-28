@@ -27,16 +27,23 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  ********************************************************************************/
  
-$libDir = dirname(__FILE__) . '/lib/Saml2/';
-$extlibDir = dirname(__FILE__) . '/extlib/';
+// Load xmlseclibs
+if (!class_exists("\RobRichards\XMLSecLibs\XMLSecurityKey")) {
+	$xmlseclibsSrcDir = dirname(__FILE__).'/extlib/xmlseclibs/src';
 
-// Load first external libs
-require_once($extlibDir . 'xmlseclibs/xmlseclibs.php');
+	include_once $xmlseclibsSrcDir.'/XMLSecEnc.php';
+	include_once $xmlseclibsSrcDir.'/XMLSecurityDSig.php';
+	include_once $xmlseclibsSrcDir.'/XMLSecurityKey.php';
+	include_once $xmlseclibsSrcDir.'/Utils/XPath.php';
+}
+
+// Load php-saml
+$libDir = dirname(__FILE__).'/lib/Saml2/';
 
 $folderInfo = scandir($libDir);
 
 foreach ($folderInfo as $element) {
     if (is_file($libDir.$element) && (substr($element, -4) === '.php')) {
-        require_once($libDir.$element);
+        include_once $libDir.$element;
     }
 }

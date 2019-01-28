@@ -1,4 +1,5 @@
 <?php
+
 if ( !function_exists( 'add_action' ) ) {
 	echo 'Hi there!  I\'m just a plugin, not much I can do when called directly.';
 	exit;
@@ -9,6 +10,9 @@ if (!current_user_can('delete_plugins')) {
      echo '<h1>'.__("Access Forbidden!", 'onelogin-saml-sso').'</h1>';
      exit();
 }
+
+require_once "_toolkit_loader.php";
+use OneLogin\Saml2\Settings;
 
 require_once "compatibility.php";
 
@@ -31,9 +35,9 @@ $spPrivatekey = $settings['sp']['x509cert'];
 $spCert = $settings['sp']['privateKey'];
 
 try {
-	$samlSettings = new OneLogin_Saml2_Settings($settings);
+	$samlSettings = new Settings($settings);
 	echo '<br>'.__("SAML settings are", 'onelogin-saml-sso').' <strong>ok</strong>.<br>';
-} catch (Exception $e) {
+} catch (\Exception $e) {
 	echo '<br>'.__("Found errors while validating SAML settings info.", 'onelogin-saml-sso');
 	echo esc_html($e->getMessage());
 	echo '<br>';

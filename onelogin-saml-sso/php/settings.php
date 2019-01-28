@@ -6,26 +6,27 @@ if ( !function_exists( 'add_action' ) ) {
     exit;
 }
 
-require_once (dirname(__FILE__) . "/lib/Saml2/Constants.php");
+require_once "_toolkit_loader.php";
+use OneLogin\Saml2\Constants;
 
 $posible_nameidformat_values = array(
-    'unspecified' => OneLogin_Saml2_Constants::NAMEID_UNSPECIFIED,
-    'emailAddress' => OneLogin_Saml2_Constants::NAMEID_EMAIL_ADDRESS,
-    'transient' => OneLogin_Saml2_Constants::NAMEID_TRANSIENT,
-    'persistent' => OneLogin_Saml2_Constants::NAMEID_PERSISTENT,
-    'entity' => OneLogin_Saml2_Constants::NAMEID_ENTITY,
-    'encrypted' => OneLogin_Saml2_Constants::NAMEID_ENCRYPTED,
-    'kerberos' => OneLogin_Saml2_Constants::NAMEID_KERBEROS,
-    'x509subjecname' => OneLogin_Saml2_Constants::NAMEID_X509_SUBJECT_NAME,
-    'windowsdomainqualifiedname' => OneLogin_Saml2_Constants::NAMEID_WINDOWS_DOMAIN_QUALIFIED_NAME
+    'unspecified' => Constants::NAMEID_UNSPECIFIED,
+    'emailAddress' => Constants::NAMEID_EMAIL_ADDRESS,
+    'transient' => Constants::NAMEID_TRANSIENT,
+    'persistent' => Constants::NAMEID_PERSISTENT,
+    'entity' => Constants::NAMEID_ENTITY,
+    'encrypted' => Constants::NAMEID_ENCRYPTED,
+    'kerberos' => Constants::NAMEID_KERBEROS,
+    'x509subjecname' => Constants::NAMEID_X509_SUBJECT_NAME,
+    'windowsdomainqualifiedname' => Constants::NAMEID_WINDOWS_DOMAIN_QUALIFIED_NAME
 );
 $posible_requestedauthncontext_values = array(
-    'unspecified' => OneLogin_Saml2_Constants::AC_UNSPECIFIED,
-    'password' => OneLogin_Saml2_Constants::AC_PASSWORD,
+    'unspecified' => Constants::AC_UNSPECIFIED,
+    'password' => Constants::AC_PASSWORD,
     'passwordprotectedtransport' => "urn:oasis:names:tc:SAML:2.0:ac:classes:PasswordProtectedTransport",
-    'x509' => OneLogin_Saml2_Constants::AC_X509,
-    'smartcard' => OneLogin_Saml2_Constants::AC_SMARTCARD,
-    'kerberos' => OneLogin_Saml2_Constants::AC_KERBEROS,
+    'x509' => Constants::AC_X509,
+    'smartcard' => Constants::AC_SMARTCARD,
+    'kerberos' => Constants::AC_KERBEROS,
 );
 
 

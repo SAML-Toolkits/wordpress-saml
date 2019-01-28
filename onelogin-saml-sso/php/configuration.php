@@ -5,10 +5,8 @@ if ( !function_exists( 'add_action' ) ) {
 	exit;
 }
 
+require_once "_toolkit_loader.php";
 require_once "compatibility.php";
-require_once (dirname(__FILE__) . "/lib/Saml2/Constants.php");
-require_once (dirname(__FILE__) . "/extlib/xmlseclibs/xmlseclibs.php");
-
 
 	function onelogin_saml_configuration_render() {
 		$title = __("SSO/SAML Settings", 'onelogin-saml-sso');

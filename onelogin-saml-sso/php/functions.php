@@ -6,6 +6,9 @@ if ( !function_exists( 'add_action' ) ) {
 	exit;
 }
 
+use OneLogin\Saml2\Auth;
+use OneLogin\Saml2\Settings;
+
 require_once "compatibility.php";
 
 function saml_checker() {
@@ -384,7 +387,7 @@ function saml_metadata() {
 	require_once plugin_dir_path(__FILE__).'_toolkit_loader.php';
 	require plugin_dir_path(__FILE__).'settings.php';
 
-	$samlSettings = new OneLogin_Saml2_Settings($settings, true);
+	$samlSettings = new Settings($settings, true);
 	$metadata = $samlSettings->getSPMetadata();
 
 	header('Content-Type: text/xml');
@@ -410,8 +413,8 @@ function initialize_saml() {
 	}
 
 	try {
-		$auth = new Onelogin_Saml2_Auth($settings);
-	} catch (Exception $e) {
+		$auth = new Auth($settings);
+	} catch (\Exception $e) {
 		echo '<br>'.__("The Onelogin SSO/SAML plugin is not correctly configured.", 'onelogin-saml-sso').'<br>';
 		echo esc_html($e->getMessage());
 		echo '<br>'.__("If you are the administrator", 'onelogin-saml-sso').', <a href="'.esc_url( get_site_url().'/wp-login.php?normal').'">'.__("access using your wordpress credentials", 'onelogin-saml-sso').'</a> '.__("and fix the problem", 'onelogin-saml-sso');
