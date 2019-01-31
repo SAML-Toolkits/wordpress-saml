@@ -102,3 +102,14 @@ if (isset($_GET['saml_sso'])) {
 }
 
 add_action('register_form', 'saml_user_register', 1);
+
+
+function onelogin_enqueue_script() {
+	wp_enqueue_script( 'onelogin-hide-login-form', plugins_url( 'assets/js/hide-login-form.js', __FILE__ ), array('jquery'), null, true );
+}
+
+if ((strpos($_SERVER['SCRIPT_NAME'], 'wp-login.php') !== FALSE) && $action == 'login' && !isset($_GET['normal'])) {
+	if (!get_option('onelogin_saml_keep_local_login', false)) {
+		add_action( 'login_enqueue_scripts', 'onelogin_enqueue_script', 10 );
+	}
+}
