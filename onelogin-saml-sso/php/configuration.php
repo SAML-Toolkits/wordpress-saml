@@ -760,7 +760,7 @@ function onelogin_saml_configuration_multisite_enabler() {
 		foreach ($sites as $site) {
 			$value = false;
 			if (in_array($site->id, $enable_on_sites)) {
-				$value = true;
+				$value = "on";
 			}
 			update_blog_option($site->id, 'onelogin_saml_enabled', $value);
 		}
