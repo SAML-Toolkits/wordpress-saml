@@ -20,13 +20,14 @@ if (!current_user_can('manage_options')) {
 $sites = get_sites();
 
 echo '<table class="form-table"><tbody>';
+echo '<tr><th scope="row" style="font-weight: normal;">Select/Unselect All</th><td><input type="checkbox" id="selector"></td></tr>';
 foreach ($sites as $site) {
     $enabled = get_blog_option($site->id, 'onelogin_saml_enabled', false);
 
     $site_address = untrailingslashit($site->domain . $site->path);
     echo '<tr><th scope="row">'.$site_address.'</th>';
     echo '<td>';
-    echo '<input type="checkbox" name="enable_saml_in_site[]" '.($enabled ? 'checked="checked"' : ""). ' value="'.$site->id.'" '.$enabled.'>';
+    echo '<input class="selectable" type="checkbox" name="enable_saml_in_site[]" '.($enabled ? 'checked="checked"' : ""). ' value="'.$site->id.'" '.$enabled.'>';
     echo '</td>';
 }
 echo '</tbody></table>';
@@ -34,3 +35,12 @@ echo '</tbody></table>';
 submit_button();
 
 echo '</form>';
+
+echo '
+<script>
+jQuery("#selector").click(function() {
+  var value = jQuery(this).prop("checked");
+  jQuery(".selectable").prop("checked", value);
+});
+</script>
+';
