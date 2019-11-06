@@ -22,6 +22,12 @@ To mitigate that bug, place the script at the root of wordpress and execute it (
 
 == Changelog ==
 
+= 3.1.0 =
+* Multisite improvement. Now when multisite is enabled, on the "Network Admin" dashboard appears a "Network SAML Settings" where you can define a SAML template setting, and then inject it in sites. Also will allow you enable/disable multiple sites on a unique view.
+* Now the onelogin_saml_keep_local_login will also hide the login form on wp-login.php view. So when on a logout action, we can notify the user with the typical message of 'You are now logged out.' without showing the local login form.
+* Update php-saml to 3.3.1
+* Update xmlseclibs to 3.0.4
+
 = 3.0.0 =
 * Update php-saml to 3.1.0 to make the plugin compatible with PHP7.3
 * Overriding user_register will prevent admins to register users, so deactivating that override
