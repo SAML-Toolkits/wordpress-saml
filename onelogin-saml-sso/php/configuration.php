@@ -405,7 +405,7 @@ function plugin_setting_boolean_onelogin_saml_advanced_settings_debug($network =
 	}
 	echo '<input type="checkbox" name="onelogin_saml_advanced_settings_debug" id="onelogin_saml_advanced_settings_debug"
 		  '.($value ? 'checked="checked"': '').'>'.
-		  '<p class="description">'.__('Enable for debugging the SAML workflow. Errors and Warnigs will be shown.', 'onelogin-saml-sso').'</p>';
+		  '<p class="description">'.__('Enable for debugging the SAML workflow. Errors and Warnings will be shown.', 'onelogin-saml-sso').'</p>';
 }
 
 function plugin_setting_boolean_onelogin_saml_advanced_settings_strict_mode($network = false) {
