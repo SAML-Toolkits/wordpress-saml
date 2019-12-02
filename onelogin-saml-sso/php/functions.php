@@ -62,7 +62,7 @@ function saml_user_register() {
 }
 
 function saml_sso() {
-	if ( defined( 'WP_CLI' ) && WP_CLI ) {
+	if ( (defined( 'WP_CLI' ) && WP_CLI) || wp_doing_cron() ) {
 		return true;
 	}
 	
