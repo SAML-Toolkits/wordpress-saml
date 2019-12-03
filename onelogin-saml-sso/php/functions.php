@@ -298,6 +298,10 @@ function saml_acs() {
 		}
 		$userdata['user_pass'] = wp_generate_password();
 		$user_id = wp_insert_user($userdata);
+                if ($user_id && !is_a($user_id, 'WP_Error') && is_multisite()) {
+                    $blog_id = get_current_blog_id();
+                    $result = add_user_to_blog($blog_id, $user_id, $userdata['role']);
+        	}
 	} else {
 		echo __("User provided by the IdP "). ' "'. esc_attr($matcherValue). '" '. __("does not exist in wordpress and auto-provisioning is disabled.");
 		exit();
