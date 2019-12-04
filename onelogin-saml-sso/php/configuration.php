@@ -84,7 +84,7 @@ function onelogin_saml_configuration() {
 }
 
 function plugin_setting_boolean_onelogin_saml_enabled() {
-	$value = get_option('onelogin_saml_enabled');
+	$value = $network ? get_site_option('onelogin_saml_enabled') : get_option('onelogin_saml_enabled');
 	echo '<input type="checkbox" name="onelogin_saml_enabled" id="onelogin_saml_enabled"
 		  '.($value ? 'checked="checked"': '').'>'.
 		  '<p class="description">'.__("Check it in order to enable the SAML plugin.", 'onelogin-saml-sso').'</p>';
@@ -116,78 +116,50 @@ function plugin_setting_textarea_onelogin_saml_idp_x509cert($network = false) {
 }
 
 function plugin_setting_boolean_onelogin_saml_advanced_idp_lowercase_url_encoding($network = false) {
-	if ($network) {
-		$value = get_site_option('onelogin_saml_advanced_idp_lowercase_url_encoding');
-	} else {
-		$value = get_option('onelogin_saml_advanced_idp_lowercase_url_encoding');
-	}
+	$value = $network ? get_site_option('onelogin_saml_advanced_idp_lowercase_url_encoding') : get_option('onelogin_saml_advanced_idp_lowercase_url_encoding');
+
 	echo '<input type="checkbox" name="onelogin_saml_advanced_idp_lowercase_url_encoding" id="onelogin_saml_advanced_idp_lowercase_url_encoding"
 		  '.($value ? 'checked="checked"': '').'>'.
 		  '<p class="description">'.__('Some IdPs like ADFS can use lowercase URL encoding, but the plugin expects uppercase URL encoding, enable it to fix incompatibility issues.', 'onelogin-saml-sso').'</p>';
 }
 
 function plugin_setting_boolean_onelogin_saml_autocreate($network = false) {
-	if ($network) {
-		$value = get_site_option('onelogin_saml_autocreate');
-	} else {
-		$value = get_option('onelogin_saml_autocreate');
-	}
+	$value = $network ? get_site_option('onelogin_saml_autocreate') : get_option('onelogin_saml_autocreate');
 	echo '<input type="checkbox" name="onelogin_saml_autocreate" id="onelogin_saml_autocreate"
 		  '.($value ? 'checked="checked"': '').'>'.
 		  '<p class="description">'.__('Auto-provisioning. If user not exists,  WordPress will create a new user with the data provided by the IdP.<br>Review the Mapping section.', 'onelogin-saml-sso').'</p>';
 }
 
 function plugin_setting_boolean_onelogin_saml_updateuser($network = false) {
-	if ($network) {
-		$value = get_site_option('onelogin_saml_updateuser');
-	} else {
-		$value = get_option('onelogin_saml_updateuser');
-	}
+	$value = $network ? get_site_option('onelogin_saml_updateuser') : get_option('onelogin_saml_updateuser');
 	echo '<input type="checkbox" name="onelogin_saml_updateuser" id="onelogin_saml_updateuser"
 		  '.($value ? 'checked="checked"': '').'>'.
 		  '<p class="description">'.__('Auto-update. WordPress will update the account of the user with the data provided by the IdP.<br>Review the Mapping section.', 'onelogin-saml-sso').'</p>';
 }
 
 function plugin_setting_boolean_onelogin_saml_forcelogin($network = false) {
-	if ($network) {
-		$value = get_site_option('onelogin_saml_forcelogin');
-	} else {
-		$value = get_option('onelogin_saml_forcelogin');
-	}
+	$value = $network ? get_site_option('onelogin_saml_forcelogin') : get_option('onelogin_saml_forcelogin');
 	echo '<input type="checkbox" name="onelogin_saml_forcelogin" id="onelogin_saml_forcelogin"
 		  '.($value ? 'checked="checked"': '').'>'.
 		  '<p class="description">'.__('Protect WordPress and force the user to authenticate at the IdP in order to access when any WordPress page is loaded and no active session.', 'onelogin-saml-sso').'</p>';
 }
 
 function plugin_setting_boolean_onelogin_saml_slo($network = false) {
-	if ($network) {
-		$value = get_site_option('onelogin_saml_slo');
-	} else {
-		$value = get_option('onelogin_saml_slo');
-	}
+	$value = $network ? get_site_option('onelogin_saml_slo') : get_option('onelogin_saml_slo');
 	echo '<input type="checkbox" name="onelogin_saml_slo" id="onelogin_saml_slo"
 		  '.($value ? 'checked="checked"': '').'>'.
 		  '<p class="description">'.__('Enable/disable Single Log Out. SLO  is a complex functionality, the most common SLO implementation is based on front-channel (redirections), sometimes if the SLO workflow fails a user can be blocked in an unhandled view. If the admin does not control the set of apps involved in the SLO process, you may want to disable this functionality to avoid more problems than benefits.', 'onelogin-saml-sso').'</p>';
 }
 
 function plugin_setting_boolean_onelogin_saml_keep_local_login($network = false) {
-	if ($network) {
-		$value = get_site_option('onelogin_saml_keep_local_login');
-	} else {
-		$value = get_option('onelogin_saml_keep_local_login');
-	}
+	$value = $network ? get_site_option('onelogin_saml_keep_local_login') : get_option('onelogin_saml_keep_local_login');
 	echo '<input type="checkbox" name="onelogin_saml_keep_local_login" id="onelogin_saml_keep_local_login"
 		  '.($value ? 'checked="checked"': '').'>'.
 		  '<p class="description">'.__('Enable/disable the normal login form. If disabled, instead of the WordPress login form, WordPress will excecute the SP-initiated SSO flow. If enabled the normal login form is displayed and a link to initiate that flow is displayed.', 'onelogin-saml-sso').'</p>';
 }
 
 function plugin_setting_select_onelogin_saml_account_matcher($network = false) {
-	if ($network) {
-		$value = get_site_option('onelogin_saml_account_matcher');
-	} else {
-		$value = get_option('onelogin_saml_account_matcher');
-	}
-
+	$value = $network ? get_site_option('onelogin_saml_account_matcher') : get_option('onelogin_saml_account_matcher');
 	echo '<select name="onelogin_saml_account_matcher" id="onelogin_saml_account_matcher">
 		  <option value="username" '.($value == 'username'?'selected="selected"':'').'>'.__("Username", 'onelogin-saml-sso').'</option>
 		  <option value="email" '.($value == 'email'? 'selected="selected"':'').'>'.__("E-mail", 'onelogin-saml-sso').'</option>
@@ -196,78 +168,51 @@ function plugin_setting_select_onelogin_saml_account_matcher($network = false) {
 }
 
 function plugin_setting_boolean_onelogin_saml_alternative_acs($network = false) {
-	if ($network) {
-		$value = get_site_option('onelogin_saml_alternative_acs');
-	} else {
-		$value = get_option('onelogin_saml_alternative_acs');
-	}
+	$value = $network ? get_site_option('onelogin_saml_alternative_acs') : get_option('onelogin_saml_alternative_acs');
 	echo '<input type="checkbox" name="onelogin_saml_alternative_acs" id="onelogin_saml_alternative_acs"
 		  '.($value ? 'checked="checked"': '').'>'.
 		  '<p class="description">'.__('Enable if you want to use a different Assertion Consumer Endpoint than <code>/wp-login.php?saml_acs</code> (Required if using WPEngine or any similar hosting service that prevents POST on <code>wp-login.php</code>). You must update the IdP with the new value after enabling/disabling this setting.', 'onelogin-saml-sso').'</p>';
 }
 
 function plugin_setting_string_onelogin_saml_attr_mapping_username($network = false) {
-	if ($network) {
-		$value = get_site_option('onelogin_saml_attr_mapping_username');
-	} else {
-		$value = get_option('onelogin_saml_attr_mapping_username');
-	}
+	$value = $network ? get_site_option('onelogin_saml_attr_mapping_username') : get_option('onelogin_saml_attr_mapping_username');
 	echo '<input type="text" name="onelogin_saml_attr_mapping_username" id="onelogin_saml_attr_mapping_username"
 		  value= "'.esc_html($value).'" size="30">';
 }
 
 function plugin_setting_string_onelogin_saml_attr_mapping_mail($network = false) {
-	if ($network) {
-		$value = get_site_option('onelogin_saml_attr_mapping_mail');
-	} else {
-		$value = get_option('onelogin_saml_attr_mapping_mail');
-	}
+	$value = $network ? get_site_option('onelogin_saml_attr_mapping_mail') : get_option('onelogin_saml_attr_mapping_mail');
 	echo '<input type="text" name="onelogin_saml_attr_mapping_mail" id="onelogin_saml_attr_mapping_mail"
 		  value= "'.esc_attr($value).'" size="30">';
 }
 
 function plugin_setting_string_onelogin_saml_attr_mapping_firstname($network = false) {
-	if ($network) {
-		$value = get_site_option('onelogin_saml_attr_mapping_firstname');
-	} else {
-		$value = get_option('onelogin_saml_attr_mapping_firstname');
-	}
+	$value = $network ? get_site_option('onelogin_saml_attr_mapping_firstname') : get_option('onelogin_saml_attr_mapping_firstname');
 	echo '<input type="text" name="onelogin_saml_attr_mapping_firstname" id="onelogin_saml_attr_mapping_firstname"
 		  value= "'.esc_attr($value).'" size="30">';
 }
 
 function plugin_setting_string_onelogin_saml_attr_mapping_lastname($network = false) {
-	if ($network) {
-		$value = get_site_option('onelogin_saml_attr_mapping_lastname');
-	} else {
-		$value = get_option('onelogin_saml_attr_mapping_lastname');
-	}
+	$value = $network ? get_site_option('onelogin_saml_attr_mapping_lastname') : get_option('onelogin_saml_attr_mapping_lastname');
 	echo '<input type="text" name="onelogin_saml_attr_mapping_lastname" id="onelogin_saml_attr_mapping_lastname"
 		  value= "'.esc_attr($value).'" size="30">';
 }
 
 function plugin_setting_string_onelogin_saml_attr_mapping_rememberme($network = false) {
-	if ($network) {
-		$value = get_site_option('onelogin_saml_attr_mapping_rememberme');
-	} else {
-		$value = get_option('onelogin_saml_attr_mapping_rememberme');
-	}
+	$value = $network ? get_site_option('onelogin_saml_attr_mapping_rememberme') : get_option('onelogin_saml_attr_mapping_rememberme');
 	echo '<input type="text" name="onelogin_saml_attr_mapping_rememberme" id="onelogin_saml_attr_mapping_rememberme"
 		  value= "'.esc_html($value).'" size="30">';
 }
 
 function plugin_setting_string_onelogin_saml_attr_mapping_role($network = false) {
-	if ($network) {
-		$value = get_site_option('onelogin_saml_attr_mapping_role');
-	} else {
-		$value = get_option('onelogin_saml_attr_mapping_role');
-	}
+	$value = $network ? get_site_option('onelogin_saml_attr_mapping_role') : get_option('onelogin_saml_attr_mapping_role');
 	echo '<input type="text" name="onelogin_saml_attr_mapping_role" id="onelogin_saml_attr_mapping_role"
 		  value= "'.esc_attr($value).'" size="30">'.
 		  '<p class="description">'.__("The attribute that contains the role of the user, For example 'memberOf'. If WordPress can't figure what role assign to the user, it will assign the default role defined at the general settings.", 'onelogin-saml-sso').'</p>';
 }
 
 function plugin_setting_string_onelogin_saml_role_mapping($role_value, $network = false) {
+	$value = $network ? get_site_option('onelogin_saml_role_mapping_'.$role_value) : get_option('onelogin_saml_role_mapping_'.$role_value);
 	if ($network) {
 		$value = get_site_option('onelogin_saml_role_mapping_'.$role_value);
 	} else {
@@ -278,142 +223,90 @@ function plugin_setting_string_onelogin_saml_role_mapping($role_value, $network 
 }
 
 function plugin_setting_string_onelogin_saml_role_order($role_value, $network = false) {
-	if ($network) {
-		$value = get_site_option('onelogin_saml_role_order_'.$role_value);
-	} else {
-		$value = get_option('onelogin_saml_role_order_'.$role_value);
-	}
+	$value = $network ? get_site_option('onelogin_saml_role_order_'.$role_value) : get_option('onelogin_saml_role_order_'.$role_value);
 	echo '<input type="text" name="onelogin_saml_role_order_'.esc_attr($role_value).'" id="onelogin_saml_role_order_'.esc_attr($role_value).'"
 		  value= "'.esc_attr($value).'" size="3">';
 }
 
 function plugin_setting_boolean_onelogin_saml_role_mapping_multivalued_in_one_attribute_value($network = false) {
-	if ($network) {
-		$value = get_site_option('onelogin_saml_role_mapping_multivalued_in_one_attribute_value');
-	} else {
-		$value = get_option('onelogin_saml_role_mapping_multivalued_in_one_attribute_value');
-	}
+	$value = $network ? get_site_option('onelogin_saml_role_mapping_multivalued_in_one_attribute_value') : get_option('onelogin_saml_role_mapping_multivalued_in_one_attribute_value');
 	echo '<input type="checkbox" name="onelogin_saml_role_mapping_multivalued_in_one_attribute_value" id="onelogin_saml_role_mapping_multivalued_in_one_attribute_value"
 		  '.($value ? 'checked="checked"': '').'>
 		  <p class="description">'.__("Sometimes role values are provided in an unique attribute statement (instead multiple attribute statements). If that is the case, activate this and the plugin will try to split those values by ;<br>Use a regular expression pattern in order to extract complex data.", 'onelogin-saml-sso').'</p>';
 }
 
 function plugin_setting_string_onelogin_saml_role_mapping_multivalued_pattern($network = false) {
-	if ($network) {
-		$value = get_site_option('onelogin_saml_role_mapping_multivalued_pattern');
-	} else {
-		$value = get_option('onelogin_saml_role_mapping_multivalued_pattern');
-	}
+	$value = $network ? get_site_option('onelogin_saml_role_mapping_multivalued_pattern') : get_option('onelogin_saml_role_mapping_multivalued_pattern');
 	echo '<input type="text" name="onelogin_saml_role_mapping_multivalued_pattern" id="onelogin_saml_role_mapping_multivalued_pattern"
 		  value= "'.esc_attr($value).'" size="70">
 		  <p class="description">'.__("Regular expression that extract roles from complex multivalued data (required to active the previous option).<br> E.g. If the SAMLResponse has a role attribute like: CN=admin;CN=superuser;CN=europe-admin; , use the regular expression <code>/CN=([A-Z0-9\s _-]*);/i</code> to retrieve the values. Or use <code>/CN=([^,;]*)/</code>", 'onelogin-saml-sso').'</p>';
 }
 
 function plugin_setting_boolean_onelogin_saml_customize_action_prevent_local_login($network = false) {
-	if ($network) {
-		$value = get_site_option('onelogin_saml_customize_action_prevent_local_login');
-	} else {
-		$value = get_option('onelogin_saml_customize_action_prevent_local_login');
-	}
+	$value = $network ? get_site_option('onelogin_saml_customize_action_prevent_local_login') : get_option('onelogin_saml_customize_action_prevent_local_login');
 	echo '<input type="checkbox" name="onelogin_saml_customize_action_prevent_local_login" id="onelogin_saml_customize_action_prevent_local_login"
 		  '.($value ? 'checked="checked"': '').'>
 		  <p class="description">'.__("Check to disable the <code>?normal</code> option and offer the local login when it is not enabled.", 'onelogin-saml-sso').'</p>';
 }
 
 function plugin_setting_boolean_onelogin_saml_customize_action_prevent_reset_password($network = false) {
-	if ($network) {
-		$value = get_site_option('onelogin_saml_customize_action_prevent_reset_password');
-	} else {
-		$value = get_option('onelogin_saml_customize_action_prevent_reset_password');
-	}
+	$value = $network ? get_site_option('onelogin_saml_customize_action_prevent_reset_password') : get_option('onelogin_saml_customize_action_prevent_reset_password');
 	echo '<input type="checkbox" name="onelogin_saml_customize_action_prevent_reset_password" id="onelogin_saml_customize_action_prevent_reset_password"
 		  '.($value ? 'checked="checked"': '').'>
 		  <p class="description">'.__("Check to disable resetting passwords in WordPress.", 'onelogin-saml-sso').'</p>';
 }
 
 function plugin_setting_boolean_onelogin_saml_customize_action_prevent_change_password($network = false) {
-	if ($network) {
-		$value = get_site_option('onelogin_saml_customize_action_prevent_change_password');
-	} else {
-		$value = get_option('onelogin_saml_customize_action_prevent_change_password');
-	}
+	$value = $network ? get_site_option('onelogin_saml_customize_action_prevent_change_password') : get_option('onelogin_saml_customize_action_prevent_change_password');
 	echo '<input type="checkbox" name="onelogin_saml_customize_action_prevent_change_password" id="onelogin_saml_customize_action_prevent_change_password"
 		  '.($value ? 'checked="checked"': '').'>
 		  <p class="description">'.__("Check to disable changing passwords in WordPress.", 'onelogin-saml-sso').'</p>';
 }
 
 function plugin_setting_boolean_onelogin_saml_customize_action_prevent_change_mail($network = false) {
-	if ($network) {
-		$value = get_site_option('onelogin_saml_customize_action_prevent_change_mail');
-	} else {
-		$value = get_option('onelogin_saml_customize_action_prevent_change_mail');
-	}
+	$value = $network ? get_site_option('onelogin_saml_customize_action_prevent_change_mail') : get_option('onelogin_saml_customize_action_prevent_change_mail');
 	echo '<input type="checkbox" name="onelogin_saml_customize_action_prevent_change_mail" id="onelogin_saml_customize_action_prevent_change_mail"
 		  '.($value ? 'checked="checked"': '').'>
 		  <p class="description">'.__("Check to disable changing the email addresses in WordPress (recommended if you are using email to match accounts).", 'onelogin-saml-sso').'</p>';
 }
 
 function plugin_setting_boolean_onelogin_saml_customize_stay_in_wordpress_after_slo($network = false) {
-	if ($network) {
-		$value = get_site_option('onelogin_saml_customize_stay_in_wordpress_after_slo');
-	} else {
-		$value = get_option('onelogin_saml_customize_stay_in_wordpress_after_slo');
-	}
+	$value = $network ? get_site_option('onelogin_saml_customize_stay_in_wordpress_after_slo') : get_option('onelogin_saml_customize_stay_in_wordpress_after_slo');
 	echo '<input type="checkbox" name="onelogin_saml_customize_stay_in_wordpress_after_slo" id="onelogin_saml_customize_stay_in_wordpress_after_slo"
 		  '.($value ? 'checked="checked"': '').'>
 		  <p class="description">'.__("If SLO and Force SAML login are enabled, after the SLO process you will be redirected to the WordPress main page and a SAML SSO process will start. Check this to prevent that and stay at the WordPress login form. ", 'onelogin-saml-sso').'</p>';
 }
 
 function plugin_setting_string_onelogin_saml_customize_links_user_registration($network = false) {
-	if ($network) {
-		$value = get_site_option('onelogin_saml_customize_links_user_registration');
-	} else {
-		$value = get_option('onelogin_saml_customize_links_user_registration');
-	}
+	$value = $network ? get_site_option('onelogin_saml_customize_links_user_registration') : get_option('onelogin_saml_customize_links_user_registration');
 	echo '<input type="text" name="onelogin_saml_customize_links_user_registration" id="onelogin_saml_customize_links_user_registration"
 		  value= "'.esc_url($value).'" size="80">
 		  <p class="description">'.__("Override the user registration link. ", 'onelogin-saml-sso').'</p>';
 }
 
 function plugin_setting_string_onelogin_saml_customize_links_lost_password($network = false) {
-	if ($network) {
-		$value = get_site_option('onelogin_saml_customize_links_lost_password');
-	} else {
-		$value = get_option('onelogin_saml_customize_links_lost_password');
-	}
+	$value = $network ? get_site_option('onelogin_saml_customize_links_lost_password') : get_option('onelogin_saml_customize_links_lost_password');
 	echo '<input type="text" name="onelogin_saml_customize_links_lost_password" id="onelogin_saml_customize_links_lost_password"
 		  value= "'.esc_url($value).'" size="80">
 			  <p class="description">'.__("Override the lost password link. (Prevent reset password must be deactivated or the SAML SSO will be used.)", 'onelogin-saml-sso').'</p>';
 }
 
 function plugin_setting_string_onelogin_saml_customize_links_saml_login($network = false) {
-	if ($network) {
-		$value = get_site_option('onelogin_saml_customize_links_saml_login');
-	} else {
-		$value = get_option('onelogin_saml_customize_links_saml_login');
-	}
+	$value = $network ? get_site_option('onelogin_saml_customize_links_saml_login') : get_option('onelogin_saml_customize_links_saml_login');
 	echo '<input type="text" name="onelogin_saml_customize_links_saml_login" id="onelogin_saml_customize_links_saml_login"
 		  value= "'.esc_attr($value).'" size="80">
 			  <p class="description">'.__("If 'Keep Local login' enabled, this will be showed as message at the SAML link.", 'onelogin-saml-sso').'</p>';
 }
 
 function plugin_setting_boolean_onelogin_saml_advanced_settings_debug($network = false) {
-	if ($network) {
-		$value = get_site_option('onelogin_saml_advanced_settings_debug');
-	} else {
-		$value = get_option('onelogin_saml_advanced_settings_debug');
-	}
+	$value = $network ? get_site_option('onelogin_saml_advanced_settings_debug') : get_option('onelogin_saml_advanced_settings_debug');
 	echo '<input type="checkbox" name="onelogin_saml_advanced_settings_debug" id="onelogin_saml_advanced_settings_debug"
 		  '.($value ? 'checked="checked"': '').'>'.
 		  '<p class="description">'.__('Enable for debugging the SAML workflow. Errors and Warnings will be shown.', 'onelogin-saml-sso').'</p>';
 }
 
 function plugin_setting_boolean_onelogin_saml_advanced_settings_strict_mode($network = false) {
-	if ($network) {
-		$value = get_site_option('onelogin_saml_advanced_settings_strict_mode');
-	} else {
-		$value = get_option('onelogin_saml_advanced_settings_strict_mode');
-	}
+	$value = $network ? get_site_option('onelogin_saml_advanced_settings_strict_mode') : get_option('onelogin_saml_advanced_settings_strict_mode');
 	echo '<input type="checkbox" name="onelogin_saml_advanced_settings_strict_mode" id="onelogin_saml_advanced_settings_strict_mode"
 		  '.($value ? 'checked="checked"': '').'>'.
 		  '<p class="description">'.__("If Strict Mode is enabled, WordPress will reject unsigned or unencrypted messages if it expects them signed or encrypted.
@@ -421,11 +314,7 @@ function plugin_setting_boolean_onelogin_saml_advanced_settings_strict_mode($net
 }
 
 function plugin_setting_string_onelogin_saml_advanced_settings_sp_entity_id($network = false) {
-	if ($network) {
-		$value = get_site_option('onelogin_saml_advanced_settings_sp_entity_id');
-	} else {
-		$value = get_option('onelogin_saml_advanced_settings_sp_entity_id');
-	}
+	$value = $network ? get_site_option('onelogin_saml_advanced_settings_sp_entity_id') : get_option('onelogin_saml_advanced_settings_sp_entity_id');
 	echo '<input type="text" name="onelogin_saml_advanced_settings_sp_entity_id" id="onelogin_saml_advanced_settings_sp_entity_id"
 		  value= "'.esc_html($value).'" size="80">'.
 		  '<p class="description">'.__("Set the Entity ID for the Service Provider. If not provided, 'php-saml' will be used.", 'onelogin-saml-sso').'</p>';
@@ -433,88 +322,56 @@ function plugin_setting_string_onelogin_saml_advanced_settings_sp_entity_id($net
 
 
 function plugin_setting_boolean_onelogin_saml_advanced_settings_nameid_encrypted($network = false) {
-	if ($network) {
-		$value = get_site_option('onelogin_saml_advanced_settings_nameid_encrypted');
-	} else {
-		$value = get_option('onelogin_saml_advanced_settings_nameid_encrypted');
-	}
+	$value = $network ? get_site_option('onelogin_saml_advanced_settings_nameid_encrypted') : get_option('onelogin_saml_advanced_settings_nameid_encrypted');
 	echo '<input type="checkbox" name="onelogin_saml_advanced_settings_nameid_encrypted" id="onelogin_saml_advanced_settings_nameid_encrypted"
 		  '.($value ? 'checked="checked"': '').'>'.
 		  '<p class="description">'.__('The nameID sent by this SP will be encrypted.', 'onelogin-saml-sso').'</p>';
 }
 
 function plugin_setting_boolean_onelogin_saml_advanced_settings_authn_request_signed($network = false) {
-	if ($network) {
-		$value = get_site_option('onelogin_saml_advanced_settings_authn_request_signed');
-	} else {
-		$value = get_option('onelogin_saml_advanced_settings_authn_request_signed');
-	}
+	$value = $network ? get_site_option('onelogin_saml_advanced_settings_authn_request_signed') : get_option('onelogin_saml_advanced_settings_authn_request_signed');
 	echo '<input type="checkbox" name="onelogin_saml_advanced_settings_authn_request_signed" id="onelogin_saml_advanced_settings_authn_request_signed"
 		  '.($value ? 'checked="checked"': '').'>'.
 		  '<p class="description">'.__('The samlp:AuthnRequest messages sent by this SP will be signed.', 'onelogin-saml-sso').'</p>';
 }
 
 function plugin_setting_boolean_onelogin_saml_advanced_settings_logout_request_signed($network = false) {
-	if ($network) {
-		$value = get_site_option('onelogin_saml_advanced_settings_logout_request_signed');
-	} else {
-		$value = get_option('onelogin_saml_advanced_settings_logout_request_signed');
-	}
+	$value = $network ? get_site_option('onelogin_saml_advanced_settings_logout_request_signed') : get_option('onelogin_saml_advanced_settings_logout_request_signed');
 	echo '<input type="checkbox" name="onelogin_saml_advanced_settings_logout_request_signed" id="onelogin_saml_advanced_settings_logout_request_signed"
 		  '.($value ? 'checked="checked"': '').'>'.
 		  '<p class="description">'.__('The samlp:logoutRequest messages sent by this SP will be signed.', 'onelogin-saml-sso').'</p>';
 }
 
 function plugin_setting_boolean_onelogin_saml_advanced_settings_logout_response_signed($network = false) {
-	if ($network) {
-		$value = get_site_option('onelogin_saml_advanced_settings_logout_response_signed');
-	} else {
-		$value = get_option('onelogin_saml_advanced_settings_logout_response_signed');
-	}
+	$value = $network ? get_site_option('onelogin_saml_advanced_settings_logout_response_signed') : get_option('onelogin_saml_advanced_settings_logout_response_signed');
 	echo '<input type="checkbox" name="onelogin_saml_advanced_settings_logout_response_signed" id="onelogin_saml_advanced_settings_logout_response_signed"
 		  '.($value ? 'checked="checked"': '').'>'.
 		  '<p class="description">'.__('The samlp:logoutResponse messages sent by this SP will be signed.', 'onelogin-saml-sso').'</p>';
 }
 
 function plugin_setting_boolean_onelogin_saml_advanced_settings_want_message_signed($network = false) {
-	if ($network) {
-		$value = get_site_option('onelogin_saml_advanced_settings_want_message_signed');
-	} else {
-		$value = get_option('onelogin_saml_advanced_settings_want_message_signed');
-	}
+	$value = $network ? get_site_option('onelogin_saml_advanced_settings_want_message_signed') : get_option('onelogin_saml_advanced_settings_want_message_signed');
 	echo '<input type="checkbox" name="onelogin_saml_advanced_settings_want_message_signed" id="onelogin_saml_advanced_settings_want_message_signed"
 		  '.($value ? 'checked="checked"': '').'>'.
 		  '<p class="description">'.__('Reject unsigned samlp:Response, samlp:LogoutRequest and samlp:LogoutResponse received', 'onelogin-saml-sso').'</p>';
 }
 
 function plugin_setting_boolean_onelogin_saml_advanced_settings_want_assertion_signed($network = false) {
-	if ($network) {
-		$value = get_site_option('onelogin_saml_advanced_settings_want_assertion_signed');
-	} else {
-		$value = get_option('onelogin_saml_advanced_settings_want_assertion_signed');
-	}
+	$value = $network ? get_site_option('onelogin_saml_advanced_settings_want_assertion_signed') : get_option('onelogin_saml_advanced_settings_want_assertion_signed');
 	echo '<input type="checkbox" name="onelogin_saml_advanced_settings_want_assertion_signed" id="onelogin_saml_advanced_settings_want_assertion_signed"
 		  '.($value ? 'checked="checked"': '').'>'.
 		  '<p class="description">'.__('Reject unsigned saml:Assertion received', 'onelogin-saml-sso').'</p>';
 }
 
 function plugin_setting_boolean_onelogin_saml_advanced_settings_want_assertion_encrypted($network = false) {
-	if ($network) {
-		$value = get_site_option('onelogin_saml_advanced_settings_want_assertion_encrypted');
-	} else {
-		$value = get_option('onelogin_saml_advanced_settings_want_assertion_encrypted');
-	}
+	$value = $network ? get_site_option('onelogin_saml_advanced_settings_want_assertion_encrypted') : get_option('onelogin_saml_advanced_settings_want_assertion_encrypted');
 	echo '<input type="checkbox" name="onelogin_saml_advanced_settings_want_assertion_encrypted" id="onelogin_saml_advanced_settings_want_assertion_encrypted"
 		  '.($value ? 'checked="checked"': '').'>'.
 		  '<p class="description">'.__('Reject unencrypted saml:Assertion received', 'onelogin-saml-sso').'</p>';
 }
 
 function plugin_setting_textarea_onelogin_saml_advanced_settings_sp_x509cert($network = false) {
-	if ($network) {
-		$value = get_site_option('onelogin_saml_advanced_settings_sp_x509cert');
-	} else {
-		$value = get_option('onelogin_saml_advanced_settings_sp_x509cert');
-	}
+	$value = $network ? get_site_option('onelogin_saml_advanced_settings_sp_x509cert') : get_option('onelogin_saml_advanced_settings_sp_x509cert');
 	echo '<textarea name="onelogin_saml_advanced_settings_sp_x509cert" id="onelogin_saml_advanced_settings_sp_x509cert" style="width:600px; height:220px; font-size:12px; font-family:courier,arial,sans-serif;">';
 	echo esc_textarea($value);
 	echo '</textarea>';
@@ -522,11 +379,7 @@ function plugin_setting_textarea_onelogin_saml_advanced_settings_sp_x509cert($ne
 }
 
 function plugin_setting_textarea_onelogin_saml_advanced_settings_sp_privatekey($network = false) {
-	if ($network) {
-		$value = get_site_option('onelogin_saml_advanced_settings_sp_privatekey');
-	} else {
-		$value = get_option('onelogin_saml_advanced_settings_sp_privatekey');
-	}
+	$value = $network ? get_site_option('onelogin_saml_advanced_settings_sp_privatekey') : get_option('onelogin_saml_advanced_settings_sp_privatekey');
 	echo '<textarea name="onelogin_saml_advanced_settings_sp_privatekey" id="onelogin_saml_advanced_settings_sp_privatekey" style="width:600px; height:220px; font-size:12px; font-family:courier,arial,sans-serif;">';
 	echo esc_textarea($value);
 	echo '</textarea>';
@@ -534,22 +387,14 @@ function plugin_setting_textarea_onelogin_saml_advanced_settings_sp_privatekey($
 }
 
 function plugin_setting_boolean_onelogin_saml_advanced_settings_retrieve_parameters_from_server($network = false) {
-	if ($network) {
-		$value = get_site_option('onelogin_saml_advanced_settings_retrieve_parameters_from_server');
-	} else {
-		$value = get_option('onelogin_saml_advanced_settings_retrieve_parameters_from_server');
-	}
+	$value = $network ? get_site_option('onelogin_saml_advanced_settings_retrieve_parameters_from_server') : get_option('onelogin_saml_advanced_settings_retrieve_parameters_from_server');
 	echo '<input type="checkbox" name="onelogin_saml_advanced_settings_retrieve_parameters_from_server" id="onelogin_saml_advanced_settings_retrieve_parameters_from_server"
 		  '.($value ? 'checked="checked"': '').'>'.
 		  '<p class="description">'.__('Sometimes when the app is behind a firewall or proxy, the query parameters can be modified an this affects the signature validation process on HTTP-Redirectbinding. Active this if you are seeing signature validation failures. The plugin will try to extract the original query parameters.', 'onelogin-saml-sso').'</p>';
 }
 
 function plugin_setting_select_onelogin_saml_advanced_nameidformat($network = false) {
-	if ($network) {
-		$nameidformat_value = get_site_option('onelogin_saml_advanced_nameidformat');
-	} else {
-		$nameidformat_value = get_option('onelogin_saml_advanced_nameidformat');
-	}
+	$value = $network ? get_site_option('onelogin_saml_advanced_nameidformat') : get_option('onelogin_saml_advanced_nameidformat');
 	$posible_nameidformat_values = array(
 		'unspecified' => Constants::NAMEID_UNSPECIFIED,
 		'emailAddress' => Constants::NAMEID_EMAIL_ADDRESS,
@@ -604,11 +449,7 @@ function plugin_setting_select_onelogin_saml_advanced_requestedauthncontext($net
 }
 
 function plugin_setting_select_onelogin_saml_advanced_signaturealgorithm($network = false) {
-	if ($network) {
-		$signaturealgorithm_value = get_site_option('onelogin_saml_advanced_signaturealgorithm');
-	} else {
-		$signaturealgorithm_value = get_option('onelogin_saml_advanced_signaturealgorithm');
-	}
+	$signaturealgorithm_value = $network ? get_site_option('onelogin_saml_advanced_signaturealgorithm') : get_option('onelogin_saml_advanced_signaturealgorithm');
 	$posible_signaturealgorithm_values = array(
 		XMLSecurityKey::RSA_SHA1 => XMLSecurityKey::RSA_SHA1,
 		XMLSecurityKey::DSA_SHA1 => XMLSecurityKey::DSA_SHA1,
@@ -628,12 +469,7 @@ function plugin_setting_select_onelogin_saml_advanced_signaturealgorithm($networ
 }
 
 function plugin_setting_select_onelogin_saml_advanced_digestalgorithm($network = false) {
-	if ($network) {
-		$digestalgorithm_value = get_site_option('onelogin_saml_advanced_digestalgorithm');
-	} else {
-		$digestalgorithm_value = get_option('onelogin_saml_advanced_digestalgorithm');
-	}
-
+	$digestalgorithm_value = $network ? get_site_option('onelogin_saml_advanced_digestalgorithm') : get_option('onelogin_saml_advanced_digestalgorithm');
 	$posible_digestalgorithm_values = array(
 		XMLSecurityDSig::SHA1 => XMLSecurityDSig::SHA1,
 		XMLSecurityDSig::SHA256 => XMLSecurityDSig::SHA256,
@@ -689,10 +525,13 @@ function plugin_section_text() {}
 
 function onelogin_saml_configuration_multisite() {
 	add_menu_page(__("Network SAML Settings"), __("Network SAML Settings"), 'manage_options', 'network_saml_settings', 'load_saml_network_config_page');
-
-	add_submenu_page('network_saml_settings', __("Settings"), __("Settings"), 'manage_options','network_saml_settings', 'load_saml_network_config_page');
+	add_submenu_page('network_saml_settings', __("Network Global Settings"), __("Network Global Settings"), 'manage_options','network_saml_global_settings', 'load_saml_network_global_config_page');
 	add_submenu_page('network_saml_settings', __("Inject SAML Settings in sites"), __("Inject SAML Settings in sites"), 'manage_options','network_saml_injection', 'load_saml_network_injection');
 	add_submenu_page('network_saml_settings', __("Enable/Disable SAML on sites"), __("Enable/Disable SAML on sites"), 'manage_options','network_saml_enabler', 'load_saml_network_enabler');
+}
+
+function load_saml_network_global_config_page() {
+	require "network_saml_global_settings.php";
 }
 
 function load_saml_network_config_page() {
@@ -705,6 +544,26 @@ function load_saml_network_injection() {
 
 function load_saml_network_enabler() {
 	require "network_saml_enabler.php";
+}
+
+function onelogin_saml_global_configuration_multisite_save() {
+	check_admin_referer('network_saml_global_settings_validate'); // Nonce security check
+	
+	if (isset($_POST)) {
+		if (isset($_POST['global_jit']) && $_POST['global_jit'] = 'on') {
+			$global_jit = true;
+		} else {
+			$global_jit = false;
+		}
+		update_site_option("onelogin_network_saml_global_jit", $global_jit);
+	}
+
+	wp_redirect(add_query_arg( array(
+		'page' => 'network_saml_global_settings',
+		'updated' => true ), network_admin_url('admin.php')
+	));
+
+	exit;
 }
 
 function onelogin_saml_configuration_multisite_save() {

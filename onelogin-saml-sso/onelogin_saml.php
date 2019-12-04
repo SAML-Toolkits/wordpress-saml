@@ -43,6 +43,7 @@ add_action('init', 'saml_checker', 1);
 // add menu option for multisite configuration
 if (is_multisite()) {
 	add_action('network_admin_menu', 'onelogin_saml_configuration_multisite');
+	add_action('network_admin_edit_network_saml_global_settings', 'onelogin_saml_global_configuration_multisite_save');
 	add_action('network_admin_edit_network_saml_settings', 'onelogin_saml_configuration_multisite_save');
 	add_action('network_admin_edit_network_saml_injection', 'onelogin_saml_configuration_multisite_injection');
 	add_action('network_admin_edit_network_saml_enabler', 'onelogin_saml_configuration_multisite_enabler');
