@@ -2,7 +2,7 @@
 Contributors: onelogin
 Tags: sso, saml, single sign on, password, active directory, ldap, identity, onelogin, yubico, yubikey, vip access, otp
 Requires at least: 2.1.2
-Tested up to: 5.0.3
+Tested up to: 5.3.2
 Stable tag: trunk
 
 This plugin provides single sign-on via SAML and gives users one-click access to their WordPress accounts from identity providers like OneLogin.
@@ -21,6 +21,11 @@ If you used this plugin before 2.2.0 with just-in-time provision active, Read: h
 To mitigate that bug, place the script at the root of wordpress and execute it (later remove it) https://gist.github.com/pitbulk/a8223c90a3534e9a7d5e0a93009a094f
 
 == Changelog ==
+
+= 3.1.1 =
+* Multisites: Add the option to automatically enroll users on sites when a SAML Network setting enabled
+* Fix #86. Set default role when not provided only on create action
+* Detect Ajax and cron tasks
 
 = 3.1.0 =
 * Multisite improvement. Now when multisite is enabled, on the "Network Admin" dashboard appears a "Network SAML Settings" where you can define a SAML template setting, and then inject it in sites. Also will allow you enable/disable multiple sites on a unique view.
