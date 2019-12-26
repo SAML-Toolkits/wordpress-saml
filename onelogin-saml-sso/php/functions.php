@@ -215,7 +215,6 @@ function saml_acs() {
 			$userdata['last_name'] = $attrs[$lastNameMapping][0];
 		}
 
-		$userdata['role'] = get_option('default_role');
 		if (!empty($roleMapping) && isset($attrs[$roleMapping])){
 			$multiValued = get_option('onelogin_saml_role_mapping_multivalued_in_one_attribute_value', false);
 			if ($multiValued && count($attrs[$roleMapping]) == 1) {
@@ -300,6 +299,11 @@ function saml_acs() {
 			echo __("The username provided by the IdP"). ' "'. esc_attr($username). '" '. __("is not valid and can't create the user at wordpress");
 			exit();
 		}
+
+		if (!isset($userdata['role'])) {
+			$userdata['role'] = get_option('default_role');
+		}
+
 		$userdata['user_pass'] = wp_generate_password();
 		$user_id = wp_insert_user($userdata);
 		if ($user_id && !is_a($user_id, 'WP_Error') && is_multisite()) {
