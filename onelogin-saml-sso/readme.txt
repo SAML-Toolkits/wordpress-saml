@@ -22,6 +22,9 @@ To mitigate that bug, place the script at the root of wordpress and execute it (
 
 == Changelog ==
 
+= 3.1.2 =
+* Minor fix to extract all sites for the multi-site features
+
 = 3.1.1 =
 * Multisites: Add the option to automatically enroll users on sites when a SAML Network setting enabled
 * Fix #86. Set default role when not provided only on create action
