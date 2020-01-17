@@ -615,7 +615,8 @@ function onelogin_saml_configuration_multisite_enabler() {
 			$enable_on_sites = $_POST['enable_saml_in_site'];
 		}
 
-		$sites = get_sites();
+		$opts = array('number' => 500);
+        $sites = get_sites($opts);
 		foreach ($sites as $site) {
 			$value = false;
 			if (in_array($site->id, $enable_on_sites)) {

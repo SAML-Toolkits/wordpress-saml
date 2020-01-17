@@ -458,7 +458,8 @@ function is_saml_enabled() {
 }
 
 function enroll_user_on_sites($user_id, $role) {
-	$sites = get_sites();
+	$opts = array('number' => 500);
+	$sites = get_sites($opts);
 	foreach ($sites as $site) {
 		if (get_blog_option($site_id, "onelogin_saml_autocreate") && !is_user_member_of_blog($user_id, $site->id)) {
 			$result = add_user_to_blog($site->id, $user_id, $role);

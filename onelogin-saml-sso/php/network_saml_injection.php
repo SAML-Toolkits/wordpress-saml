@@ -17,7 +17,8 @@ if (!current_user_can('manage_options')) {
 <form method="post" action="edit.php?action=network_saml_injection">
 <?php
 
-$sites = get_sites();
+$opts = array('number' => 500);
+$sites = get_sites($opts);
 
 echo '<table class="form-table"><tbody>';
 echo '<tr><th scope="row" style="font-weight: normal;">Select/Unselect All</th><td><input type="checkbox" id="selector"></td></tr>';
