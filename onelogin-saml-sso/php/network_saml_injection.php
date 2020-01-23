@@ -17,7 +17,7 @@ if (!current_user_can('manage_options')) {
 <form method="post" action="edit.php?action=network_saml_injection">
 <?php
 
-$opts = array('number' => 500);
+$opts = array('number' => 1000);
 $sites = get_sites($opts);
 
 echo '<table class="form-table"><tbody>';
