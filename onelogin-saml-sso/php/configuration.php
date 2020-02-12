@@ -550,7 +550,7 @@ function onelogin_saml_global_configuration_multisite_save() {
 	check_admin_referer('network_saml_global_settings_validate'); // Nonce security check
 	
 	if (isset($_POST)) {
-		if (isset($_POST['global_jit']) && $_POST['global_jit'] = 'on') {
+		if (isset($_POST['global_jit']) && $_POST['global_jit'] === 'on') {
 			$global_jit = true;
 		} else {
 			$global_jit = false;
