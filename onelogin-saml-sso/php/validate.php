@@ -5,10 +5,10 @@ if ( !function_exists( 'add_action' ) ) {
 	exit;
 }
 
-if (!current_user_can('delete_plugins')) {
-     header("HTTP/1.0 403 Forbidden");
-     echo '<h1>'.__("Access Forbidden!", 'onelogin-saml-sso').'</h1>';
-     exit();
+if ( ! current_user_can( 'manage_options' ) ) {
+	header( 'HTTP/1.0 403 Forbidden' );
+	echo '<h1>' . __( 'Access Forbidden!', 'onelogin-saml-sso' ) . '</h1>';
+	exit();
 }
 
 require_once "_toolkit_loader.php";
