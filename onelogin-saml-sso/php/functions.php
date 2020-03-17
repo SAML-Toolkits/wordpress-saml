@@ -248,10 +248,15 @@ function saml_acs() {
 				}
 			}
 
+			$multirole = get_site_option('onelogin_saml_multirole');
+			$userdata['roles'] = [];
+
 			uksort($roles_found, 'saml_role_order_compare');
-			foreach ($roles_found as $role_value => $__role_found) {
-				$userdata['role'] = $role_value;
-				break;
+			foreach ($roles_found as $role_value => $_role_found) {
+				$userdata['roles'][] = $role_value;
+				if (!$multirole || is_multisite()) {
+					break;
+				}
 			}
 		}
 	}
@@ -269,12 +274,12 @@ function saml_acs() {
 	if ($user_id) {
 		if (is_multisite()) {
 			if (get_site_option('onelogin_network_saml_global_jit')) {
-				enroll_user_on_sites($user_id, $userdata['role']);
+				enroll_user_on_sites($user_id, $userdata['roles']);
 			} else if (!is_user_member_of_blog($user_id)) {
 				if (get_option('onelogin_saml_autocreate')) {
 					//Exist's but is not user to the current blog id
 					$blog_id = get_current_blog_id();
-					$result = add_user_to_blog($blog_id, $user_id, $userdata['role']);
+					enroll_user_on_blogs($blog_id, $user_id, $userdata['roles']);
 				} else {
 					$user_id = null;
 					echo __("User provided by the IdP "). ' "'. esc_attr($matcherValue). '" '. __("does not exist in this wordpress site and auto-provisioning is disabled.");
@@ -287,12 +292,21 @@ function saml_acs() {
 			$userdata['ID'] = $user_id;
 			unset($userdata['$user_pass']);
 
-			// Prevent to change the role to the superuser (id=1)
-			if ($user_id == 1 && isset($userdata['role'])) {
-				unset($userdata['role']);
+			$roles = [];
+			if (isset($userdata['roles'])) {
+				// Prevent to change the role to the superuser (id=1)
+				if ($user_id == 1) {
+					unset($userdata['roles']);
+				} else {
+					$roles = $userdata['roles'];
+					unset($userdata['roles']);
+				}
 			}
 
 			$user_id = wp_update_user($userdata);
+			if (isset($user_id) && !empty($roles)) {
+				update_user_role($user_id, $roles);
+			}
 		}
 	} else if (get_option('onelogin_saml_autocreate')) {
 		if (!validate_username($username)) {
@@ -300,18 +314,25 @@ function saml_acs() {
 			exit();
 		}
 
-		if (!isset($userdata['role'])) {
-			$userdata['role'] = get_option('default_role');
+		if (!isset($userdata['roles'])) {
+			$userdata['roles'] = array();
+			$userdata['roles'][] = get_option('default_role');
 		}
-
+		$userdata['role'] = array_shift($userdata['roles']);
+		$roles = $userdata['roles'];
+		unset($userdata['roles']);
 		$userdata['user_pass'] = wp_generate_password();
 		$user_id = wp_insert_user($userdata);
-		if ($user_id && !is_a($user_id, 'WP_Error') && is_multisite()) {
-			if (get_site_option('onelogin_network_saml_global_jit')) {
-				enroll_user_on_sites($user_id, $userdata['role']);
-			} else {
-				$blog_id = get_current_blog_id();
-				$result = add_user_to_blog($blog_id, $user_id, $userdata['role']);
+		if ($user_id && !is_a($user_id, 'WP_Error')) {
+			if (is_multisite()) {
+				if (get_site_option('onelogin_network_saml_global_jit')) {
+					enroll_user_on_sites($user_id, $userdata['roles']);
+				} else {
+					$blog_id = get_current_blog_id();
+					enroll_user_on_blogs($blog_id, $user_id, $userdata['roles']);
+				}
+			} else if (!empty($roles)) {
+				add_roles_to_user($user_id, $roles);
 			}
 		}
 	} else {
@@ -457,13 +478,41 @@ function is_saml_enabled() {
 	return $saml_enabled;
 }
 
-function enroll_user_on_sites($user_id, $role) {
+function enroll_user_on_sites($user_id, $roles) {
 	$opts = array('number' => 1000);
 	$sites = get_sites($opts);
 	foreach ($sites as $site) {
 		if (get_blog_option($site_id, "onelogin_saml_autocreate") && !is_user_member_of_blog($user_id, $site->id)) {
-			$result = add_user_to_blog($site->id, $user_id, $role);
+			foreach($roles as $role) {
+				add_user_to_blog($site->id, $user_id, $role);
+			}
 		}
+	}
+}
+
+function enroll_user_on_blogs($blog_id, $user_id, $roles) {
+	foreach($roles as $role) {
+		add_user_to_blog($blog_id, $user_id, $role);
+	}
+}
+
+function update_user_role($user_id, $roles)
+{
+	$user = get_user_by('id', $user_id);
+	$role = array_shift($roles);
+	$user->set_role($role);	// This removes previous assignations
+
+	foreach($roles as $role) {
+		$user->add_role($role);
+	}
+}
+
+function add_roles_to_user($user_id, $roles)
+{
+	$user = get_user_by('id', $user_id);
+
+	foreach($roles as $role) {
+		$user->add_role($role);
 	}
 }
 
