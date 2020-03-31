@@ -83,7 +83,7 @@ function onelogin_saml_configuration() {
 	}
 }
 
-function plugin_setting_boolean_onelogin_saml_enabled() {
+function plugin_setting_boolean_onelogin_saml_enabled($network = false) {
 	$value = $network ? get_site_option('onelogin_saml_enabled') : get_option('onelogin_saml_enabled');
 	echo '<input type="checkbox" name="onelogin_saml_enabled" id="onelogin_saml_enabled"
 		  '.($value ? 'checked="checked"': '').'>'.
@@ -165,6 +165,13 @@ function plugin_setting_select_onelogin_saml_account_matcher($network = false) {
 		  <option value="email" '.($value == 'email'? 'selected="selected"':'').'>'.__("E-mail", 'onelogin-saml-sso').'</option>
 		</select>'.
 		'<p class="description">'.__('Select what field will be used in order to find the user account. If "email", the plugin will prevent the user from changing their email address in their user profile.', 'onelogin-saml-sso').'</p>';
+}
+
+function plugin_setting_boolean_onelogin_saml_multirole($network = false) {
+    $value = $network ? get_site_option('onelogin_saml_multirole') : get_option('onelogin_saml_multirole');
+    echo '<input type="checkbox" name="onelogin_saml_multirole" id="onelogin_saml_multirole"
+          '.($value ? 'checked="checked"': '').'>'.
+          '<p class="description">'.__('Enable/disable the support of multiple roles. Not available in multi-site wordpress', 'onelogin-saml-sso').'</p>';
 }
 
 function plugin_setting_boolean_onelogin_saml_alternative_acs($network = false) {
@@ -508,7 +515,7 @@ function plugin_section_role_mapping_text() {
 }
 
 function plugin_section_role_precedence_text() {
-	echo "<p>".__("In some cases, the IdP returns more than one role. In this secion, you can set the precedence of the different roles. The smallest integer will be the role chosen.", 'onelogin-saml-sso')."</p>";
+	echo "<p>".__("In some cases, the IdP returns more than one role. In this secion, you can set the precedence of the different roles which makes sense if multi-role support is not enabled. The smallest integer will be the role chosen.", 'onelogin-saml-sso')."</p>";
 }
 
 function plugin_section_customize_links_text() {
@@ -728,7 +735,11 @@ function get_onelogin_saml_settings_options() {
 		'onelogin_saml_account_matcher' => array(
 			__('Match Wordpress account by', 'onelogin-saml-sso'),
 			'select'
-		)
+		),
+        'onelogin_saml_multirole' => array(
+            __('Multi Role Support', 'onelogin-saml-sso'),
+            'boolean'
+        )
 	);
 }
 
