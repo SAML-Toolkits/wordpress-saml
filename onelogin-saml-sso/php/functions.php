@@ -18,14 +18,24 @@ function saml_checker() {
 			exit();
 		}
 		saml_acs();
-	}
-	else if (isset($_GET['saml_sls'])) {
+	} else if (isset($_GET['saml_sls'])) {
 		saml_sls();
 	} else if (isset($_GET['saml_metadata'])) {
 		saml_metadata();
 	} else if (isset($_GET['saml_validate_config'])) {
 		saml_validate_config();
 	}
+}
+
+function may_disable_saml() {
+	if ((defined('WP_CLI') && WP_CLI) || wp_doing_cron() || wp_doing_ajax()) {
+		return true;
+	}
+	if (apply_filters('onelogin_disable_saml_sso', false)) {
+		return true;
+	}
+
+	return false;
 }
 
 function saml_custom_login_footer() {
@@ -62,10 +72,10 @@ function saml_user_register() {
 }
 
 function saml_sso() {
-	if ((defined('WP_CLI') && WP_CLI) || wp_doing_cron() || wp_doing_ajax()) {
+	if (may_disable_saml()) {
 		return true;
 	}
-	
+
 	if (is_user_logged_in()) {
 		return true;
 	}
@@ -83,6 +93,10 @@ function saml_sso() {
 }
 
 function saml_slo() {
+	if (may_disable_saml()) {
+		return true;
+	}
+
 	$slo = get_option('onelogin_saml_slo');
 
 	if (isset($_GET['action']) && $_GET['action']  == 'logout') {
@@ -145,6 +159,10 @@ function saml_role_order_compare($role1, $role2) {
 }
 
 function saml_acs() {
+	if (may_disable_saml()) {
+		return true;
+	}
+
 	$auth = initialize_saml();
 	if ($auth == false) {
 		wp_redirect(home_url());
@@ -380,6 +398,10 @@ function saml_acs() {
 }
 
 function saml_sls() {
+	if (may_disable_saml()) {
+		return true;
+	}
+
 	$auth = initialize_saml();
 	if ($auth == false) {
 		wp_redirect(home_url());
