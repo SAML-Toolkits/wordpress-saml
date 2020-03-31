@@ -22,6 +22,15 @@ To mitigate that bug, place the script at the root of wordpress and execute it (
 
 == Changelog ==
 
+= 3.2.0 =
+* Avoid untrusted redirections
+* Disable SAML on CLI/Cron on ACS and SLS endpoints. Allow custom filter to disable SAML
+* Support multi-role
+* Fix variable assignment during conditional check
+* Swap to `manage_options` for the cap check on the validate page.
+* Fix unintentional variable assignment
+* Set 1000 as the limit of sites to be managed by SAML network settings
+
 = 3.1.2 =
 * Minor fix to extract all sites for the multi-site features
 

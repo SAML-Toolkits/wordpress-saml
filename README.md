@@ -11,6 +11,11 @@ This kind of WP hosting used to cache plugins and protect the wp-login.php view.
 You will need to contact them in order to disable the cache for this SAML plugin and also allow external HTTP POST to
 wp-login.php
 
+
+### Security Improvements on 3.2.0 ###
+
+Version 3.2.0 includes a security patch that prevent RelayState redirection attacks
+
 ### Security Improvements on 3.0.0 ###
 
 Version 3.0.0 includes a security patch that will prevent DDOS by expansion of internally defined entities (XEE)
