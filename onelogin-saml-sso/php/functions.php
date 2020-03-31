@@ -38,6 +38,65 @@ function may_disable_saml() {
 	return false;
 }
 
+function get_domain() {
+	$protocols = array( 'http://', 'https://', 'http://www.', 'https://www.', 'www.' );
+	return str_replace($protocols, '', site_url());
+}
+
+function redirect_to_relaystate_if_trusted($url) {
+	$trusted = false;
+	$trustedDomainsOpt = get_option('onelogin_saml_trusted_url_domains', "");
+	$trustedDomains = explode(",", trim($trustedDomainsOpt));
+	$trustedDomains[] = get_domain();
+
+	$trusted = checkURLAllowed($url, $trustedDomains);
+
+	if ($trusted) {
+		wp_redirect($url);
+	} else {
+		wp_redirect(home_url());
+	}
+}
+
+function checkURLAllowed($url, $trustedSites = [])
+{
+	// Allow Relative URL
+	if ($url[0] === '/') {
+		return true;
+	}
+
+	if (!wp_http_validate_url($url)) {
+		return false;
+	}
+
+	$components = parse_url($url);
+	$hostname = $components['host'];
+
+	// check for userinfo
+	if ((isset($components['user'])
+		&& strpos($components['user'], '\\') !== false)
+		|| (isset($components['pass'])
+		&& strpos($components['pass'], '\\') !== false)
+	) {
+		return false;
+	}
+
+	// allow URLs with standard ports specified (non-standard ports must then be allowed explicitly)
+	if (
+		isset($components['port'])
+		&& (($components['scheme'] === 'http'
+		&& $components['port'] !== 80)
+		|| ($components['scheme'] === 'https'
+		&& $components['port'] !== 443))
+	) {
+		if (in_array($hostname.':'.$components['port'], $trustedSites, true)) {
+			return true;
+		}
+	}
+
+	return in_array($hostname, $trustedSites, true);
+}
+
 function saml_custom_login_footer() {
 	$saml_login_message = get_option('onelogin_saml_customize_links_saml_login');
 	if (empty($saml_login_message)) {
@@ -385,10 +444,10 @@ function saml_acs() {
 		} else {
 			if (strpos($_REQUEST['RelayState'], 'redirect_to') !== false) {
 				$query = wp_parse_url($_REQUEST['RelayState'], PHP_URL_QUERY);
-				parse_str( $query, $parameters );
-				wp_redirect(urldecode($parameters['redirect_to']));
+				parse_str($query, $parameters);
+				redirect_to_relaystate_if_trusted(urldecode($parameters['redirect_to']));
 			}  else {
-				wp_redirect($_REQUEST['RelayState']);
+				redirect_to_relaystate_if_trusted($_REQUEST['RelayState']);
 			}
 		}
 	} else {
@@ -427,7 +486,7 @@ function saml_sls() {
 			wp_redirect(home_url().'/wp-login.php?loggedout=true');
 		} else {
 			if (isset($_REQUEST['RelayState'])) {
-				wp_redirect($_REQUEST['RelayState']);
+				redirect_to_relaystate_if_trusted($_REQUEST['RelayState']);
 			} else {
 				wp_redirect(home_url());
 			}

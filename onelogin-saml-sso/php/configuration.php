@@ -181,6 +181,13 @@ function plugin_setting_boolean_onelogin_saml_alternative_acs($network = false) 
 		  '<p class="description">'.__('Enable if you want to use a different Assertion Consumer Endpoint than <code>/wp-login.php?saml_acs</code> (Required if using WPEngine or any similar hosting service that prevents POST on <code>wp-login.php</code>). You must update the IdP with the new value after enabling/disabling this setting.', 'onelogin-saml-sso').'</p>';
 }
 
+function plugin_setting_textarea_onelogin_saml_trusted_url_domains($network = false) {
+	echo '<textarea name="onelogin_saml_trusted_url_domains" id="onelogin_saml_trusted_url_domains" style="width:600px; height:220px; font-size:12px; font-family:courier,arial,sans-serif;">';
+	echo esc_textarea($network ? get_site_option('onelogin_saml_trusted_url_domains') : get_option('onelogin_saml_trusted_url_domains'));
+	echo '</textarea>';
+	echo '<p class="description">'.__("List here any domain (comma- separated) that you want to be trusted in the RelayState parameter, otherwise the parameter will be ignored. You don't need to include the domain of the wordpress instance", 'onelogin-saml-sso');
+}
+
 function plugin_setting_string_onelogin_saml_attr_mapping_username($network = false) {
 	$value = $network ? get_site_option('onelogin_saml_attr_mapping_username') : get_option('onelogin_saml_attr_mapping_username');
 	echo '<input type="text" name="onelogin_saml_attr_mapping_username" id="onelogin_saml_attr_mapping_username"
@@ -736,10 +743,14 @@ function get_onelogin_saml_settings_options() {
 			__('Match Wordpress account by', 'onelogin-saml-sso'),
 			'select'
 		),
-        'onelogin_saml_multirole' => array(
-            __('Multi Role Support', 'onelogin-saml-sso'),
-            'boolean'
-        )
+		'onelogin_saml_multirole' => array(
+			__('Multi Role Support', 'onelogin-saml-sso'),
+			'boolean'
+		),
+		'onelogin_saml_trusted_url_domains' => array(
+			__('Trust URL domains on RelayState', 'onelogin-saml-sso'),
+			'textarea'
+		)
 	);
 }
 
