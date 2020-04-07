@@ -22,6 +22,11 @@ To mitigate that bug, place the script at the root of wordpress and execute it (
 
 == Changelog ==
 
+= 3.2.1 =
+* Sanitize inputs
+* Update php-saml to 3.4.1
+* Fix nameidformat field
+
 = 3.2.0 =
 * Avoid untrusted redirections
 * Disable SAML on CLI/Cron on ACS and SLS endpoints. Allow custom filter to disable SAML

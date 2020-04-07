@@ -12,7 +12,7 @@ You will need to contact them in order to disable the cache for this SAML plugin
 wp-login.php
 
 
-### Security Improvements on 3.2.0 ###
+### Security Improvements on 3.2.0 and 3.2.1 ###
 
 Version 3.2.0 includes a security patch that prevent RelayState redirection attacks
 
