@@ -412,7 +412,7 @@ function plugin_setting_boolean_onelogin_saml_advanced_settings_retrieve_paramet
 }
 
 function plugin_setting_select_onelogin_saml_advanced_nameidformat($network = false) {
-	$value = $network ? get_site_option('onelogin_saml_advanced_nameidformat') : get_option('onelogin_saml_advanced_nameidformat');
+	$nameidformat_value = $network ? get_site_option('onelogin_saml_advanced_nameidformat') : get_option('onelogin_saml_advanced_nameidformat');
 	$posible_nameidformat_values = array(
 		'unspecified' => Constants::NAMEID_UNSPECIFIED,
 		'emailAddress' => Constants::NAMEID_EMAIL_ADDRESS,
