@@ -13,6 +13,10 @@ use OneLogin\Saml2\Constants;
 use RobRichards\XMLSecLibs\XMLSecurityDSig;
 use RobRichards\XMLSecLibs\XMLSecurityKey;
 
+function sanitize_array_int($integers) {
+	$sanitized_array = array_map( 'intval', $integers );
+	return $sanitized_array;
+}
 
 function onelogin_saml_configuration_render() {
 	$title = __("SSO/SAML Settings", 'onelogin-saml-sso');
@@ -587,7 +591,7 @@ function onelogin_saml_configuration_multisite_save() {
 
 	foreach (array_keys($fields) as $section) {
 		foreach (array_keys($fields[$section]) as $name) {
-			update_site_option($name, $_POST[$name]);
+			update_site_option($name, wp_unslash($_POST[$name]));
 		}
 	}
 
@@ -603,9 +607,11 @@ function onelogin_saml_configuration_multisite_injection() {
 	$updated = false;
 	if (!empty($_POST) && isset($_POST['inject_saml_in_site'])) {
 		$fields = get_onelogin_saml_settings();
-		foreach ($_POST['inject_saml_in_site'] as $site_id) {
+		$sites = sanitize_array_int($_POST['inject_saml_in_site']);
+		foreach ($sites as $site_id) {
 			foreach (array_keys($fields) as $section) {
 				foreach (array_keys($fields[$section]) as $name) {
+					$name = sanitize_key($name);
 					update_blog_option($site_id, $name, get_site_option($name, ''));
 				}
 			}
@@ -626,7 +632,7 @@ function onelogin_saml_configuration_multisite_enabler() {
 	if (!empty($_POST)) {
 		$enable_on_sites = array();
 		if (isset($_POST['enable_saml_in_site'])) {
-			$enable_on_sites = $_POST['enable_saml_in_site'];
+			$enable_on_sites = sanitize_array_int($_POST['enable_saml_in_site']);
 		}
 
 		$opts = array('number' => 1000);

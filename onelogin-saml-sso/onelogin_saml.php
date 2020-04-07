@@ -4,7 +4,7 @@ Plugin Name: OneLogin SAML SSO
 Plugin URI: https://github.com/onelogin/wordpress-saml
 Description: Give users secure one-click access to WordPress from OneLogin. This SAML integration eliminates passwords and allows you to authenticate users against your existing Active Directory or LDAP server as well increase security using YubiKeys or VeriSign VIP Access, browser PKI certificates and OneLogin's flexible security policies. OneLogin is pre-integrated with thousands of apps and handles all of your SSO needs in the cloud and behind the firewall.
 Author: OneLogin, Inc.
-Version: 3.2.0
+Version: 3.2.1
 Author URI: http://www.onelogin.com
 */
 
@@ -63,7 +63,7 @@ if ($prevent_reset_password) {
 	add_action('password_reset', 'saml_lostpassword', 1);
 }
 
-$action = isset($_REQUEST['action']) ? $_REQUEST['action'] : 'login';
+$action = sanitize_key(isset($_REQUEST['action']) ? $_REQUEST['action'] : 'login');
 
 // Handle SLO
 if (isset($_COOKIE[SAML_LOGIN_COOKIE]) && get_option('onelogin_saml_slo')) {

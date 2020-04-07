@@ -28,7 +28,10 @@ function saml_checker() {
 }
 
 function may_disable_saml() {
-	if ((defined('WP_CLI') && WP_CLI) || wp_doing_cron() || wp_doing_ajax()) {
+	if ((defined('WP_CLI') && WP_CLI) ||
+	    (function_exists('wp_doing_cron') && wp_doing_cron()) ||
+            (function_exists('wp_doing_ajax') && wp_doing_ajax())
+	) {
 		return true;
 	}
 	if (apply_filters('onelogin_disable_saml_sso', false)) {
@@ -103,7 +106,7 @@ function saml_custom_login_footer() {
 		$saml_login_message = "SAML Login";
 	}
 
-    echo '<div style="font-size: 110%;padding:8px;background: #fff;text-align: center;"><a href="'.esc_url( get_site_url().'/wp-login.php?saml_sso') .'">'.esc_html($saml_login_message).'</a></div>';
+	echo '<div style="font-size: 110%;padding:8px;background: #fff;text-align: center;"><a href="'.esc_url( get_site_url().'/wp-login.php?saml_sso') .'">'.esc_html($saml_login_message).'</a></div>';
 }
 
 function saml_load_translations() {
@@ -168,13 +171,13 @@ function saml_slo() {
 			$nameIdFormat = null;
 
 			if (isset($_COOKIE[SAML_NAMEID_COOKIE])) {
-				$nameId = $_COOKIE[SAML_NAMEID_COOKIE];
+				$nameId = sanitize_text_field($_COOKIE[SAML_NAMEID_COOKIE]);
 			}
 			if (isset($_COOKIE[SAML_SESSIONINDEX_COOKIE])) {
-				$sessionIndex = $_COOKIE[SAML_SESSIONINDEX_COOKIE];
+				$sessionIndex = sanitize_text_field($_COOKIE[SAML_SESSIONINDEX_COOKIE]);
 			}
 			if (isset($_COOKIE[SAML_NAMEID_FORMAT_COOKIE])) {
-				$nameIdFormat = $_COOKIE[SAML_NAMEID_FORMAT_COOKIE];
+				$nameIdFormat = sanitize_text_field($_COOKIE[SAML_NAMEID_FORMAT_COOKIE]);
 			}
 
 			$auth = initialize_saml();
@@ -195,7 +198,7 @@ function saml_role_order_get($role) {
 		'author'        => 3,
 		'contributor'   => 4,
 		'subscriber'    => 5);
-	$rv = get_option('onelogin_saml_role_order_'.$role);
+	$rv = get_option(sanitize_key('onelogin_saml_role_order_'.$role));
 	if (empty($rv))
 		if (isset($role_defaults[$role])) {
 			return $role_defaults[$role];
@@ -240,10 +243,6 @@ function saml_acs() {
 		exit();
 	}
 
-	setcookie(SAML_NAMEID_COOKIE, $auth->getNameId(), time() + YEAR_IN_SECONDS, SITECOOKIEPATH );
-	setcookie(SAML_SESSIONINDEX_COOKIE, $auth->getSessionIndex(), time() + YEAR_IN_SECONDS, SITECOOKIEPATH );
-	setcookie(SAML_NAMEID_FORMAT_COOKIE, $auth->getNameIdFormat(), time() + YEAR_IN_SECONDS, SITECOOKIEPATH );
-
 	$attrs = $auth->getAttributes();
 
 	if (empty($attrs)) {
@@ -252,17 +251,17 @@ function saml_acs() {
 			echo __("The SAMLResponse may contain NameID or AttributeStatement");
 			exit();
 		}
-		$username = $nameid;
-		$email = $username;
+		$username = sanitize_user($nameid);
+		$email = sanitize_email($nameid);
 	} else {
 		$usernameMapping = get_option('onelogin_saml_attr_mapping_username');
 		$mailMapping =  get_option('onelogin_saml_attr_mapping_mail'); 
 
 		if (!empty($usernameMapping) && isset($attrs[$usernameMapping]) && !empty($attrs[$usernameMapping][0])){
-			$username = $attrs[$usernameMapping][0];
+			$username = sanitize_user($attrs[$usernameMapping][0]);
 		}
 		if (!empty($mailMapping) && isset($attrs[$mailMapping])  && !empty($attrs[$mailMapping][0])){
-			$email = $attrs[$mailMapping][0];
+			$email = sanitize_email($attrs[$mailMapping][0]);
 		}
 	}
 
@@ -272,6 +271,9 @@ function saml_acs() {
 	}
 	else if (empty($email)) {
 		echo __("The email could not be retrieved from the IdP and is required");
+		exit();
+	} else if (!is_email($email)) {
+		echo __("The email provided is invalid");
 		exit();
 	} else {
 		$userdata = array();
@@ -318,6 +320,7 @@ function saml_acs() {
 				}
 
 				foreach ($all_roles as $role_value => $role_name) {
+					$role_value = sanitize_key($role_value);
 					$matchList = explode(',', get_option('onelogin_saml_role_mapping_'.$role_value));
 					if (in_array($samlRole, $matchList)) {
 						$roles_found[$role_value] = true;
@@ -434,20 +437,25 @@ function saml_acs() {
 		wp_set_auth_cookie($user_id, $rememberme);
 
 		setcookie(SAML_LOGIN_COOKIE, 1, time() + YEAR_IN_SECONDS, SITECOOKIEPATH );
+		setcookie(SAML_NAMEID_COOKIE, $auth->getNameId(), time() + YEAR_IN_SECONDS, SITECOOKIEPATH );
+		setcookie(SAML_SESSIONINDEX_COOKIE, $auth->getSessionIndex(), time() + YEAR_IN_SECONDS, SITECOOKIEPATH );
+		setcookie(SAML_NAMEID_FORMAT_COOKIE, $auth->getNameIdFormat(), time() + YEAR_IN_SECONDS, SITECOOKIEPATH );
 	}
 
 	do_action( 'onelogin_saml_attrs', $attrs, wp_get_current_user(), get_current_user_id() );
-	
+
 	if (isset($_REQUEST['RelayState'])) {
-		if (!empty($_REQUEST['RelayState']) && ((substr($_REQUEST['RelayState'], -strlen('/wp-login.php')) === '/wp-login.php') || (substr($_REQUEST['RelayState'], -strlen('/alternative_acs.php')) === '/alternative_acs.php'))) {
+		$relayState = sanitize_url( $_REQUEST['RelayState'], ['https','http']);
+
+		if (!empty($relayState) && ((substr($relayState, -strlen('/wp-login.php')) === '/wp-login.php') || (substr($relayState, -strlen('/alternative_acs.php')) === '/alternative_acs.php'))) {
 			wp_redirect(home_url());
 		} else {
-			if (strpos($_REQUEST['RelayState'], 'redirect_to') !== false) {
-				$query = wp_parse_url($_REQUEST['RelayState'], PHP_URL_QUERY);
+			if (strpos($relayState, 'redirect_to') !== false) {
+				$query = wp_parse_url($relayState, PHP_URL_QUERY);
 				parse_str($query, $parameters);
 				redirect_to_relaystate_if_trusted(urldecode($parameters['redirect_to']));
 			}  else {
-				redirect_to_relaystate_if_trusted($_REQUEST['RelayState']);
+				redirect_to_relaystate_if_trusted($relayState);
 			}
 		}
 	} else {
