@@ -164,7 +164,7 @@ class Settings
             'base' => $basePath,
             'config' => $basePath,
             'cert' => $basePath.'certs/',
-            'lib' => $basePath.'src/'
+            'lib' => $basePath.'src/Saml2/'
         );
 
         if (defined('ONELOGIN_CUSTOMPATH')) {
@@ -220,7 +220,21 @@ class Settings
      */
     public function getSchemasPath()
     {
-        return $this->_paths['lib'].'schemas/';
+        if (isset($this->_paths['schemas'])) {
+            return $this->_paths['schemas'];
+        }
+        return __DIR__ . '/schemas/';
+    }
+
+    /**
+     * Set schemas path
+     *
+     * @param string $path
+     * @return $this
+     */
+    public function setSchemasPath($path)
+    {
+        $this->_paths['schemas'] = $path;
     }
 
     /**
@@ -376,6 +390,16 @@ class Settings
         // Relax Destination validation
         if (!isset($this->_security['relaxDestinationValidation'])) {
             $this->_security['relaxDestinationValidation'] = false;
+        }
+
+        // Strict Destination match validation
+        if (!isset($this->_security['destinationStrictlyMatches'])) {
+            $this->_security['destinationStrictlyMatches'] = false;
+        }
+
+        // InResponseTo
+        if (!isset($this->_security['rejectUnsolicitedResponsesWithInResponseTo'])) {
+            $this->_security['rejectUnsolicitedResponsesWithInResponseTo'] = false;
         }
 
         // encrypt expected
@@ -924,7 +948,7 @@ class Settings
         assert(is_string($xml));
 
         $errors = array();
-        $res = Utils::validateXML($xml, 'saml-schema-metadata-2.0.xsd', $this->_debug);
+        $res = Utils::validateXML($xml, 'saml-schema-metadata-2.0.xsd', $this->_debug, $this->getSchemasPath());
         if (!$res instanceof DOMDocument) {
             $errors[] = $res;
         } else {
