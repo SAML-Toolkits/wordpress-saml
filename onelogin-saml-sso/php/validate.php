@@ -102,10 +102,10 @@ $lacked_attr_mappings = array();
 foreach ($attr_mappings as $field => $name) {
 	$value = get_option($field);
 	if (empty($value)) {
-		if ($account_matcher == 'username' && $field == 'onelogin_saml_attr_mapping_username') {
+		if ($account_matcher === 'username' && $field === 'onelogin_saml_attr_mapping_username') {
 			echo '<br>'.__("Username mapping is required in order to enable the SAML Single Sign On", 'onelogin-saml-sso').'<br>';
 		}
-		if ($account_matcher == 'email' && $field == 'onelogin_saml_attr_mapping_mail') {
+		if ($account_matcher === 'email' && $field === 'onelogin_saml_attr_mapping_mail') {
 			echo '<br>'.__("E-mail mapping is required in order to enable the SAML Single Sign On", 'onelogin-saml-sso').'<br>';
 		}
 		$lacked_attr_mappings[] = $name;
