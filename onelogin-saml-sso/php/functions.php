@@ -445,7 +445,7 @@ function saml_acs() {
 	do_action( 'onelogin_saml_attrs', $attrs, wp_get_current_user(), get_current_user_id() );
 
 	if (isset($_REQUEST['RelayState'])) {
-		$relayState = sanitize_url( $_REQUEST['RelayState'], ['https','http']);
+		$relayState = esc_url_raw( $_REQUEST['RelayState'], ['https','http']);
 
 		if (!empty($relayState) && ((substr($relayState, -strlen('/wp-login.php')) === '/wp-login.php') || (substr($relayState, -strlen('/alternative_acs.php')) === '/alternative_acs.php'))) {
 			wp_redirect(home_url());
