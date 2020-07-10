@@ -17,6 +17,8 @@ if (!current_user_can('manage_options')) {
 <form method="post" action="edit.php?action=network_saml_enabler">
 <?php
 
+wp_nonce_field('network_saml_enabler_validate');
+
 $opts = array('number' => 1000);
 $sites = get_sites($opts);
 

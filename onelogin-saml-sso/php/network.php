@@ -45,10 +45,10 @@ $option_group = 'onelogin_saml_configuration_network';
 			echo '<tr><th scope="row">'.$description.'</th>';
 			echo '<td>';
 
-			if ($section == 'role_mapping' && !in_array($name, $special_fields)) {
+			if ($section === 'role_mapping' && !in_array($name, $special_fields)) {
 				$role_value = str_replace('onelogin_saml_role_mapping_', '', $name);
 				call_user_func("plugin_setting_".$type."_onelogin_saml_role_mapping", $role_value, true);
-			} else if ($section == 'role_precedence') {
+			} else if ($section === 'role_precedence') {
 				$role_value = str_replace('onelogin_saml_role_order_', '', $name);
 				call_user_func("plugin_setting_".$type."_onelogin_saml_role_order", $role_value, true);
 			} else {
@@ -59,6 +59,8 @@ $option_group = 'onelogin_saml_configuration_network';
 		}
 		echo '</tbody></table>';
 	}
+
+
 
 	submit_button();
 

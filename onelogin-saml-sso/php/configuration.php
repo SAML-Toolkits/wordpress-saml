@@ -19,7 +19,7 @@ function sanitize_array_int($integers) {
 }
 
 function onelogin_saml_configuration_render() {
-	$title = __("SSO/SAML Settings", 'onelogin-saml-sso');
+	$config_title = __("SSO/SAML Settings", 'onelogin-saml-sso');
 	?>
 		<div class="wrap">
 			<div class="alignleft">
@@ -30,7 +30,7 @@ function onelogin_saml_configuration_render() {
 				<a href="<?php echo esc_url( get_site_url().'/wp-login.php?saml_validate_config' ); ?>" target="blank"><?php echo __("Once configured, validate here your OneLogin SSO/SAML Settings", 'onelogin-saml-sso');?></a>
 			</div>
 			<div style="clear:both"></div>
-			<h2><?php echo esc_html( $title ); ?></h2>
+			<h2><?php echo esc_html( $config_title ); ?></h2>
 			<form action="options.php" method="post">
 
 				<?php settings_fields('onelogin_saml_configuration'); ?>
@@ -72,19 +72,21 @@ function onelogin_saml_configuration() {
 	foreach ($fields as $section => $settings) {
 		foreach ($settings as $name => $data) {
 			$description = $data[0];
-			$type = $data[1];
+			$field_type = $data[1];
 			register_setting($option_group, $name);
-			if ($section == 'role_mapping' && !in_array($name, $special_fields)) {
+			if ($section === 'role_mapping' && !in_array($name, $special_fields, true)) {
 				$role_value = str_replace('onelogin_saml_role_mapping_', '', $name);
-				add_settings_field($name, $description, "plugin_setting_".$type."_onelogin_saml_role_mapping", $option_group, 'role_mapping', $role_value);
-			} else if ($section == 'role_precedence') {
+				add_settings_field($name, $description, "plugin_setting_".$field_type."_onelogin_saml_role_mapping", $option_group, 'role_mapping', $role_value);
+			} else if ($section === 'role_precedence') {
 				$role_value = str_replace('onelogin_saml_role_order_', '', $name);
-				add_settings_field($name, $description, "plugin_setting_".$type."_onelogin_saml_role_order", $option_group, 'role_precedence', $role_value);
+				add_settings_field($name, $description, "plugin_setting_".$field_type."_onelogin_saml_role_order", $option_group, 'role_precedence', $role_value);
 			} else {
-				add_settings_field($name, $description, "plugin_setting_".$type."_$name", $option_group, $section);
+				add_settings_field($name, $description, "plugin_setting_".$field_type."_$name", $option_group, $section);
 			}
 		}
 	}
+
+	wp_create_nonce('onelogin_saml_configuration');
 }
 
 function plugin_setting_boolean_onelogin_saml_enabled($network = false) {
@@ -165,8 +167,8 @@ function plugin_setting_boolean_onelogin_saml_keep_local_login($network = false)
 function plugin_setting_select_onelogin_saml_account_matcher($network = false) {
 	$value = $network ? get_site_option('onelogin_saml_account_matcher') : get_option('onelogin_saml_account_matcher');
 	echo '<select name="onelogin_saml_account_matcher" id="onelogin_saml_account_matcher">
-		  <option value="username" '.($value == 'username'?'selected="selected"':'').'>'.__("Username", 'onelogin-saml-sso').'</option>
-		  <option value="email" '.($value == 'email'? 'selected="selected"':'').'>'.__("E-mail", 'onelogin-saml-sso').'</option>
+		  <option value="username" '.($value === 'username'?'selected="selected"':'').'>'.__("Username", 'onelogin-saml-sso').'</option>
+		  <option value="email" '.($value === 'email'? 'selected="selected"':'').'>'.__("E-mail", 'onelogin-saml-sso').'</option>
 		</select>'.
 		'<p class="description">'.__('Select what field will be used in order to find the user account. If "email", the plugin will prevent the user from changing their email address in their user profile.', 'onelogin-saml-sso').'</p>';
 }
@@ -428,7 +430,7 @@ function plugin_setting_select_onelogin_saml_advanced_nameidformat($network = fa
 	echo '<select name="onelogin_saml_advanced_nameidformat" id="onelogin_saml_advanced_nameidformat">';
 
 	foreach ($posible_nameidformat_values as $key => $value) {
-		echo '<option value='.esc_attr($key).' '.($key == $nameidformat_value ? 'selected="selected"': '').' >'.esc_html($value).'</option>';
+		echo '<option value='.esc_attr($key).' '.($key === $nameidformat_value ? 'selected="selected"': '').' >'.esc_html($value).'</option>';
 	}
 
 	echo '</select>'.
@@ -458,7 +460,7 @@ function plugin_setting_select_onelogin_saml_advanced_requestedauthncontext($net
 	echo '<select multiple="multiple" name="onelogin_saml_advanced_requestedauthncontext[]" id="onelogin_saml_advanced_requestedauthncontext">';
 	echo '<option value=""></option>';
 	foreach ($posible_requestedauthncontext_values as $key => $value) {
-		echo '<option value='.esc_attr($key).' '.(in_array($key, $requestedauthncontext_values) ? 'selected="selected"': '').' >'.esc_html($value).'</option>';
+		echo '<option value='.esc_attr($key).' '.(in_array($key, $requestedauthncontext_values, true) ? 'selected="selected"': '').' >'.esc_html($value).'</option>';
 	}
 
 	echo '</select>'.
@@ -479,7 +481,7 @@ function plugin_setting_select_onelogin_saml_advanced_signaturealgorithm($networ
 	echo '<select name="onelogin_saml_advanced_signaturealgorithm" id="onelogin_saml_advanced_signaturealgorithm">';
 
 	foreach ($posible_signaturealgorithm_values as $key => $value) {
-		echo '<option value='.esc_attr($key).' '.($key == $signaturealgorithm_value ? 'selected="selected"': '').' >'.esc_html($value).'</option>';
+		echo '<option value='.esc_attr($key).' '.($key === $signaturealgorithm_value ? 'selected="selected"': '').' >'.esc_html($value).'</option>';
 	}
 
 	echo '</select>'.
@@ -498,7 +500,7 @@ function plugin_setting_select_onelogin_saml_advanced_digestalgorithm($network =
 	echo '<select name="onelogin_saml_advanced_digestalgorithm" id="onelogin_saml_advanced_digestalgorithm">';
 
 	foreach ($posible_digestalgorithm_values as $key => $value) {
-		echo '<option value='.esc_attr($key).' '.($key == $digestalgorithm_value ? 'selected="selected"': '').' >'.esc_html($value).'</option>';
+		echo '<option value='.esc_attr($key).' '.($key === $digestalgorithm_value ? 'selected="selected"': '').' >'.esc_html($value).'</option>';
 	}
 
 	echo '</select>'.
@@ -591,7 +593,8 @@ function onelogin_saml_configuration_multisite_save() {
 
 	foreach (array_keys($fields) as $section) {
 		foreach (array_keys($fields[$section]) as $name) {
-			update_site_option($name, wp_unslash($_POST[$name]));
+			$value = isset($_POST[$name]) ? $_POST[$name] : NULL;
+			update_site_option($name, wp_unslash($value));
 		}
 	}
 
@@ -606,8 +609,11 @@ function onelogin_saml_configuration_multisite_save() {
 function onelogin_saml_configuration_multisite_injection() {
 	$updated = false;
 	if (!empty($_POST) && isset($_POST['inject_saml_in_site'])) {
+		check_admin_referer('network_saml_injection_validate'); // Nonce security check
+
 		$fields = get_onelogin_saml_settings();
 		$sites = sanitize_array_int($_POST['inject_saml_in_site']);
+
 		foreach ($sites as $site_id) {
 			foreach (array_keys($fields) as $section) {
 				foreach (array_keys($fields[$section]) as $name) {
@@ -630,6 +636,7 @@ function onelogin_saml_configuration_multisite_injection() {
 function onelogin_saml_configuration_multisite_enabler() {
 	$updated = false;
 	if (!empty($_POST)) {
+		check_admin_referer('network_saml_enabler_validate'); // Nonce security check
 		$enable_on_sites = array();
 		if (isset($_POST['enable_saml_in_site'])) {
 			$enable_on_sites = sanitize_array_int($_POST['enable_saml_in_site']);
@@ -639,7 +646,7 @@ function onelogin_saml_configuration_multisite_enabler() {
         $sites = get_sites($opts);
 		foreach ($sites as $site) {
 			$value = false;
-			if (in_array($site->id, $enable_on_sites)) {
+			if (in_array($site->id, $enable_on_sites, true)) {
 				$value = "on";
 			}
 			update_blog_option($site->id, 'onelogin_saml_enabled', $value);
@@ -651,7 +658,6 @@ function onelogin_saml_configuration_multisite_enabler() {
 		'page' => 'network_saml_enabler',
 		'updated' => $updated ), network_admin_url('admin.php')
 	));
-
 	exit();
 }
 

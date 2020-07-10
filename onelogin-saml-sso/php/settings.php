@@ -62,8 +62,8 @@ $acs_endpoint = get_option('onelogin_saml_alternative_acs', false) ? plugins_url
 
 $settings = array (
 
-    'strict' => $opt['strict'] == 'on'? true : false,
-    'debug' => $opt['debug'] == 'on'? true : false,
+    'strict' => $opt['strict'] === 'on'? true : false,
+    'debug' => $opt['debug'] === 'on'? true : false,
 
     'sp' => array (
         'entityId' => (!empty($opt['sp_entity_id'])? $opt['sp_entity_id'] : 'php-saml'),
@@ -91,13 +91,13 @@ $settings = array (
 
     'security' => array (
         'signMetadata' => false,
-        'nameIdEncrypted' => $opt['nameIdEncrypted'] == 'on'? true: false,
-        'authnRequestsSigned' => $opt['authnRequestsSigned'] == 'on'? true: false,
-        'logoutRequestSigned' => $opt['logoutRequestSigned'] == 'on'? true: false,
-        'logoutResponseSigned' => $opt['logoutResponseSigned'] == 'on'? true: false,
-        'wantMessagesSigned' => $opt['wantMessagesSigned'] == 'on'? true: false,
-        'wantAssertionsSigned' => $opt['wantAssertionsSigned'] == 'on'? true: false,
-        'wantAssertionsEncrypted' => $opt['wantAssertionsEncrypted'] == 'on'? true: false,
+        'nameIdEncrypted' => $opt['nameIdEncrypted'] === 'on'? true: false,
+        'authnRequestsSigned' => $opt['authnRequestsSigned'] === 'on'? true: false,
+        'logoutRequestSigned' => $opt['logoutRequestSigned'] === 'on'? true: false,
+        'logoutResponseSigned' => $opt['logoutResponseSigned'] === 'on'? true: false,
+        'wantMessagesSigned' => $opt['wantMessagesSigned'] === 'on'? true: false,
+        'wantAssertionsSigned' => $opt['wantAssertionsSigned'] === 'on'? true: false,
+        'wantAssertionsEncrypted' => $opt['wantAssertionsEncrypted'] === 'on'? true: false,
         'wantNameId' => false,
         'requestedAuthnContext' => $opt['requestedAuthnContext'],
         'relaxDestinationValidation' => true,
