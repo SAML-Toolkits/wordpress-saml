@@ -436,13 +436,18 @@ function saml_acs() {
 		}
 		wp_set_auth_cookie($user_id, $rememberme);
 
-		setcookie(SAML_LOGIN_COOKIE, 1, time() + YEAR_IN_SECONDS, SITECOOKIEPATH );
-		setcookie(SAML_NAMEID_COOKIE, $auth->getNameId(), time() + YEAR_IN_SECONDS, SITECOOKIEPATH );
-		setcookie(SAML_SESSIONINDEX_COOKIE, $auth->getSessionIndex(), time() + YEAR_IN_SECONDS, SITECOOKIEPATH );
-		setcookie(SAML_NAMEID_FORMAT_COOKIE, $auth->getNameIdFormat(), time() + YEAR_IN_SECONDS, SITECOOKIEPATH );
+		setcookie(SAML_LOGIN_COOKIE, 1, time() + MONTH_IN_SECONDS, SITECOOKIEPATH );
+		setcookie(SAML_NAMEID_COOKIE, $auth->getNameId(), time() + MONTH_IN_SECONDS, SITECOOKIEPATH );
+		setcookie(SAML_SESSIONINDEX_COOKIE, $auth->getSessionIndex(), time() + MONTH_IN_SECONDS, SITECOOKIEPATH );
+		setcookie(SAML_NAMEID_FORMAT_COOKIE, $auth->getNameIdFormat(), time() + MONTH_IN_SECONDS, SITECOOKIEPATH );
 	}
 
 	do_action( 'onelogin_saml_attrs', $attrs, wp_get_current_user(), get_current_user_id() );
+
+	$triggerWPLoginHook = get_site_option('onelogin_saml_trigger_login_hook');
+	if ($triggerWPLoginHook) {
+		do_action( 'wp_login', $user->user_login, $user );
+	}
 
 	if (isset($_REQUEST['RelayState'])) {
 		$relayState = esc_url_raw( $_REQUEST['RelayState'], ['https','http']);
