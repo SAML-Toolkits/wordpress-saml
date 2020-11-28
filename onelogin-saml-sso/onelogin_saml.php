@@ -15,17 +15,23 @@ if ( !function_exists( 'add_action' ) ) {
 }
 
 // Allow cookie name overriding by defining following constants prior this point. Eg.: in wp-config.php.
-if ( false === defined( 'SAML_LOGIN_COOKIE' ) ) {
-	define( 'SAML_LOGIN_COOKIE', 'saml_login' );
+if (false === defined('SAML_LOGIN_COOKIE' )) {
+	define( 'SAML_LOGIN_COOKIE', 'saml_login');
 }
-if ( false === defined( 'SAML_NAMEID_COOKIE' ) ) {
-	define( 'SAML_NAMEID_COOKIE', 'saml_nameid' );
+if (false === defined('SAML_NAMEID_COOKIE')) {
+	define( 'SAML_NAMEID_COOKIE', 'saml_nameid');
 }
-if ( false === defined( 'SAML_SESSIONINDEX_COOKIE' ) ) {
-	define( 'SAML_SESSIONINDEX_COOKIE', 'saml_sessionindex' );
+if (false === defined('SAML_SESSIONINDEX_COOKIE')) {
+	define( 'SAML_SESSIONINDEX_COOKIE', 'saml_sessionindex');
 }
-if ( false === defined( 'SAML_NAMEID_FORMAT_COOKIE' ) ) {
-	define( 'SAML_NAMEID_FORMAT_COOKIE', 'saml_nameid_format' );
+if (false === defined('SAML_NAMEID_FORMAT_COOKIE')) {
+	define( 'SAML_NAMEID_FORMAT_COOKIE', 'saml_nameid_format');
+}
+if (false === defined('SAML_NAMEID_NAME_QUALIFIER_COOKIE')) {
+	define( 'SAML_NAMEID_NAME_QUALIFIER_COOKIE', 'saml_nameid_name_qualifier');
+}
+if (false === defined('SAML_NAMEID_SP_NAME_QUALIFIER_COOKIE')) {
+	define( 'SAML_NAMEID_SP_NAME_QUALIFIER_COOKIE', 'saml_nameid_name_sp_qualifier');
 }
 
 require_once plugin_dir_path(__FILE__)."php/functions.php";

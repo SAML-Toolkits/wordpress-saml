@@ -169,6 +169,8 @@ function saml_slo() {
 			$nameId = null;
 			$sessionIndex = null;
 			$nameIdFormat = null;
+			$samlNameIdNameQualifier = null;
+    		$samlNameIdSPNameQualifier = null;
 
 			if (isset($_COOKIE[SAML_NAMEID_COOKIE])) {
 				$nameId = sanitize_text_field($_COOKIE[SAML_NAMEID_COOKIE]);
@@ -179,13 +181,19 @@ function saml_slo() {
 			if (isset($_COOKIE[SAML_NAMEID_FORMAT_COOKIE])) {
 				$nameIdFormat = sanitize_text_field($_COOKIE[SAML_NAMEID_FORMAT_COOKIE]);
 			}
+			if (isset($_COOKIE[SAML_NAMEID_NAME_QUALIFIER_COOKIE])) {
+        		$nameIdNameQualifier = sanitize_text_field($_COOKIE[SAML_NAMEID_NAME_QUALIFIER_COOKIE]);
+    		}
+    		if (isset($_COOKIE[SAML_NAMEID_SP_NAME_QUALIFIER_COOKIE])) {
+        		$nameIdSPNameQualifier = sanitize_text_field($_COOKIE[SAML_NAMEID_SP_NAME_QUALIFIER_COOKIE]);
+    		}
 
 			$auth = initialize_saml();
 			if ($auth == false) {
 				wp_redirect(home_url());
 				exit();
 			}
-			$auth->logout(home_url(), array(), $nameId, $sessionIndex, false, $nameIdFormat);
+			$auth->logout(home_url(), array(), $nameId, $sessionIndex, false, $nameIdFormat, $nameIdNameQualifier, $nameIdSPNameQualifier);
 			return false;
 		}
 	}
@@ -436,10 +444,13 @@ function saml_acs() {
 		}
 		wp_set_auth_cookie($user_id, $rememberme);
 
-		setcookie(SAML_LOGIN_COOKIE, 1, time() + MONTH_IN_SECONDS, SITECOOKIEPATH );
-		setcookie(SAML_NAMEID_COOKIE, $auth->getNameId(), time() + MONTH_IN_SECONDS, SITECOOKIEPATH );
-		setcookie(SAML_SESSIONINDEX_COOKIE, $auth->getSessionIndex(), time() + MONTH_IN_SECONDS, SITECOOKIEPATH );
-		setcookie(SAML_NAMEID_FORMAT_COOKIE, $auth->getNameIdFormat(), time() + MONTH_IN_SECONDS, SITECOOKIEPATH );
+		$secure = is_ssl();
+		setcookie(SAML_LOGIN_COOKIE, 1, time() + MONTH_IN_SECONDS, SITECOOKIEPATH, COOKIE_DOMAIN, $secure, true);
+		setcookie(SAML_NAMEID_COOKIE, $auth->getNameId(), time() + MONTH_IN_SECONDS, SITECOOKIEPATH, COOKIE_DOMAIN, $secure, true);
+		setcookie(SAML_SESSIONINDEX_COOKIE, $auth->getSessionIndex(), time() + MONTH_IN_SECONDS, SITECOOKIEPATH, COOKIE_DOMAIN, $secure, true);
+		setcookie(SAML_NAMEID_FORMAT_COOKIE, $auth->getNameIdFormat(), time() + MONTH_IN_SECONDS, SITECOOKIEPATH, COOKIE_DOMAIN, $secure, true);
+		setcookie(SAML_NAMEID_NAME_QUALIFIER_COOKIE, $auth->getNameIdNameQualifier(), time() + MONTH_IN_SECONDS, SITECOOKIEPATH, COOKIE_DOMAIN, $secure, true);
+		setcookie(SAML_NAMEID_SP_NAME_QUALIFIER_COOKIE, $auth->getNameIdSPNameQualifier(), time() + MONTH_IN_SECONDS, SITECOOKIEPATH, COOKIE_DOMAIN, $secure, true);
 	}
 
 	do_action( 'onelogin_saml_attrs', $attrs, wp_get_current_user(), get_current_user_id() );
@@ -490,10 +501,13 @@ function saml_sls() {
 	$errors = $auth->getErrors();
 	if (empty($errors)) {
 		wp_logout();
-		setcookie(SAML_LOGIN_COOKIE, 0, time() - 3600, SITECOOKIEPATH );
-		setcookie(SAML_NAMEID_COOKIE, null, time() - 3600, SITECOOKIEPATH );
-		setcookie(SAML_SESSIONINDEX_COOKIE, null, time() - 3600, SITECOOKIEPATH );
-		setcookie(SAML_NAMEID_FORMAT_COOKIE, null, time() - 3600, SITECOOKIEPATH );
+		$secure = is_ssl();
+		setcookie(SAML_LOGIN_COOKIE, 0, time() - 3600, SITECOOKIEPATH, COOKIE_DOMAIN, $secure, true);
+		setcookie(SAML_NAMEID_COOKIE, null, time() - 3600, SITECOOKIEPATH, COOKIE_DOMAIN, $secure, true);
+		setcookie(SAML_SESSIONINDEX_COOKIE, null, time() - 3600, SITECOOKIEPATH, COOKIE_DOMAIN, $secure, true);
+		setcookie(SAML_NAMEID_FORMAT_COOKIE, null, time() - 3600, SITECOOKIEPATH, COOKIE_DOMAIN, $secure, true);
+		setcookie(SAML_NAMEID_NAME_QUALIFIER_COOKIE, null, time() - 3600, SITECOOKIEPATH, COOKIE_DOMAIN, $secure, true);
+		setcookie(SAML_NAMEID_SP_NAME_QUALIFIER_COOKIE, null, time() - 3600, SITECOOKIEPATH, COOKIE_DOMAIN, $secure, true);
 
 		if (get_option('onelogin_saml_forcelogin') && get_option('onelogin_saml_customize_stay_in_wordpress_after_slo')) {
 			wp_redirect(home_url().'/wp-login.php?loggedout=true');
