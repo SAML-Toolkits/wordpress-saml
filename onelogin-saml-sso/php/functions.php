@@ -41,7 +41,7 @@ function may_disable_saml() {
 	return false;
 }
 
-function get_domain() {
+function get_without() {
 	$protocols = array( 'http://', 'https://', 'http://www.', 'https://www.', 'www.' );
 	return str_replace($protocols, '', site_url());
 }
@@ -50,22 +50,24 @@ function redirect_to_relaystate_if_trusted($url) {
 	$trusted = false;
 	$trustedDomainsOpt = get_option('onelogin_saml_trusted_url_domains', "");
 	$trustedDomains = explode(",", trim($trustedDomainsOpt));
-	$trustedDomains[] = get_domain();
+	$trusted = !empty($trustedDomains) && checkIsExternalURLAllowed($url, $trustedDomains);
 
-	$trusted = checkURLAllowed($url, $trustedDomains);
+	if (!$trusted) {
+		$url = wp_validate_redirect($url, home_url());
+	}
 
 	if ($trusted) {
 		wp_redirect($url);
 	} else {
-		wp_redirect(home_url());
+		wp_redirect($url);
 	}
 }
 
-function checkURLAllowed($url, $trustedSites = [])
+function checkIsExternalURLAllowed($url, $trustedSites = [])
 {
-	// Allow Relative URL
+	// If seems Relative URL, convert into absolute and validate it
 	if ($url[0] === '/') {
-		return true;
+		$url = WP_Http::make_absolute_url($url, home_url());
 	}
 
 	if (!wp_http_validate_url($url)) {
@@ -94,10 +96,14 @@ function checkURLAllowed($url, $trustedSites = [])
 	) {
 		if (in_array($hostname.':'.$components['port'], $trustedSites, true)) {
 			return true;
+		} else {
+
 		}
 	}
 
-	return in_array($hostname, $trustedSites, true);
+	if (in_array($hostname, $trustedSites, true)) {
+		return true;
+	}
 }
 
 function saml_custom_login_footer() {
