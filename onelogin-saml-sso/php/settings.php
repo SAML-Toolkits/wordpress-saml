@@ -47,7 +47,7 @@ $opt['NameIDFormat'] = $posible_nameidformat_values[$nameIDformat];
 
 
 $requested_authncontext_values = get_option('onelogin_saml_advanced_requestedauthncontext', array());
-if (empty(array_filter($requested_authncontext_values))) {
+if ((is_array($requested_authncontext_values) && empty(array_filter($requested_authncontext_values))) || empty($requested_authncontext_values)) {
     $opt['requestedAuthnContext'] = false;
 } else {
     $opt['requestedAuthnContext'] = array();
