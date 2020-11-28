@@ -1,30 +1,11 @@
 <?php
-/**
- * This file is part of php-saml.
- *
- * (c) OneLogin Inc
- *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
- *
- * @package OneLogin
- * @author  OneLogin Inc <saml-info@onelogin.com>
- * @license MIT https://github.com/onelogin/php-saml/blob/master/LICENSE
- * @link    https://github.com/onelogin/php-saml
- */
-
-namespace OneLogin\Saml2;
-
-use RobRichards\XMLSecLibs\XMLSecurityKey;
-use RobRichards\XMLSecLibs\XMLSecurityDSig;
-
-use DOMDocument;
-use Exception;
 
 /**
  * Metadata lib of OneLogin PHP Toolkit
+ *
  */
-class Metadata
+
+class OneLogin_Saml2_Metadata
 {
     const TIME_VALID = 172800;  // 2 days
     const TIME_CACHED = 604800; // 1 week
@@ -35,7 +16,7 @@ class Metadata
      * @param array         $sp            The SP data
      * @param bool|string   $authnsign     authnRequestsSigned attribute
      * @param bool|string   $wsign         wantAssertionsSigned attribute
-     * @param int|null      $validUntil    Metadata's valid time
+     * @param DateTime|null $validUntil    Metadata's valid time
      * @param int|null      $cacheDuration Duration of the cache in seconds
      * @param array         $contacts      Contacts info
      * @param array         $organization  Organization ingo
@@ -49,7 +30,7 @@ class Metadata
         if (!isset($validUntil)) {
             $validUntil =  time() + self::TIME_VALID;
         }
-        $validUntilTime =  Utils::parseTime2SAML($validUntil);
+        $validUntilTime =  gmdate('Y-m-d\TH:i:s\Z', $validUntil);
 
         if (!isset($cacheDuration)) {
             $cacheDuration = self::TIME_CACHED;
@@ -193,28 +174,28 @@ METADATA_TEMPLATE;
     /**
      * Signs the metadata with the key/cert provided
      *
-     * @param string $metadata        SAML Metadata XML
-     * @param string $key             x509 key
-     * @param string $cert            x509 cert
-     * @param string $signAlgorithm   Signature algorithm method
+     * @param string $metadata SAML Metadata XML
+     * @param string $key x509 key
+     * @param string $cert x509 cert
+     * @param string $signAlgorithm Signature algorithm method
      * @param string $digestAlgorithm Digest algorithm method
      *
      * @return string Signed Metadata
      *
      * @throws Exception
      */
-    public static function signMetadata($metadata, $key, $cert, $signAlgorithm = XMLSecurityKey::RSA_SHA256, $digestAlgorithm = XMLSecurityDSig::SHA256)
+    public static function signMetadata($metadata, $key, $cert, $signAlgorithm = XMLSecurityKey::RSA_SHA1, $digestAlgorithm = XMLSecurityDSig::SHA1)
     {
-        return Utils::addSign($metadata, $key, $cert, $signAlgorithm, $digestAlgorithm);
+        return OneLogin_Saml2_Utils::addSign($metadata, $key, $cert, $signAlgorithm, $digestAlgorithm);
     }
 
     /**
-     * Adds the x509 descriptors (sign/encryption) to the metadata
+     * Adds the x509 descriptors (sign/encriptation) to the metadata
      * The same cert will be used for sign/encrypt
      *
-     * @param string $metadata       SAML Metadata XML
-     * @param string $cert           x509 cert
-     * @param bool   $wantsEncrypted Whether to include the KeyDescriptor for encryption
+     * @param string $metadata SAML Metadata XML
+     * @param string $cert x509 cert
+     * @param bool $wantsEncrypted Whether to include the KeyDescriptor for encryption
      *
      * @return string Metadata with KeyDescriptors
      *
@@ -226,7 +207,7 @@ METADATA_TEMPLATE;
         $xml->preserveWhiteSpace = false;
         $xml->formatOutput = true;
         try {
-            $xml = Utils::loadXML($xml, $metadata);
+            $xml = OneLogin_Saml2_Utils::loadXML($xml, $metadata);
             if (!$xml) {
                 throw new Exception('Error parsing metadata');
             }
@@ -234,16 +215,16 @@ METADATA_TEMPLATE;
             throw new Exception('Error parsing metadata. '.$e->getMessage());
         }
 
-        $formatedCert = Utils::formatCert($cert, false);
-        $x509Certificate = $xml->createElementNS(Constants::NS_DS, 'X509Certificate', $formatedCert);
+        $formatedCert = OneLogin_Saml2_Utils::formatCert($cert, false);
+        $x509Certificate = $xml->createElementNS(OneLogin_Saml2_Constants::NS_DS, 'X509Certificate', $formatedCert);
 
-        $keyData = $xml->createElementNS(Constants::NS_DS, 'ds:X509Data');
+        $keyData = $xml->createElementNS(OneLogin_Saml2_Constants::NS_DS, 'ds:X509Data');
         $keyData->appendChild($x509Certificate);
 
-        $keyInfo = $xml->createElementNS(Constants::NS_DS, 'ds:KeyInfo');
+        $keyInfo = $xml->createElementNS(OneLogin_Saml2_Constants::NS_DS, 'ds:KeyInfo');
         $keyInfo->appendChild($keyData);
 
-        $keyDescriptor = $xml->createElementNS(Constants::NS_MD, "md:KeyDescriptor");
+        $keyDescriptor = $xml->createElementNS(OneLogin_Saml2_Constants::NS_MD, "md:KeyDescriptor");
 
         $SPSSODescriptor = $xml->getElementsByTagName('SPSSODescriptor')->item(0);
         $SPSSODescriptor->insertBefore($keyDescriptor->cloneNode(), $SPSSODescriptor->firstChild);
