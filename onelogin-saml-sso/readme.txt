@@ -22,6 +22,17 @@ To mitigate that bug, place the script at the root of wordpress and execute it (
 
 == Changelog ==
 
+= 3.3.0 =
+* Add support for Nickname user field
+* Fix redirect protection. Absolute URLs failed and only relatives were accepted
+* Add support for saml_nameid_name_qualifier and saml_nameid_name_sp_qualifier which fixes detected issues on SLO process with ADFS
+* Add to setcookie method the cookie domain, secure flag and httponly
+* 
+* [#101](https://github.com/onelogin/wordpress-saml/issues/101) SAML request was improperly generated when requestedAuthNContext was empty.
+* Replace deprecated method (sanitize_url --> esc_url_raw )
+* Support triggering wp_login hook controller by a setting
+* Update php-saml to 3.5.0
+
 = 3.2.1 =
 * Sanitize inputs
 * Update php-saml to 3.4.1
