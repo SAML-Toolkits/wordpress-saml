@@ -93,6 +93,7 @@ $attr_mappings = array (
 	'onelogin_saml_attr_mapping_mail' => __('E-mail', 'onelogin-saml-sso'),
 	'onelogin_saml_attr_mapping_firstname' => __('First Name', 'onelogin-saml-sso'),
 	'onelogin_saml_attr_mapping_lastname' => __('Last Name', 'onelogin-saml-sso'),
+	'onelogin_saml_attr_mapping_nickname' => __('Nickname', 'onelogin-saml-sso'),
 	'onelogin_saml_attr_mapping_role' => __('Role', 'onelogin-saml-sso'),
 );
 

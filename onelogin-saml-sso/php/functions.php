@@ -41,11 +41,6 @@ function may_disable_saml() {
 	return false;
 }
 
-function get_without() {
-	$protocols = array( 'http://', 'https://', 'http://www.', 'https://www.', 'www.' );
-	return str_replace($protocols, '', site_url());
-}
-
 function redirect_to_relaystate_if_trusted($url) {
 	$trusted = false;
 	$trustedDomainsOpt = get_option('onelogin_saml_trusted_url_domains', "");
@@ -298,6 +293,7 @@ function saml_acs() {
 	if (!empty($attrs)) {
 		$firstNameMapping = get_option('onelogin_saml_attr_mapping_firstname');
 		$lastNameMapping = get_option('onelogin_saml_attr_mapping_lastname');
+		$nickNameMapping = get_option('onelogin_saml_attr_mapping_nickname');
 		$roleMapping = get_option('onelogin_saml_attr_mapping_role');
 
 		if (!empty($firstNameMapping) && isset($attrs[$firstNameMapping]) && !empty($attrs[$firstNameMapping][0])){
@@ -306,6 +302,9 @@ function saml_acs() {
 
 		if (!empty($lastNameMapping) && isset($attrs[$lastNameMapping])  && !empty($attrs[$lastNameMapping][0])){
 			$userdata['last_name'] = $attrs[$lastNameMapping][0];
+		}
+		if (!empty($nickNameMapping) && isset($attrs[$nickNameMapping])  && !empty($attrs[$nickNameMapping][0])){
+			$userdata['nickname'] = $attrs[$nickNameMapping][0];
 		}
 
 		if (!empty($roleMapping) && isset($attrs[$roleMapping])){

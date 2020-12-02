@@ -223,6 +223,13 @@ function plugin_setting_string_onelogin_saml_attr_mapping_lastname($network = fa
 		  value= "'.esc_attr($value).'" size="30">';
 }
 
+function plugin_setting_string_onelogin_saml_attr_mapping_nickname($network = false) {
+	$value = $network ? get_site_option('onelogin_saml_attr_mapping_nickname') : get_option('onelogin_saml_attr_mapping_nickname');
+	echo '<input type="text" name="onelogin_saml_attr_mapping_nickname" id="onelogin_saml_attr_mapping_nickname"
+		  value= "'.esc_attr($value).'" size="30">'.
+		  '<p class="description">'.__("If not provided, default  value is the user's username.");
+}
+
 function plugin_setting_string_onelogin_saml_attr_mapping_rememberme($network = false) {
 	$value = $network ? get_site_option('onelogin_saml_attr_mapping_rememberme') : get_option('onelogin_saml_attr_mapping_rememberme');
 	echo '<input type="text" name="onelogin_saml_attr_mapping_rememberme" id="onelogin_saml_attr_mapping_rememberme"
@@ -787,6 +794,10 @@ function get_onelogin_saml_settings_attribute_mapping() {
 		),
 		'onelogin_saml_attr_mapping_lastname' =>  array(
 			__('Last Name', 'onelogin-saml-sso'),
+			'string'
+		),
+		'onelogin_saml_attr_mapping_nickname' =>  array(
+			__('Nickname', 'onelogin-saml-sso'),
 			'string'
 		),
 		'onelogin_saml_attr_mapping_role' =>  array(
