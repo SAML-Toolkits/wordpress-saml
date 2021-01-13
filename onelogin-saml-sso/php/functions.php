@@ -461,9 +461,16 @@ function saml_acs() {
 
 	do_action( 'onelogin_saml_attrs', $attrs, wp_get_current_user(), get_current_user_id() );
 
-	$triggerWPLoginHook = get_site_option('onelogin_saml_trigger_login_hook');
-	if ($triggerWPLoginHook) {
-		do_action( 'wp_login', $user->user_login, $user );
+	// Trigger the wp_login hook used by wp_signon()
+	// @see https://developer.wordpress.org/reference/hooks/wp_login/
+	$trigger_wp_login_hook = get_site_option( 'onelogin_saml_trigger_login_hook' );
+
+	if ( $trigger_wp_login_hook ) {
+		$user = get_user_by( 'id', $user_id );
+
+		if ( false !== $user ) {
+			do_action( 'wp_login', $user->user_login, $user );
+		}
 	}
 
 	if (isset($_REQUEST['RelayState'])) {
