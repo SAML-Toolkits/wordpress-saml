@@ -56,6 +56,7 @@ function redirect_to_relaystate_if_trusted($url) {
 	} else {
 		wp_redirect($url);
 	}
+	exit();
 }
 
 function checkIsExternalURLAllowed($url, $trustedSites = [])
