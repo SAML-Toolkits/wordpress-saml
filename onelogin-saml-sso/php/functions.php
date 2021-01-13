@@ -54,7 +54,7 @@ function redirect_to_relaystate_if_trusted($url) {
 	if ($trusted) {
 		wp_redirect($url);
 	} else {
-		wp_redirect($url);
+		wp_redirect(home_url());
 	}
 	exit();
 }
