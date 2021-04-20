@@ -352,6 +352,7 @@ function saml_acs() {
 	}
 
 	$matcher = get_option('onelogin_saml_account_matcher');
+	$newuser = false;
 
 	if (empty($matcher) || $matcher == 'username') {
 		$matcherValue = $userdata['user_login'];
@@ -399,6 +400,7 @@ function saml_acs() {
 			}
 		}
 	} else if (get_option('onelogin_saml_autocreate')) {
+		$newuser = true;
 		if (!validate_username($username)) {
 			echo __("The username provided by the IdP"). ' "'. esc_attr($username). '" '. __("is not valid and can't create the user at wordpress");
 			exit();
@@ -455,7 +457,7 @@ function saml_acs() {
 		setcookie(SAML_NAMEID_SP_NAME_QUALIFIER_COOKIE, $auth->getNameIdSPNameQualifier(), time() + MONTH_IN_SECONDS, SITECOOKIEPATH, COOKIE_DOMAIN, $secure, true);
 	}
 
-	do_action( 'onelogin_saml_attrs', $attrs, wp_get_current_user(), get_current_user_id() );
+	do_action( 'onelogin_saml_attrs', $attrs, wp_get_current_user(), get_current_user_id(), $newuser);
 
 	// Trigger the wp_login hook used by wp_signon()
 	// @see https://developer.wordpress.org/reference/hooks/wp_login/
