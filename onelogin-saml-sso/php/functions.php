@@ -144,7 +144,10 @@ function saml_sso() {
 		wp_redirect(home_url());
 		exit();
 	}
-	if (isset($_SERVER['REQUEST_URI']) && !isset($_GET['saml_sso'])) {
+
+	if (isset($_GET["target"])) {
+		$auth->login($_GET["target"]);
+	} else if (isset($_SERVER['REQUEST_URI']) && !isset($_GET['saml_sso'])) {
 		$auth->login($_SERVER['REQUEST_URI']);
 	} else {
 		$auth->login();
