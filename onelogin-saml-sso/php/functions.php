@@ -244,6 +244,25 @@ function saml_acs() {
 
 	$errors = $auth->getErrors();
 	if (!empty($errors)) {
+		// Don't raise an error on passive mode
+		$errorReason = $auth->getLastErrorReason();
+		if (strpos($errorReason, 'Responder') != false && strpos($errorReason, 'NoPassive') !== false ) {
+			$relayState = esc_url_raw( $_REQUEST['RelayState'], ['https','http']);
+
+			if (empty($relayState)) {
+				wp_redirect(home_url());
+			} else {
+				if (strpos($relayState, 'redirect_to') !== false) {
+					$query = wp_parse_url($relayState, PHP_URL_QUERY);
+					parse_str($query, $parameters);
+					redirect_to_relaystate_if_trusted(urldecode($parameters['redirect_to']));
+				}  else {
+					redirect_to_relaystate_if_trusted($relayState);
+				}
+				exit();
+			}
+		}
+
 		echo '<br>'.__("There was at least one error processing the SAML Response").': ';
 		foreach($errors as $error) {
 			echo esc_html($error).'<br>';
