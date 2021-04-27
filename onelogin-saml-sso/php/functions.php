@@ -246,7 +246,7 @@ function saml_acs() {
 	if (!empty($errors)) {
 		// Don't raise an error on passive mode
 		$errorReason = $auth->getLastErrorReason();
-		if (strpos($errorReason, 'Responder') != false && strpos($errorReason, 'NoPassive') !== false ) {
+		if (strpos($errorReason, 'Responder') != false && strpos($errorReason, 'Passive') !== false ) {
 			$relayState = esc_url_raw( $_REQUEST['RelayState'], ['https','http']);
 
 			if (empty($relayState)) {
@@ -259,8 +259,8 @@ function saml_acs() {
 				}  else {
 					redirect_to_relaystate_if_trusted($relayState);
 				}
-				exit();
 			}
+			exit();
 		}
 
 		echo '<br>'.__("There was at least one error processing the SAML Response").': ';
