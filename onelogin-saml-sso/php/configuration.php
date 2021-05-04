@@ -175,7 +175,7 @@ function plugin_setting_boolean_onelogin_saml_trigger_login_hook($network = fals
 	$value = $network ? get_site_option('onelogin_saml_trigger_login_hook') : get_option('onelogin_saml_trigger_login_hook');
 	echo '<input type="checkbox" name="onelogin_saml_trigger_login_hook" id="onelogin_saml_trigger_login_hook"
 		  '.($value ? 'checked="checked"': '').'>'.
-		  '<p class="description">'.__('When enabled, the wp_login hook will be trieggered.', 'onelogin-saml-sso').'</p>';
+		  '<p class="description">'.__('When enabled, the wp_login hook will be triggered.', 'onelogin-saml-sso').'</p>';
 }
 
 function plugin_setting_boolean_onelogin_saml_multirole($network = false) {
