@@ -104,7 +104,12 @@ function saml_custom_login_footer() {
 		$saml_login_message = "SAML Login";
 	}
 
-	echo '<div style="font-size: 110%;padding:8px;background: #fff;text-align: center;"><a href="'.esc_url( get_site_url().'/wp-login.php?saml_sso') .'">'.esc_html($saml_login_message).'</a></div>';
+	$login_page = 'wp-login.php';
+	if (is_plugin_active('wps-hide-login/wps-hide-login.php')) {
+		$login_page = str_replace( 'wp-login.php', get_site_option( 'whl_page', 'login' ), $login_page ) . '/';
+	}
+	
+	echo '<div style="font-size: 110%;padding:8px;background: #fff;text-align: center;"><a href="'.esc_url( get_site_url().'/'.$login_page.'?saml_sso') .'">'.esc_html($saml_login_message).'</a></div>';
 }
 
 function saml_load_translations() {
