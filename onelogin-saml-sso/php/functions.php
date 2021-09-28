@@ -109,7 +109,8 @@ function saml_custom_login_footer() {
 		$login_page = str_replace( 'wp-login.php', get_site_option( 'whl_page', 'login' ), $login_page ) . '/';
 	}
 	
-	echo '<div style="font-size: 110%;padding:8px;background: #fff;text-align: center;"><a href="'.esc_url( get_site_url().'/'.$login_page.'?saml_sso') .'">'.esc_html($saml_login_message).'</a></div>';
+	$redirect_to = isset($_GET['redirect_to']) ? '&redirect_to='.$_GET['redirect_to'] : '';
+	echo '<div style="font-size: 110%;padding:8px;background: #fff;text-align: center;"><a href="'.esc_url( get_site_url().'/'.$login_page.'?saml_sso'.$redirect_to) .'">'.esc_html($saml_login_message).'</a></div>';
 }
 
 function saml_load_translations() {
@@ -152,6 +153,8 @@ function saml_sso() {
 
 	if (isset($_GET["target"])) {
 		$auth->login($_GET["target"]);
+	} else if (isset($_GET['redirect_to'])) {
+		$auth->login($_GET['redirect_to']);
 	} else if (isset($_SERVER['REQUEST_URI']) && !isset($_GET['saml_sso'])) {
 		$auth->login($_SERVER['REQUEST_URI']);
 	} else {
