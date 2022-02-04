@@ -23,7 +23,6 @@ To mitigate that bug, place the script at the root of wordpress and execute it (
 == Changelog ==
 = 3.4.0 =
 * Update php-saml to 3.6.1 and xmlseclibs to 3.1.1
-* 
 * Support Passive mode and don't raise error when passive authentication failed
 * Allow set desired target on saml_sso endpoint by the use of a 'target' GET parameter
 * Add new parameter to determine if the account was created or already existed
