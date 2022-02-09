@@ -392,6 +392,8 @@ function saml_acs() {
 		$user_id = email_exists($matcherValue);
 	}
 
+	do_action('onelogin_saml_attrs_pre_setup_user', $attrs);
+
 	if ($user_id) {
 		if (is_multisite()) {
 			if (get_site_option('onelogin_network_saml_global_jit')) {
@@ -457,7 +459,7 @@ function saml_acs() {
 				add_roles_to_user($user_id, $roles);
 			}
 		}
-	} else {
+	} elseif (apply_filters('onelogin_saml_show_no_user_error_response', true)) {
 		echo __("User provided by the IdP "). ' "'. esc_attr($matcherValue). '" '. __("does not exist in wordpress and auto-provisioning is disabled.");
 		exit();
 	}
@@ -470,6 +472,8 @@ function saml_acs() {
 		exit();
 	} else if ($user_id) {
 		wp_set_current_user($user_id);
+
+		do_action( 'onelogin_saml_attrs', $attrs, wp_get_current_user(), get_current_user_id(), $newuser);
 		
 		$rememberme = false;
 		$remembermeMapping = get_option('onelogin_saml_attr_mapping_rememberme');
@@ -487,8 +491,6 @@ function saml_acs() {
 		setcookie(SAML_NAMEID_SP_NAME_QUALIFIER_COOKIE, $auth->getNameIdSPNameQualifier(), time() + MONTH_IN_SECONDS, SITECOOKIEPATH, COOKIE_DOMAIN, $secure, true);
 	}
 
-	do_action( 'onelogin_saml_attrs', $attrs, wp_get_current_user(), get_current_user_id(), $newuser);
-
 	// Trigger the wp_login hook used by wp_signon()
 	// @see https://developer.wordpress.org/reference/hooks/wp_login/
 	$trigger_wp_login_hook = get_site_option( 'onelogin_saml_trigger_login_hook' );
@@ -505,7 +507,7 @@ function saml_acs() {
 		$relayState = esc_url_raw( $_REQUEST['RelayState'], ['https','http']);
 
 		if (!empty($relayState) && ((substr($relayState, -strlen('/wp-login.php')) === '/wp-login.php') || (substr($relayState, -strlen('/alternative_acs.php')) === '/alternative_acs.php'))) {
-			wp_redirect(home_url());
+			wp_redirect( apply_filters('onelogin_saml_after_login_redirect_url', home_url()) );
 		} else {
 			if (strpos($relayState, 'redirect_to') !== false) {
 				$query = wp_parse_url($relayState, PHP_URL_QUERY);
@@ -516,7 +518,7 @@ function saml_acs() {
 			}
 		}
 	} else {
-		wp_redirect(home_url());
+		wp_redirect( apply_filters('onelogin_saml_after_login_redirect_url', home_url()) );
 	}
 	exit();
 }
