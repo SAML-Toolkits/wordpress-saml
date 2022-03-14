@@ -178,8 +178,8 @@ function saml_slo() {
 			$nameId = null;
 			$sessionIndex = null;
 			$nameIdFormat = null;
-			$samlNameIdNameQualifier = null;
-			$samlNameIdSPNameQualifier = null;
+			$nameIdNameQualifier = null;
+			$nameIdSPNameQualifier = null;
 
 			if (isset($_COOKIE[SAML_NAMEID_COOKIE])) {
 				$nameId = sanitize_text_field($_COOKIE[SAML_NAMEID_COOKIE]);
