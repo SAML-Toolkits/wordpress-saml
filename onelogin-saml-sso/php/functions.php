@@ -143,6 +143,13 @@ function saml_sso() {
 	}
 
 	if (is_user_logged_in()) {
+		if (isset($_GET["target"])) {
+			wp_redirect($_GET["target"]);
+			exit();
+		} else if (isset($_GET['redirect_to'])) {
+			wp_redirect($_GET['redirect_to']);
+			exit();
+		}
 		return true;
 	}
 	$auth = initialize_saml();
@@ -202,6 +209,7 @@ function saml_slo() {
 				wp_redirect(home_url());
 				exit();
 			}
+			
 			$auth->logout(home_url(), array(), $nameId, $sessionIndex, false, $nameIdFormat, $nameIdNameQualifier, $nameIdSPNameQualifier);
 			return false;
 		}
