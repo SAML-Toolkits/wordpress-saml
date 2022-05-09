@@ -99,6 +99,11 @@ function checkIsExternalURLAllowed($url, $trustedSites = [])
 }
 
 function saml_custom_login_footer() {
+
+	if (!function_exists('is_plugin_active')) {
+		include_once ABSPATH . 'wp-admin/includes/plugin.php';
+	}
+
 	$saml_login_message = get_option('onelogin_saml_customize_links_saml_login');
 	if (empty($saml_login_message)) {
 		$saml_login_message = "SAML Login";
