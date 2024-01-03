@@ -105,8 +105,9 @@ function saml_custom_login_footer() {
 	}
 
 	$login_page = 'wp-login.php';
-	if (is_plugin_active('wps-hide-login/wps-hide-login.php')) {
-		$login_page = str_replace( 'wp-login.php', get_site_option( 'whl_page', 'login' ), $login_page ) . '/';
+	$active_plugins = get_option( 'active_plugins' );
+	if ( is_array( $active_plugins ) && ! empty( $active_plugins ) && in_array( 'wps-hide-login/wps-hide-login.php', $active_plugins, true ) ) {
+		$login_page = str_replace( 'wp-login.php', esc_url( get_site_option( 'whl_page', 'login' ) ), $login_page ) . '/';
 	}
 	
 	$redirect_to = isset($_GET['redirect_to']) ? '&redirect_to='.$_GET['redirect_to'] : '';
