@@ -313,8 +313,8 @@ function saml_acs() {
 		exit();
 	} else {
 		$userdata = array();
-		$userdata['user_login'] = wp_slash($username);
-		$userdata['user_email'] = wp_slash($email);
+		$userdata['user_login'] = wp_unslash($username);
+		$userdata['user_email'] = wp_unslash($email);
 	}
 
 	if (!empty($attrs)) {
