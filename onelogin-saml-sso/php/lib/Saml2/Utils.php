@@ -763,7 +763,7 @@ class Utils
      */
     public static function generateUniqueID()
     {
-        return 'ONELOGIN_' . sha1(uniqid((string)mt_rand(), true));
+        return 'ONELOGIN_' . sha1(random_bytes(20));
     }
 
     /**
@@ -961,7 +961,7 @@ class Utils
      *
      * @return DOMNodeList The queried nodes
      */
-    public static function query(DOMDocument $dom, $query, DOMElement $context = null)
+    public static function query(DOMDocument $dom, $query, ?DOMElement $context = null)
     {
         $xpath = new DOMXPath($dom);
         $xpath->registerNamespace('samlp', Constants::NS_SAMLP);

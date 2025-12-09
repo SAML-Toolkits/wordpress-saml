@@ -272,7 +272,10 @@ class Response
 
                 // Check destination
                 if ($this->document->documentElement->hasAttribute('Destination')) {
-                    $destination = trim($this->document->documentElement->getAttribute('Destination'));
+                    $destination = $this->document->documentElement->getAttribute('Destination');
+                    if (isset($destination)) {
+                        $destination = trim($destination);
+                    }
                     if (empty($destination)) {
                         if (!$security['relaxDestinationValidation']) {
                             throw new ValidationError(
@@ -298,12 +301,9 @@ class Response
                 // Check audience
                 $validAudiences = $this->getAudiences();
                 if (!empty($validAudiences) && !in_array($spEntityId, $validAudiences, true)) {
+                    $validAudiencesStr = implode(',', $validAudiences);
                     throw new ValidationError(
-                        sprintf(
-                            "Invalid audience for this Response (expected '%s', got '%s')",
-                            $spEntityId,
-                            implode(',', $validAudiences)
-                        ),
+                        "Invalid audience for this Response (expected '".$spEntityId."', got '".$validAudiencesStr."')",
                         ValidationError::WRONG_AUDIENCE
                     );
                 }
@@ -311,12 +311,14 @@ class Response
                 // Check the issuers
                 $issuers = $this->getIssuers();
                 foreach ($issuers as $issuer) {
-                    $trimmedIssuer = trim($issuer);
-                    if (empty($trimmedIssuer) || $trimmedIssuer !== $idPEntityId) {
-                        throw new ValidationError(
-                            "Invalid issuer in the Assertion/Response (expected '$idPEntityId', got '$trimmedIssuer')",
-                            ValidationError::WRONG_ISSUER
-                        );
+                    if (isset($issuer)) {
+                        $trimmedIssuer = trim($issuer);
+                        if (empty($trimmedIssuer) || $trimmedIssuer !== $idPEntityId) {
+                            throw new ValidationError(
+                                "Invalid issuer in the Assertion/Response (expected '".$idPEntityId."', got '".$trimmedIssuer."')",
+                                ValidationError::WRONG_ISSUER
+                            );
+                        }
                     }
                 }
 
@@ -546,7 +548,10 @@ class Response
 
         $entries = $this->_queryAssertion('/saml:Conditions/saml:AudienceRestriction/saml:Audience');
         foreach ($entries as $entry) {
-            $value = trim($entry->textContent);
+            $value = $entry->textContent;
+            if (isset($value)) {
+                $value = trim($value);
+            }
             if (!empty($value)) {
                 $audiences[] = $value;
             }
@@ -651,7 +656,7 @@ class Response
                         $spEntityId = $spData['entityId'];
                         if ($spEntityId != $nameId->getAttribute($attr)) {
                             throw new ValidationError(
-                                "The SPNameQualifier value mistmatch the SP entityID value.",
+                                "The SPNameQualifier value mismatch the SP entityID value.",
                                 ValidationError::SP_NAME_QUALIFIER_NAME_MISMATCH
                             );
                         }
@@ -1261,13 +1266,19 @@ class Response
     /**
      * After execute a validation process, if fails this method returns the cause
      *
+     * @param bool $escape Apply or not htmlentities to the message.
+     *
      * @return null|string Error reason
      */
-    public function getError()
+    public function getError($escape = true)
     {
         $errorMsg = null;
         if (isset($this->_error)) {
-            $errorMsg = htmlentities($this->_error->getMessage());
+            if ($escape) {
+                $errorMsg = htmlentities($this->_error->getMessage());
+            } else {
+                $errorMsg = $this->_error->getMessage();
+            }
         }
         return $errorMsg;
     }
