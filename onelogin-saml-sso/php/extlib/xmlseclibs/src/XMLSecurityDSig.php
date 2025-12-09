@@ -293,7 +293,11 @@ class XMLSecurityDSig
             }
         }
 
-        return $node->C14N($exclusive, $withComments, $arXPath, $prefixList);
+        $ret = $node->C14N($exclusive, $withComments, $arXPath, $prefixList);
+        if ($ret === false) {
+            throw new Exception("Canonicalization failed");
+        }
+        return $ret;
     }
 
     /**
@@ -1050,7 +1054,7 @@ class XMLSecurityDSig
                             }
                             $subjectNameValue = implode(',', $parts);
                         } else {
-                            $subjectNameValue = $certData['issuer'];
+                            $subjectNameValue = $certData['subject'];
                         }
                         $x509SubjectNode = $baseDoc->createElementNS(self::XMLDSIGNS, $dsig_pfx.'X509SubjectName', $subjectNameValue);
                         $x509DataNode->appendChild($x509SubjectNode);
