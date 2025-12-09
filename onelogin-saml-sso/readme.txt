@@ -21,6 +21,14 @@ If you used this plugin before 2.2.0 with just-in-time provision active, Read: h
 To mitigate that bug, place the script at the root of wordpress and execute it (later remove it) https://gist.github.com/pitbulk/a8223c90a3534e9a7d5e0a93009a094f
 
 == Changelog ==
+
+= 3.6.0 =
+* Update php-saml to 4.3.1 (PHP8 compatibility)
+
+= 3.5.0 =
+* Security: Update xmlseclibs to 3.1.4 due CVE-2025-66475
+* Update php-saml to 3.8.1
+
 = 3.4.0 =
 * Update php-saml to 3.6.1 and xmlseclibs to 3.1.1
 * Support Passive mode and don't raise error when passive authentication failed

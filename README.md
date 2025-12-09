@@ -12,6 +12,10 @@ You will need to contact them in order to disable the cache for this SAML plugin
 wp-login.php
 
 
+### PHP Compatibility on 3.6.0 ###
+
+Version 3.6.0 is compatible with PHP 8.X (php-saml 4.3.1)
+
 ### Security Improvements on 3.5.0 ###
 
 Version 3.5.0 includes a security patch for xmlseclibs (CVE-2025-66475) . Updated to version 3.1.4
