@@ -18,11 +18,11 @@ function saml_checker() {
 			exit();
 		}
 		saml_acs();
-	} else if (isset($_GET['saml_sls'])) {
+	} elseif (isset($_GET['saml_sls'])) {
 		saml_sls();
-	} else if (isset($_GET['saml_metadata'])) {
+	} elseif (isset($_GET['saml_metadata'])) {
 		saml_metadata();
-	} else if (isset($_GET['saml_validate_config'])) {
+	} elseif (isset($_GET['saml_validate_config'])) {
 		saml_validate_config();
 	}
 }
@@ -57,6 +57,10 @@ function redirect_to_relaystate_if_trusted($url) {
 
 function checkIsExternalURLAllowed($url, $trustedSites = [])
 {
+	if (empty($url)) {
+		return false;
+	}
+
 	// If seems Relative URL, convert into absolute and validate it
 	if ($url[0] === '/') {
 		$url = WP_Http::make_absolute_url($url, home_url());
@@ -88,14 +92,119 @@ function checkIsExternalURLAllowed($url, $trustedSites = [])
 	) {
 		if (in_array($hostname.':'.$components['port'], $trustedSites, true)) {
 			return true;
-		} else {
-
 		}
 	}
 
 	if (in_array($hostname, $trustedSites, true)) {
 		return true;
 	}
+
+	return false;
+}
+
+function saml_scan_svg_content($svg_content) {
+	$issues = array();
+	if (empty($svg_content) || !is_string($svg_content)) {
+		return $issues;
+	}
+
+	$svg_content = trim($svg_content);
+	if ($svg_content === '') {
+		return $issues;
+	}
+
+	// Detect embedded DTDs/entities and other XML attack surface.
+	if (preg_match('/<!DOCTYPE\s+/i', $svg_content) || preg_match('/<!ENTITY\s+/i', $svg_content)) {
+		$issues[] = 'SVG contains DTD or ENTITY declarations, which are unsafe.';
+	}
+
+	$dangerous_tags = array(
+		'script',
+		'foreignObject',
+		'iframe',
+		'object',
+		'embed',
+		'audio',
+		'video',
+		'meta',
+		'animate',
+		'set',
+		'feDisplacementMap',
+		'feGaussianBlur',
+		'feColorMatrix',
+		'feComponentTransfer'
+	);
+
+	$dangerous_attributes = array(
+		'onload',
+		'onerror',
+		'onfocus',
+		'onmouseenter',
+		'onmouseleave',
+		'onclick',
+		'onmouseover',
+		'onabort',
+		'xmlns:xlink',
+		'xlink:href',
+		'href',
+		'src',
+		'formaction',
+		'style',
+		'persist',
+		'javaScript'
+	);
+
+	$external_uri_pattern = '/^(?:https?:|data:|javascript:|mailto:)/i';
+
+	if (class_exists('DOMDocument')) {
+		$dom = new DOMDocument();
+		libxml_use_internal_errors(true);
+		$prev = libxml_disable_entity_loader(true);
+		if (@$dom->loadXML($svg_content) !== false) {
+			$xpath = new DOMXPath($dom);
+			foreach ($dangerous_tags as $tag) {
+				$nodes = $xpath->query('//*[name() = "' . $tag . '"]');
+				if ($nodes->length > 0) {
+					$issues[] = 'SVG contains dangerous tag: ' . $tag . '.';
+				}
+			}
+
+			$all_nodes = $dom->getElementsByTagName('*');
+			foreach ($all_nodes as $node) {
+				foreach ($dangerous_attributes as $attr) {
+					if ($node->hasAttribute($attr)) {
+						$value = $node->getAttribute($attr);
+						$issues[] = sprintf('SVG contains dangerous attribute %s on <%s>.', $attr, $node->nodeName);
+						if (preg_match($external_uri_pattern, $value)) {
+							$issues[] = sprintf('SVG contains external reference in %s: %s', $attr, $value);
+						}
+					}
+				}
+			}
+		}
+		libxml_disable_entity_loader($prev);
+	} else {
+		// Fallback if DOMDocument is unavailable.
+		foreach ($dangerous_tags as $tag) {
+			if (preg_match('/<\s*' . preg_quote($tag, '/') . '\b/i', $svg_content)) {
+				$issues[] = 'SVG contains dangerous tag: ' . $tag . '.';
+			}
+		}
+		foreach ($dangerous_attributes as $attr) {
+			if (preg_match('/\b' . preg_quote($attr, '/') . '\s*=\s*["\"]/i', $svg_content, $matches)) {
+				$issues[] = 'SVG contains dangerous attribute: ' . $attr . '.';
+			}
+		}
+		if (preg_match($external_uri_pattern, $svg_content, $match)) {
+			$issues[] = 'SVG contains an external URI reference: ' . $match[0];
+		}
+	}
+
+	return array_unique($issues);
+}
+
+function saml_is_suspicious_svg($svg_content) {
+	return !empty(saml_scan_svg_content($svg_content));
 }
 
 function saml_custom_login_footer() {
@@ -108,9 +217,15 @@ function saml_custom_login_footer() {
 	if (is_plugin_active('wps-hide-login/wps-hide-login.php')) {
 		$login_page = str_replace( 'wp-login.php', get_site_option( 'whl_page', 'login' ), $login_page ) . '/';
 	}
-	
-	$redirect_to = isset($_GET['redirect_to']) ? '&redirect_to='.$_GET['redirect_to'] : '';
-	echo '<div style="font-size: 110%;padding:8px;background: #fff;text-align: center;"><a href="'.esc_url( get_site_url().'/'.$login_page.'?saml_sso'.$redirect_to) .'">'.esc_html($saml_login_message).'</a></div>';
+
+	$redirect_to = '';
+	if (isset($_GET['redirect_to'])) {
+		$redirect_to_value = rawurlencode( sanitize_text_field( wp_unslash( $_GET['redirect_to'] ) ) );
+		$redirect_to = '&redirect_to=' . $redirect_to_value;
+	}
+
+	$url = get_site_url() . '/' . $login_page . '?saml_sso' . $redirect_to;
+	echo '<div style="font-size: 110%;padding:8px;background: #fff;text-align: center;"><a href="' . esc_url( $url ) . '">' . esc_html($saml_login_message) . '</a></div>';
 }
 
 function saml_load_translations() {
@@ -124,7 +239,8 @@ function saml_load_translations() {
 function saml_lostpassword() {
 	$target = get_option('onelogin_saml_customize_links_lost_password');
 	if (!empty($target)) {
-		wp_redirect($target);
+		$target = esc_url_raw( $target );
+		wp_safe_redirect( $target ? $target : home_url() );
 		exit;
 	}
 }
@@ -132,7 +248,8 @@ function saml_lostpassword() {
 function saml_user_register() {
 	$target = get_option('onelogin_saml_customize_links_user_registration');
 	if (!empty($target)) {
-		wp_redirect($target);
+		$target = esc_url_raw( $target );
+		wp_safe_redirect( $target ? $target : home_url() );
 		exit;
 	}
 }
@@ -151,12 +268,15 @@ function saml_sso() {
 		exit();
 	}
 
-	if (isset($_GET["target"])) {
-		$auth->login($_GET["target"]);
-	} else if (isset($_GET['redirect_to'])) {
-		$auth->login($_GET['redirect_to']);
-	} else if (isset($_SERVER['REQUEST_URI']) && !isset($_GET['saml_sso'])) {
-		$auth->login($_SERVER['REQUEST_URI']);
+	if (isset($_GET['target'])) {
+		$target = wp_validate_redirect( wp_unslash( $_GET['target'] ), home_url() );
+		$auth->login( $target );
+	} elseif (isset($_GET['redirect_to'])) {
+		$redirect_to = wp_validate_redirect( wp_unslash( $_GET['redirect_to'] ), home_url() );
+		$auth->login( $redirect_to );
+	} elseif (isset($_SERVER['REQUEST_URI']) && !isset($_GET['saml_sso'])) {
+		$request_uri = wp_validate_redirect( wp_unslash( $_SERVER['REQUEST_URI'] ), home_url() );
+		$auth->login( $request_uri );
 	} else {
 		$auth->login();
 	}
@@ -232,7 +352,7 @@ function saml_role_order_compare($role1, $role2) {
 	$r2 = saml_role_order_get($role2);
 	if ($r1 > $r2)
 		return 1;
-	else if ($r1 < $r2)
+	elseif ($r1 < $r2)
 		return -1;
 	else return 0;
 }
@@ -305,10 +425,10 @@ function saml_acs() {
 		echo __("The username could not be retrieved from the IdP and is required");
 		exit();
 	}
-	else if (empty($email)) {
+	elseif (empty($email)) {
 		echo __("The email could not be retrieved from the IdP and is required");
 		exit();
-	} else if (!is_email($email)) {
+	} elseif (!is_email($email)) {
 		echo __("The email provided is invalid");
 		exit();
 	} else {
@@ -396,7 +516,7 @@ function saml_acs() {
 		if (is_multisite()) {
 			if (get_site_option('onelogin_network_saml_global_jit')) {
 				enroll_user_on_sites($user_id, $userdata['roles']);
-			} else if (!is_user_member_of_blog($user_id)) {
+			} elseif (!is_user_member_of_blog($user_id)) {
 				if (get_option('onelogin_saml_autocreate')) {
 					//Exist's but is not user to the current blog id
 					$blog_id = get_current_blog_id();
@@ -429,7 +549,7 @@ function saml_acs() {
 				update_user_role($user_id, $roles);
 			}
 		}
-	} else if (get_option('onelogin_saml_autocreate')) {
+	} elseif (get_option('onelogin_saml_autocreate')) {
 		$newuser = true;
 		if (!validate_username($username)) {
 			echo __("The username provided by the IdP"). ' "'. esc_attr($username). '" '. __("is not valid and can't create the user at wordpress");
@@ -453,7 +573,7 @@ function saml_acs() {
 					$blog_id = get_current_blog_id();
 					enroll_user_on_blogs($blog_id, $user_id, $userdata['roles']);
 				}
-			} else if (!empty($roles)) {
+			} elseif (!empty($roles)) {
 				add_roles_to_user($user_id, $roles);
 			}
 		}
@@ -468,7 +588,7 @@ function saml_acs() {
 			echo esc_html($error).'<br>';
 		}
 		exit();
-	} else if ($user_id) {
+	} elseif ($user_id) {
 		wp_set_current_user($user_id);
 		
 		$rememberme = false;
@@ -631,7 +751,7 @@ function enroll_user_on_sites($user_id, $roles) {
 	$opts = array('number' => 1000);
 	$sites = get_sites($opts);
 	foreach ($sites as $site) {
-		if (get_blog_option($site_id, "onelogin_saml_autocreate") && !is_user_member_of_blog($user_id, $site->id)) {
+		if (get_blog_option($site->id, "onelogin_saml_autocreate") && !is_user_member_of_blog($user_id, $site->id)) {
 			foreach($roles as $role) {
 				add_user_to_blog($site->id, $user_id, $role);
 			}
@@ -648,6 +768,9 @@ function enroll_user_on_blogs($blog_id, $user_id, $roles) {
 function update_user_role($user_id, $roles)
 {
 	$user = get_user_by('id', $user_id);
+	if (!$user) {
+		return false;
+	}
 	$role = array_shift($roles);
 	$user->set_role($role);	// This removes previous assignations
 
@@ -659,6 +782,9 @@ function update_user_role($user_id, $roles)
 function add_roles_to_user($user_id, $roles)
 {
 	$user = get_user_by('id', $user_id);
+	if (!$user) {
+		return false;
+	}
 
 	foreach($roles as $role) {
 		$user->add_role($role);
