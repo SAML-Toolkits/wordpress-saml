@@ -16,7 +16,7 @@ if ( !function_exists( 'add_action' ) ) {
 
 // Allow cookie name overriding by defining following constants prior this point. Eg.: in wp-config.php.
 if (false === defined('SAML_LOGIN_COOKIE' )) {
-	define( 'SAML_LOGIN_COOKIE', 'saml_login');
+	define( 'SAML_LOGIN_COOKIE', 'saml_login'    );
 }
 if (false === defined('SAML_NAMEID_COOKIE')) {
 	define( 'SAML_NAMEID_COOKIE', 'saml_nameid');
