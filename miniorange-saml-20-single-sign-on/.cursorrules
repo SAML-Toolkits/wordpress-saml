@@ -1,0 +1,589 @@
+# WordPress Plugin Development Guidelines
+
+These guidelines are generic and applicable across all WordPress plugin development projects.
+
+## CRITICAL: Required Documentation References
+
+**MANDATORY**: When generating, modifying, or reviewing code, you MUST refer to and follow ALL documentation files in the `docs/` folder:
+
+1. **`docs/ARCHITECTURE.md`** - Comprehensive plugin architecture, directory structure, component responsibilities, file organization, security architecture, and development workflow
+2. **`docs/instructions.md`** - Plugin-specific instructions, naming conventions, code patterns, utility functions, security implementation, development rules, and SAML processing
+
+**Enforcement Rules**:
+- ✅ ALWAYS check all documentation files before writing code
+- ✅ Follow architecture from `docs/ARCHITECTURE.md` for file organization and component structure
+- ✅ Follow guidelines from `docs/instructions.md` for plugin-specific requirements (prefixes, architecture, utility functions, security implementation, development rules)
+- ✅ Follow guidelines from `.cursorrules` (this file) for general WordPress best practices
+- ❌ NEVER skip referencing any of these files
+- ❌ NEVER generate code that violates guidelines in any of these files
+- ❌ NEVER assume you know the requirements without checking the documentation
+
+**When to Reference**:
+- Before writing any new code
+- Before modifying existing code
+- When reviewing code for security issues
+- When implementing forms, AJAX handlers, or API endpoints
+- When handling user input or output
+- When implementing authentication or authorization
+- When working with file operations
+- When implementing database queries
+- When organizing files or creating new components
+
+**Priority Order** (if conflicts arise):
+1. `docs/instructions.md` - Plugin-specific requirements and security implementation (highest priority)
+2. `docs/ARCHITECTURE.md` - File organization and component structure
+3. `.cursorrules` - General WordPress best practices
+
+**Architecture Compliance**:
+- Follow the directory structure defined in `docs/ARCHITECTURE.md`
+- Place files in the correct directories according to their purpose (controllers, handlers, utils, etc.)
+- Use the module system correctly (base, standard, premium, enterprise)
+- Follow naming conventions for classes, files, functions, and constants
+- Use the handler pattern, controller pattern, and DTO pattern as documented
+
+**Code Quality Requirements**:
+- Run PHPCS (PHP CodeSniffer) with WordPress ruleset before committing
+- Run Plugin Check Plugin (PCP) - must pass with zero issues
+- Follow WordPress Coding Standards (WPCS)
+- All code must be human-readable
+- All code must pass security checks defined in `docs/instructions.md`
+
+## Internationalization: Don't use variables or defines as text, context or text domain parameters.
+
+To make them be able to translate this plugin, please do not use variables or function calls for the text, context or text domain parameters of any gettext function, all of them NEED to be strings. Note that the translation parser reads the code without executing it, so it won't be able to read anything that is not a string within these functions.
+
+For example, if your gettext function looks like this...
+```php
+esc_html__( $greetings , 'miniorange-saml-20-single-sign-on' );
+```
+...the translator won't be able to see anything to be translated as $greetings is not a string, it is not something that can be translated.
+
+You need to give them the string to be translated, so they can see it in the translation system and can translate it, the correct would be as follows...
+```php
+esc_html__( 'Hello, how are you?' , 'miniorange-saml-20-single-sign-on' );
+```
+
+This also applies to the translation domain, this is a bad call:
+```php
+esc_html__( 'Hello, how are you?' , $plugin_slug );
+```
+The fix here would be like this
+```php
+esc_html__( 'Hello, how are you?' , 'miniorange-saml-20-single-sign-on' );
+```
+Also note that the translation domain needs to be the same as your plugin slug.
+
+What if we want to include a dynamic value inside the translation? Easy, you need to add a placeholder which will be part of the string and change it after the gettext function does its magic, you can use printf to do so, like this:
+```php
+printf(
+    /* translators: %s: First name of the user */
+    esc_html__( 'Hello %s, how are you?', 'miniorange-saml-20-single-sign-on' ),
+    esc_html( $user_firstname )
+);
+```
+
+You can read https://developer.wordpress.org/plugins/internationalization/how-to-internationalize-your-plugin/#text-domains for more information.
+
+## Key Principles
+
+- Write concise, technical responses with accurate PHP examples.
+- Follow WordPress coding standards and best practices.
+- Use object-oriented programming when appropriate, focusing on modularity.
+- Prefer iteration and modularization over duplication (DRY principle).
+- Use descriptive function, variable, and file names that clearly indicate purpose.
+- Use lowercase with hyphens for directories (e.g., wp-content/themes/my-theme).
+- Favor hooks (actions and filters) for extending functionality.
+- Write self-documenting code with clear intent.
+- Maintain backward compatibility when possible.
+- Follow the principle of least privilege for user capabilities.
+
+## PHP/WordPress Standards
+
+### No publicly documented resource for your generated/compressed content
+
+In reviewing your plugin, we cannot find a non-compiled version of your javascript and/or css related source code.
+
+In order to comply with our guidelines of human-readable code, we require you to include the source code and / or a link to the source code, this is true for your own code and for developer libraries you've included in your plugin. If you include a link, this may be in your source code, however we require you to also have it in your readme.
+
+### PHP Version & Features
+- Use PHP 7.4+ features when appropriate (e.g., typed properties, arrow functions, null coalescing operator).
+- Follow WordPress PHP Coding Standards: https://developer.wordpress.org/coding-standards/wordpress-coding-standards/php/
+- Use strict typing when possible: `declare(strict_types=1);`
+- Prefer modern PHP syntax while maintaining compatibility with WordPress minimum requirements.
+- Use type hints for function parameters and return types when appropriate.
+
+### Code Organization
+- File structure: Follow WordPress theme and plugin directory structures and naming conventions.
+- Plugin folder name must match the plugin slug exactly.
+- Root level structure must include:
+  - `plugin-name.php` (main plugin file)
+  - `uninstall.php` (optional but recommended)
+  - `readme.txt` (required for WordPress.org)
+- Prevent data leaks:
+  - Include `index.php` or `index.html` file in each folder/directory to prevent directory indexing.
+  - Use proper `.htaccess` rules to prevent direct access to private files (like private keys).
+  - Add `ABSPATH` check at the top of every PHP file:
+    ```php
+    if ( ! defined( 'ABSPATH' ) ) {
+        exit; // Exit if accessed directly
+    }
+    ```
+- Use namespaces for plugin classes to avoid naming conflicts.
+- Organize code into logical directories (e.g., includes/, admin/, public/, assets/).
+- Keep main plugin file minimal - use it primarily for initialization.
+- Separate concerns: Models, Views, Controllers, or similar architectural patterns.
+- WordPress requires all code to be "mostly human-readable." If your plugin includes minified, compressed, or compiled files (JS/CSS) generated by build tools (Webpack, Gulp, etc.), you must provide the non-compiled source code or a direct link to it. This ensures code can be audited, reviewed, and forked.
+
+### Error Handling
+- Implement proper error handling and logging:
+  - Use WordPress debug logging features (`error_log()`, `WP_DEBUG_LOG`).
+  - Create custom error handlers when necessary.
+  - Use try-catch blocks for expected exceptions.
+  - Never expose sensitive information in error messages to end users.
+  - Log detailed errors for debugging, show user-friendly messages to users.
+
+### Data Handling - Security Principle: "Sanitize Early, Validate Early, Escape Late"
+- **Sanitize Early**: Clean and filter input data before storing or using in code.
+  - Sanitize all values from super global variables: `$_POST`, `$_GET`, `$_REQUEST`, `$_COOKIE`, `$_SESSION`, etc.
+  - Sanitization should be done AFTER all processing is done to the input.
+  - ❌ Incorrect: `base64_decode( htmlspecialchars( $_COOKIE['sessionid'] ) )`
+  - ✅ Correct: `sanitize_text_field( base64_decode( $_COOKIE['sessionid'] ) )`
+  - Use WordPress sanitization functions: https://developer.wordpress.org/apis/security/sanitizing/
+- **Validate Early**: Once data is sanitized, validate it. If sanitization is not possible, always validate.
+  - Check required fields are not blank.
+  - Validate format (email, phone, URL, etc.).
+  - Use whitelist/blocklist for known values.
+  - Use format detection (preg_match) or format correction (preg_replace).
+  - WordPress validation functions: https://developer.wordpress.org/apis/security/data-validation/
+- **Escape Late**: Escape output data as late as possible to prevent XSS attacks.
+  - Escape everything: databases, users, third parties (Twitter, etc.).
+  - When escaping early is necessary, use variable naming: `$variable_escaped`, `$variable_safe`, or `$variable_clean`.
+  - ❌ Bad: `echo '<a href="' . $url . '">' . $text . '</a>';`
+  - ✅ Better: `echo '<a href="' . esc_url( $url ) . '">' . esc_html( $text ) . '</a>';`
+  - WordPress escaping functions: https://developer.wordpress.org/apis/security/escaping/
+- Use WordPress's built-in functions for data validation and sanitization.
+- Always sanitize input: `sanitize_text_field()`, `sanitize_email()`, `sanitize_url()`, etc.
+- Always escape output: `esc_html()`, `esc_attr()`, `esc_url()`, `esc_js()`, etc.
+- Use `wp_unslash()` before sanitizing `$_POST`, `$_GET`, `$_REQUEST` data.
+- Validate data after sanitization when format/constraints matter.
+- **Never assume anything** - even admins are users, and users will enter incorrect data either on purpose or accidentally.
+
+### Security
+- Implement proper nonce verification for all form submissions and AJAX requests (both GET and POST).
+- Use `check_admin_referer()` for admin forms (handles both nonce and referer check).
+- Use `check_ajax_referer()` for AJAX requests.
+- Always check user capabilities before performing sensitive operations.
+- Never trust user input - validate, sanitize, and escape everything.
+- Use `wp_safe_redirect()` for same-domain redirects, `wp_redirect()` for external redirects (with validation).
+- For external links, always use `target="_blank"` with `rel="noopener noreferrer"`:
+  ```html
+  <a href="https://example.com/" target="_blank" rel="noopener noreferrer">Link</a>
+  ```
+- Protected values storage:
+  - Display secret keys as asterisks or dots, never in plain text if already stored.
+  - Use `input type="password"` for sensitive input fields.
+  - Store sensitive data in encrypted format.
+  - Never hardcode client keys or values.
+  - Use `.htaccess` rules to protect private files (crt, cer, key, pem):
+    ```apache
+    Options -Indexes
+    <Files ~ "\.(crt|cer|key|pem)$">
+        Order allow,deny
+        Deny from all
+    </Files>
+    ```
+- See `docs/instructions.md` for comprehensive security guidelines, OWASP Top 10, security principles, and plugin-specific security implementation details.
+- See `docs/ARCHITECTURE.md` for security architecture overview.
+
+### Database Operations
+- Utilize WordPress's database abstraction layer (`$wpdb`) for database interactions.
+- Always use `$wpdb->prepare()` with placeholders (%d, %s, %f) for queries.
+- Never concatenate user input directly into SQL queries.
+- Prefer WordPress query functions (WP_Query, get_posts, get_users, etc.) over raw SQL.
+- Implement proper database schema changes using `dbDelta()` function.
+- Use transactions when performing multiple related database operations.
+
+## Dependencies & Package Management
+
+- WordPress (latest stable version as minimum requirement).
+- Use Composer for dependency management when building advanced plugins or themes.
+- Include `composer.json` and `composer.lock` in version control.
+- Use PSR-4 autoloading when using Composer.
+- Document all external dependencies and their purposes.
+- Keep dependencies up to date and monitor for security vulnerabilities.
+
+## WordPress Function Preferences
+
+### Prefer WordPress Functions Over PHP Functions
+- Use WordPress HTTP API instead of PHP functions:
+  - `wp_remote_get()` instead of `file_get_contents()` on remote files.
+  - `wp_remote_request()` instead of CURL calls.
+- Use WordPress validation functions:
+  - `is_email()` instead of `filter_var( $email, FILTER_VALIDATE_EMAIL )`.
+- Reference: https://developer.wordpress.org/reference/
+
+### File Paths
+- **Never hardcode file paths**:
+  - ❌ Bad: `plugins_url( 'miniorange-plugin/includes/images/loader.gif' )`
+  - ✅ Good: `plugins_url( 'includes/images/loader.gif', __FILE__ )`
+- Always use `__FILE__` variable for relative paths.
+
+### File/Class Inclusion
+- Use `require_once` for unconditional class file includes.
+- Use `include_once` for conditional class file includes (e.g., factory methods).
+  ```php
+  require_once 'login.php';
+  if ( ! empty( $_POST['SAMLRequest'] ) ) {
+      include_once 'miniorange-saml-authn.php';
+  }
+  ```
+
+## WordPress Best Practices
+
+### Hooks & Filters
+- Use WordPress hooks (actions and filters) instead of modifying core files.
+- Create custom hooks in your plugin to allow extensibility.
+- Document all custom hooks with PHPDoc comments.
+- Use descriptive hook names with plugin prefix (e.g., `my_plugin_before_save`).
+- Remove hooks when plugin is deactivated to prevent conflicts.
+
+### User Management
+- Use WordPress's built-in user roles and capabilities system.
+- Check capabilities with `current_user_can()` before sensitive operations.
+- Never hardcode user IDs or roles - use capabilities instead.
+- Respect WordPress user meta and profile fields.
+
+### Caching
+- Utilize WordPress's transients API for caching expensive operations.
+- Set appropriate expiration times for transient data.
+- Use `wp_cache_*` functions for object caching when available.
+- Clear caches when relevant data changes.
+- Consider using `wp_schedule_single_event()` for cache warming.
+
+### Background Processing
+- Implement background processing for long-running tasks using `wp_cron()`.
+- Use `wp_schedule_event()` for recurring tasks.
+- Consider Action Scheduler library for complex background jobs.
+- Handle cron failures gracefully with retry logic.
+
+### Testing
+- Use WordPress's built-in testing tools (`WP_UnitTestCase`) for unit tests.
+- Write tests for critical functionality, especially security-sensitive code.
+- Test with multiple WordPress versions (minimum and latest).
+- Test with different PHP versions (7.4+).
+- Include integration tests for complex workflows.
+
+### Internationalization (i18n)
+- Implement proper internationalization and localization using WordPress i18n functions.
+- Use `__()` for translatable strings, `_e()` for echo, `_n()` for plural forms.
+- Use text domains matching your plugin slug.
+- Never concatenate translatable strings - use placeholders with `sprintf()`.
+- Extract all user-facing strings for translation.
+- Use `esc_html__()` and `esc_html_e()` when outputting translated strings.
+
+### Asset Management
+- **NO Remote Calls Permitted** (with specific exceptions):
+  - ❌ Do NOT offload jQuery/CSS files to CDNs - include them in your plugin.
+  - ❌ Do NOT insert iframes with help docs - use links or include docs in plugin.
+  - ❌ Do NOT call images from external domains - include them in your plugin.
+  - ✅ Permitted: Google Fonts from approved CDN (if GPL compatible).
+  - ✅ Permitted: API calls to your own server (e.g., OTP verification, spam checking).
+  - ✅ Permitted: Embed calls to service providers (Twitter, YouTube).
+- Use `wp_enqueue_script()` and `wp_enqueue_style()` for proper asset management.
+- **Do NOT use CDNs** - download libraries and enqueue them:
+  - ❌ Bad: `<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css">`
+  - ✅ Good: `wp_enqueue_style( 'bootstrap', plugins_url( 'assets/css/bootstrap.css', __FILE__ ), array(), '5.2.3' );`
+- Always specify dependencies for scripts and styles.
+- Use version numbers (plugin version constant) for cache busting.
+- Enqueue assets only on pages where they're needed.
+- Use `wp_localize_script()` to pass PHP data to JavaScript securely.
+- Use `wp_add_inline_script()` to add inline JavaScript.
+- Use `admin_enqueue_scripts`, `admin_print_scripts`, `admin_print_styles` for admin enqueues.
+- Minify production assets, keep source files readable.
+
+### Custom Post Types & Taxonomies
+- Implement custom post types and taxonomies when appropriate.
+- Use descriptive names with plugin prefix to avoid conflicts.
+- Register post types and taxonomies on `init` hook.
+- Set appropriate capabilities and supports.
+- Provide proper labels for admin UI.
+
+### Settings & Options
+- Use WordPress's built-in Options API for storing configuration data.
+- Use `add_option()`, `update_option()`, `get_option()` for simple settings.
+- Use Settings API for admin settings pages with proper sanitization.
+- Group related options together when possible.
+- Provide default values for all options.
+- Clean up options on plugin uninstall.
+
+### Pagination & Queries
+- Implement proper pagination using functions like `paginate_links()`.
+- Use `WP_Query` for custom queries instead of raw SQL when possible.
+- Set appropriate `posts_per_page` limits.
+- Use `no_found_rows => true` when total count isn't needed for performance.
+- Implement proper query caching for expensive queries.
+
+### REST API
+- Use WordPress REST API for modern integrations.
+- Register custom endpoints with proper permission callbacks.
+- Validate and sanitize all REST API request parameters.
+- Use schema definitions for automatic validation.
+- Return proper HTTP status codes and error messages.
+
+### AJAX Handling
+- Use `admin-ajax.php` or REST API for AJAX requests.
+- Always verify nonces in AJAX handlers.
+- Check user capabilities before processing AJAX requests.
+- Sanitize all AJAX input data.
+- Use `wp_send_json_success()` and `wp_send_json_error()` for responses.
+- Handle errors gracefully with user-friendly messages.
+
+## Code Quality & Standards
+
+### Naming Conventions
+- **Prefix Everything (COMPULSORY)**:
+  - The prefix must be at least 4 characters to avoid name collisions (e.g., `mo_` is invalid, `mopr_` is valid).
+  - The prefix should be related to the plugin name (e.g., "Page Restriction" → `pgrt_` or `pare_`).
+  - All variables, functions, classes, and CSS classes must be prefixed with a unique identifier.
+  - Example: For "MiniOrange Page Restriction" plugin, use prefix `mopr_`.
+- Use lowercase with underscores for functions: `my_plugin_function_name()`.
+- Use PascalCase for class names: `My_Plugin_Class_Name`.
+- Check for existing class implementations before defining:
+  ```php
+  if ( ! class_exists( 'MoPr_Page_Restriction' ) ) {
+      class MoPr_Page_Restriction {
+          // ...
+      }
+  }
+  ```
+- Use camelCase for JavaScript variables and functions.
+- Use UPPERCASE for constants: `MY_PLUGIN_CONSTANT`.
+
+### Documentation
+- Add PHPDoc comments for all functions, classes, and methods.
+- Document parameters, return values, and exceptions.
+- Include usage examples in complex function documentation.
+- Keep README.md updated with installation and usage instructions.
+- Document all hooks, filters, and public APIs.
+
+### Code Comments
+- Write self-documenting code - comments should explain "why", not "what".
+- Use comments to explain complex business logic or workarounds.
+- **Remove unused code** - commenting out unused code is NOT enough, delete it completely.
+- **Do NOT comment CSS or HTML code** - these comments are visible in the DOM.
+- Use TODO comments for future improvements with context.
+
+### Performance
+- Minimize database queries - use caching when appropriate.
+- Avoid querying inside loops - use `WP_Query` with proper parameters.
+- Use transients for expensive operations.
+- Lazy load assets and data when possible.
+- Optimize images and assets (minify, compress).
+- Consider using object caching for frequently accessed data.
+
+### Accessibility
+- Follow WCAG 2.1 guidelines for accessibility.
+- Use semantic HTML elements.
+- Provide proper ARIA labels when needed.
+- Ensure keyboard navigation works.
+- Maintain sufficient color contrast.
+- Test with screen readers when possible.
+
+## Plugin Architecture Patterns
+
+### Singleton Pattern
+- Use singleton pattern for main plugin class when appropriate.
+- Ensure thread-safe implementation if needed.
+- Document why singleton is used.
+
+### Factory Pattern
+- Use factory pattern for creating complex objects.
+- Centralize object creation logic.
+
+### Observer Pattern
+- Use WordPress hooks as observer pattern implementation.
+- Separate event handling from business logic.
+
+### Dependency Injection
+- Consider dependency injection for testability.
+- Avoid global state when possible.
+- Pass dependencies through constructors or setters.
+
+## Version Control & Deployment
+
+### Git Best Practices
+- Use meaningful commit messages following conventional commits.
+- Create feature branches for new functionality.
+- Tag releases with version numbers.
+- Keep `.gitignore` updated for WordPress-specific files.
+- Don't commit `node_modules/`, `vendor/`, or build artifacts.
+
+### Version Management
+- Follow Semantic Versioning (MAJOR.MINOR.PATCH).
+- Update version in main plugin file header.
+- Update version constant if used.
+- Update version in readme.txt for WordPress.org.
+- Maintain changelog with all changes.
+
+## Plugin Header Requirements
+
+Include proper plugin header in main plugin file. Header must be in sync with readme.txt:
+```php
+/**
+ * Plugin Name:       Your Plugin Name
+ * Plugin URI:        https://example.com/plugin
+ * Description:       Brief description of what the plugin does.
+ * Version:           1.0.0
+ * Requires at least: 5.2
+ * Requires PHP:      7.2
+ * Author:            Your Name
+ * License:           GPL-2.0+ (or MIT/Expat for miniOrange plugins)
+ * License URI:       http://www.gnu.org/licenses/gpl-2.0.txt
+ * Text Domain:       your-plugin-slug
+ * Domain Path:       /languages
+ */
+```
+
+### Plugin Name & Slug Guidelines
+- Plugin folder name must match the slug exactly.
+- Plugin name in header must match readme.txt exactly.
+- Slug is derived from plugin name (lowercase, hyphens instead of spaces).
+- **What NOT to choose**:
+  - ❌ Do NOT start or end with "WP" or "WordPress" (e.g., "wp-salesforce-integration").
+  - ❌ Do NOT start with third-party company/trademarked terms (e.g., "salesforce-wordpress-integration").
+- Check if slug is already in use: https://wordpress.org/plugins/{slug}
+- **Note**: Plugin name can be changed after release, but slug cannot be changed.
+- Name and slug must respect trademarks, copyrights, and project names.
+
+## Activation & Deactivation
+
+- Use `register_activation_hook()` for setup tasks (database tables, default options).
+- Use `register_deactivation_hook()` for cleanup (clear caches, unschedule events).
+- Create `uninstall.php` for complete removal (delete options, tables, etc.).
+- Never delete user data on deactivation - only on uninstall.
+- Test activation/deactivation on clean WordPress installations.
+
+## Key Conventions Summary
+
+1. Follow WordPress's plugin API for extending functionality.
+2. Use WordPress's template hierarchy for theme development.
+3. Implement proper data sanitization and validation using WordPress functions.
+4. Use WordPress's template tags and conditional tags in themes.
+5. Implement proper database queries using `$wpdb` or `WP_Query`.
+6. Use WordPress's authentication and authorization functions.
+7. Implement proper AJAX handling using `admin-ajax.php` or REST API.
+8. Use WordPress's hook system for modular and extensible code.
+9. Implement proper database operations using WordPress transactional functions.
+10. Use WordPress's WP_Cron API for scheduling tasks.
+11. Always escape output and sanitize input.
+12. Verify nonces and check capabilities for all user actions.
+13. Use WordPress constants and functions instead of hardcoded values.
+14. Follow WordPress naming conventions and coding standards.
+15. Write code that is maintainable, testable, and extensible.
+
+## Resources
+
+### Documentation Files (MANDATORY REFERENCES)
+
+**Plugin-Specific Documentation** (in `docs/` folder):
+- **`docs/ARCHITECTURE.md`** - Complete plugin architecture, directory structure, component responsibilities, database schema, module system, security architecture, and development workflow
+- **`docs/instructions.md`** - Plugin-specific instructions, naming conventions, code patterns, utility functions, security implementation, development rules, SAML processing, and OWASP Top 10 guidelines
+
+**Development Rules**:
+- **`.cursorrules`** (this file) - Generic WordPress plugin development guidelines and coding standards
+
+### External Resources
+
+- WordPress Plugin Handbook: https://developer.wordpress.org/plugins/
+- WordPress Coding Standards: https://developer.wordpress.org/coding-standards/
+- WordPress PHP Coding Standards: https://developer.wordpress.org/coding-standards/wordpress-coding-standards/php/
+- WordPress JavaScript Coding Standards: https://developer.wordpress.org/coding-standards/wordpress-coding-standards/javascript/
+- WordPress CSS Coding Standards: https://developer.wordpress.org/coding-standards/wordpress-coding-standards/css/
+- WordPress API Reference: https://developer.wordpress.org/reference/
+- Plugin Check Plugin: https://wordpress.org/plugins/plugin-check/
+- OWASP Top 10: https://owasp.org/www-project-top-ten/
+
+## Plugin Validation Requirements
+
+### Plugin Check Plugin (PCP) Compliance
+
+**MANDATORY**: All plugins MUST pass Plugin Check Plugin validation with ZERO issues before:
+- Submitting pull requests
+- Requesting code review
+- Publishing to WordPress.org
+- Releasing new versions
+
+**Plugin Check Plugin**:
+- Official WordPress.org tool: https://wordpress.org/plugins/plugin-check/
+- Validates plugins against WordPress.org directory requirements
+- Checks for deprecated functions, security issues, coding standards
+- Tests compatibility with different WordPress versions
+- Verifies readme.txt format and plugin headers
+
+**Enforcement Rules**:
+- ✅ ALWAYS run Plugin Check Plugin before submitting code
+- ✅ Fix ALL issues reported by Plugin Check Plugin
+- ✅ Verify plugin passes with zero errors and zero warnings
+- ✅ Include PCP validation results in PR description
+- ❌ NEVER submit code with PCP issues
+- ❌ NEVER skip PCP validation
+- ❌ NEVER ignore PCP warnings (treat as errors)
+
+**How to Use Plugin Check Plugin**:
+1. Install and activate Plugin Check Plugin from WordPress.org
+2. Go to Tools → Plugin Check
+3. Select your plugin from the dropdown
+4. Click "Check Plugin"
+5. Review all results (Errors, Warnings, Info)
+6. Fix all issues before proceeding
+7. Re-run check until zero issues remain
+
+**Common PCP Issues to Watch For**:
+- Deprecated WordPress functions or APIs
+- Missing or incorrect plugin headers
+- Security vulnerabilities (unvalidated input, unescaped output)
+- Coding standards violations
+- Incorrect readme.txt format
+- Missing text domain in translation functions
+- Hardcoded URLs or paths
+- Use of prohibited functions
+- Missing ABSPATH checks
+- Incorrect hook usage
+
+**Integration with Development Workflow**:
+- Run PCP check after completing feature development
+- Run PCP check before creating pull request
+- Run PCP check after code review feedback
+- Run PCP check before final release
+
+**Priority**: PCP compliance takes precedence over feature completion. If PCP reports issues, they MUST be fixed before code can be merged or released.
+
+## Functionality Restrictions
+
+### WordPress.org Plugin Directory Rules
+- **Plugins may NOT contain functionality that is restricted or locked**, only to be made available by payment or upgrade.
+- **Functionality may NOT be disabled** after a trial period or quota is met.
+- **Not Allowed**:
+  - Restriction of number of users that can use features (even if not using your servers).
+  - Trialware (time-limited functionality).
+  - Tracking users without their consent.
+- **Allowed**:
+  - Paid functionality in services (if API calls are made to your server and you own the server).
+  - All code inside the plugin must be fully available (no obfuscation for free version restrictions).
+- Reference: WordPress.org plugin guidelines on allowed restrictions.
+
+## Additional Guidelines
+
+- Always test code in a staging environment before production deployment.
+- Consider multisite compatibility when developing plugins.
+- Ensure compatibility with popular WordPress plugins and themes.
+- Monitor WordPress core updates for deprecated functions.
+- Keep dependencies updated and test compatibility.
+- Document breaking changes in upgrade notices.
+- Provide migration paths for major version updates.
+- Consider performance impact of all code additions.
+- Write code that fails gracefully with helpful error messages.
+- Consider edge cases and error conditions in all implementations.
+- Code must be human-readable.
+- The first version release should be as simple as possible to ensure fast review.
+

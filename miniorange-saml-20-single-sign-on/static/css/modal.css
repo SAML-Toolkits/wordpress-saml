@@ -1,0 +1,131 @@
+.mosaml-notice-modal-overlay {
+	position: fixed;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	background-color: rgba(0, 0, 0, 0.5);
+	display: none;
+	z-index: 9999;
+	justify-content: center;
+	align-items: center;
+}
+
+.mosaml-notice-modal-overlay.active {
+	display: flex;
+}
+
+.mosaml-notice-modal-content {
+	background-color: #fff;
+	border-radius: 8px;
+	box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+	max-width: 500px;
+	width: 90%;
+	padding: 30px;
+	position: relative;
+	animation: slideIn 0.3s ease-out;
+}
+
+@keyframes slideIn {
+	from {
+		transform: translateY(-50px);
+		opacity: 0;
+	}
+
+	to {
+		transform: translateY(0);
+		opacity: 1;
+	}
+}
+
+.mosaml-notice-modal-close {
+	position: absolute;
+	top: 15px;
+	right: 15px;
+	background: none;
+	border: none;
+	font-size: 28px;
+	cursor: pointer;
+	color: #666;
+	padding: 0;
+	width: 30px;
+	height: 30px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+.mosaml-notice-modal-close:hover {
+	color: #000;
+}
+
+.mosaml-notice-modal-image {
+	text-align: center;
+	margin-bottom: 20px;
+}
+
+.mosaml-notice-modal-image img {
+	max-width: 80px;
+	height: auto;
+}
+
+.mosaml-notice-modal-title {
+	font-size: 20px;
+	font-weight: 600;
+	margin-bottom: 15px;
+	color: #333;
+	text-align: center;
+}
+
+.mosaml-notice-modal-message {
+	font-size: 14px;
+	color: #666;
+	margin-bottom: 25px;
+	line-height: 1.5;
+	text-align: center;
+}
+
+.mosaml-notice-modal-buttons {
+	display: flex;
+	gap: 10px;
+	justify-content: center;
+	flex-wrap: wrap;
+}
+
+.mosaml-notice-modal-btn {
+	padding: 10px 20px;
+	border: none;
+	border-radius: 4px;
+	font-size: 14px;
+	font-weight: 500;
+	cursor: pointer;
+	transition: all 0.3s ease;
+}
+
+.mosaml-notice-modal-btn.primary {
+	background-color: #0073aa;
+	color: #fff;
+}
+
+.mosaml-notice-modal-btn.primary:hover {
+	background-color: #005a87;
+}
+
+.mosaml-notice-modal-btn.secondary {
+	background-color: #ddd;
+	color: #333;
+}
+
+.mosaml-notice-modal-btn.secondary:hover {
+	background-color: #ccc;
+}
+
+.mosaml-notice-modal-btn.cancel {
+	background-color: #f0f0f0;
+	color: #333;
+	border: 1px solid #ddd;
+}
+
+.mosaml-notice-modal-btn.cancel:hover {
+	background-color: #e0e0e0;
+}

@@ -1,0 +1,114 @@
+/* Popup styles */
+.mosaml-grace-notice-flex {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 20px;
+}
+
+.mosaml-grace-notice-flex-column {
+	display: flex;
+	flex-direction: column;
+	justify-content: space-around;
+	gap: 10px;
+}
+
+.mosaml-grace-notice-overlay {
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	background: #ffffff;
+	backdrop-filter: blur(100%);
+	z-index: 9999;
+}
+
+.mosaml-grace-notice-content {
+	background: #fff;
+	padding: 32px;
+	border-radius: 8px;
+	width: 600px;
+	min-height: 200px;
+	text-align: center;
+	/* box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2); */
+}
+
+.mosaml-grace-notice-content h2 {
+	color: #D60000;
+	font-size: 32px;
+}
+
+.mosaml-grace-notice-content h2 {
+	font-size: 20px;
+}
+
+.mosaml-grace-notice-list {
+	padding: 0 20px;
+}
+
+.mosaml-grace-notice-content li {
+	text-align: left;
+	font-size: 14px;
+	margin: 0;
+	list-style: circle;
+	padding-left: 20px;
+}
+
+.mosaml-grace-notice-content p {
+	font-size: 16px;
+	margin: 0;
+}
+
+.mosaml-grace-notice-btn-div {
+	margin-top: 20px;
+}
+
+.mosaml-grace-notice-success-btn {
+	background-color: #50C878;
+	color: #fff;
+	border: none;
+	font-size: 16px;
+	padding: 15px 20px;
+	border-radius: 5px;
+	cursor: pointer;
+}
+
+.mosaml-grace-notice-error-btn {
+	background-color: #D60000;
+	color: #fff;
+	border: none;
+	font-size: 16px;
+	padding: 15px 20px;
+	border-radius: 5px;
+	cursor: pointer;
+}
+
+.mosaml-plain-notice-btn {
+	font-weight: 400;
+	background: none;
+	border: none;
+	margin-top: 12px;
+	color: inherit;
+	font-size: 16px;
+	cursor: pointer;
+	text-decoration: underline;
+}
+
+.mosaml-grace-sync-message {
+	margin-top: 16px;
+	background: none !important;
+	border: none !important;
+	color: inherit !important;
+	font-size: 16px;
+}
+
+.mosaml-grace-notice-btns:hover {
+	opacity: 0.8;
+	transition: opacity 0.3s ease;
+}
+
+.mosaml-grace-notice-icon {
+	vertical-align: middle;
+	margin: 8px;
+}

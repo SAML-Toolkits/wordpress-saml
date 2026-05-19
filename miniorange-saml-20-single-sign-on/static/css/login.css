@@ -1,0 +1,52 @@
+/**
+ * Login Page SSO Button Styles
+ *
+ * @package miniorange-saml-20-single-sign-on
+ */
+
+.mo-saml-login-button-container {
+	margin: 8px 0 16px 0;
+	text-align: center;
+	width: 100%;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	clear: both;
+}
+
+.mo-saml-login-sso-button {
+	width: 100%;
+	max-width: 320px;
+	display: flex !important;
+	justify-content: center !important;
+	align-items: center !important;
+	text-align: center !important;
+	font-size: 14px;
+	margin: 0 0 12px 0 !important;
+	min-height: 40px;
+	box-sizing: border-box;
+	cursor: pointer;
+	overflow: hidden;
+}
+
+.mo-saml-login-sso-button span {
+	display: block;
+	text-align: center;
+	width: 100%;
+	font-size: 16px;
+	line-height: 1.4;
+	margin: 0;
+	padding: 0;
+}
+
+.mo-saml-or-separator {
+	padding: 12px 0 0 0;
+	font-size: 14px;
+	height: auto;
+	text-align: center;
+	margin: 0 0 16px 0;
+	line-height: 1.2;
+	width: 100%;
+	max-width: 320px;
+}
