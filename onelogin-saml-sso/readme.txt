@@ -1,4 +1,4 @@
-=== Plugin Name ===
+=== OneLogin SAML SSO ===
 Contributors: onelogin
 Tags: sso, saml, single sign on, password, active directory, ldap, identity, onelogin, yubico, yubikey, vip access, otp
 Requires at least: 2.1.2
