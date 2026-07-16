@@ -660,6 +660,15 @@ function enroll_user_on_blogs($blog_id, $user_id, $roles) {
 function update_user_role($user_id, $roles)
 {
 	$user = get_user_by('id', $user_id);
+
+	if (get_option('onelogin_saml_role_mapping_preserve_existing', false)) {
+		// Keep roles and per-user capabilities assigned outside the role mapping
+		foreach($roles as $role) {
+			$user->add_role($role);
+		}
+		return;
+	}
+
 	$role = array_shift($roles);
 	$user->set_role($role);	// This removes previous assignations
 

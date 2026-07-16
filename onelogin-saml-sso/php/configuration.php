@@ -66,7 +66,8 @@ function onelogin_saml_configuration() {
 
 	$special_fields = array(
 		'onelogin_saml_role_mapping_multivalued_in_one_attribute_value',
-		'onelogin_saml_role_mapping_multivalued_pattern'
+		'onelogin_saml_role_mapping_multivalued_pattern',
+		'onelogin_saml_role_mapping_preserve_existing'
 	);
 
 	foreach ($fields as $section => $settings) {
@@ -265,6 +266,13 @@ function plugin_setting_boolean_onelogin_saml_role_mapping_multivalued_in_one_at
 	echo '<input type="checkbox" name="onelogin_saml_role_mapping_multivalued_in_one_attribute_value" id="onelogin_saml_role_mapping_multivalued_in_one_attribute_value"
 		  '.($value ? 'checked="checked"': '').'>
 		  <p class="description">'.__("Sometimes role values are provided in an unique attribute statement (instead multiple attribute statements). If that is the case, activate this and the plugin will try to split those values by ;<br>Use a regular expression pattern in order to extract complex data.", 'onelogin-saml-sso').'</p>';
+}
+
+function plugin_setting_boolean_onelogin_saml_role_mapping_preserve_existing($network = false) {
+	$value = $network ? get_site_option('onelogin_saml_role_mapping_preserve_existing') : get_option('onelogin_saml_role_mapping_preserve_existing');
+	echo '<input type="checkbox" name="onelogin_saml_role_mapping_preserve_existing" id="onelogin_saml_role_mapping_preserve_existing"
+		  '.($value ? 'checked="checked"': '').'>
+		  <p class="description">'.__("If enabled, roles resolved by the role mapping are only ever ADDED to the user: existing roles and per-user capabilities assigned in WordPress (e.g. via plugins like User Role Editor) are preserved on SSO login. Warning: roles revoked on the IdP side are NOT removed in WordPress, revoke them manually.", 'onelogin-saml-sso').'</p>';
 }
 
 function plugin_setting_string_onelogin_saml_role_mapping_multivalued_pattern($network = false) {
@@ -829,6 +837,11 @@ function get_onelogin_saml_settings_role_mapping() {
 	$fields['onelogin_saml_role_mapping_multivalued_pattern'] = array(
 		__('Regular expression for multiple role values', 'onelogin-saml-sso'),
 		'string'
+	);
+
+	$fields['onelogin_saml_role_mapping_preserve_existing'] = array(
+		__('Preserve existing roles', 'onelogin-saml-sso'),
+		'boolean'
 	);
 
 	return $fields;
