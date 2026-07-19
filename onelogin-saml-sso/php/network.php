@@ -31,7 +31,8 @@ $option_group = 'onelogin_saml_configuration_network';
 	unset($fields['status']);
 	$special_fields = array(
 		'onelogin_saml_role_mapping_multivalued_in_one_attribute_value',
-		'onelogin_saml_role_mapping_multivalued_pattern'
+		'onelogin_saml_role_mapping_multivalued_pattern',
+		'onelogin_saml_role_mapping_preserve_existing'
 	);
 
 	foreach ($sections as $section => $description) {

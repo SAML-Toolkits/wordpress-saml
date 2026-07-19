@@ -22,6 +22,9 @@ To mitigate that bug, place the script at the root of wordpress and execute it (
 
 == Changelog ==
 
+= 3.7.0 =
+* Add new "Preserve existing roles" option to the Role Mapping section. When enabled, roles resolved by the role mapping are only added to the user, preserving existing roles and per-user capabilities assigned in WordPress (e.g. via plugins like User Role Editor). Note that with this option enabled, roles revoked on the IdP side are not removed in WordPress.
+
 = 3.6.0 =
 * Update php-saml to 4.3.1 (PHP8 compatibility)
 
