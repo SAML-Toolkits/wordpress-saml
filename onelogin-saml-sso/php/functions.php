@@ -483,11 +483,7 @@ function saml_acs() {
 	} else if ($user_id) {
 		wp_set_current_user($user_id);
 		
-		$rememberme = false;
-		$remembermeMapping = get_option('onelogin_saml_attr_mapping_rememberme');
-		if (!empty($remembermeMapping) && isset($attrs[$remembermeMapping]) && !empty($attrs[$remembermeMapping][0])) {
-			$rememberme = in_array($attrs[$remembermeMapping][0], array(1, true, '1', 'yes', 'on')) ? true : false;
-		}
+		$rememberme = (boolean) get_option('onelogin_saml_rememberme', false);
 		wp_set_auth_cookie($user_id, $rememberme);
 
 		$secure = is_ssl();

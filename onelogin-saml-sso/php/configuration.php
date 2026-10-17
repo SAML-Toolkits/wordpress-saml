@@ -192,6 +192,13 @@ function plugin_setting_boolean_onelogin_saml_alternative_acs($network = false) 
 		  '<p class="description">'.__('Enable if you want to use a different Assertion Consumer Endpoint than <code>/wp-login.php?saml_acs</code> (Required if using WPEngine or any similar hosting service that prevents POST on <code>wp-login.php</code>). You must update the IdP with the new value after enabling/disabling this setting.', 'onelogin-saml-sso').'</p>';
 }
 
+function plugin_setting_boolean_onelogin_saml_rememberme($network = false) {
+	$value = $network ? get_site_option('onelogin_saml_rememberme') : get_option('onelogin_saml_rememberme');
+	echo '<input type="checkbox" name="onelogin_saml_rememberme" id="onelogin_saml_rememberme"
+		 '.($value ? 'checked="checked"': '').'>'.
+		  '<p class="description">'.__('Mark it to store the user_id in an auth cookie.', 'onelogin-saml-sso').'</p>';
+}
+
 function plugin_setting_textarea_onelogin_saml_trusted_url_domains($network = false) {
 	echo '<textarea name="onelogin_saml_trusted_url_domains" id="onelogin_saml_trusted_url_domains" style="width:600px; height:220px; font-size:12px; font-family:courier,arial,sans-serif;">';
 	echo esc_textarea($network ? get_site_option('onelogin_saml_trusted_url_domains') : get_option('onelogin_saml_trusted_url_domains'));
@@ -228,12 +235,6 @@ function plugin_setting_string_onelogin_saml_attr_mapping_nickname($network = fa
 	echo '<input type="text" name="onelogin_saml_attr_mapping_nickname" id="onelogin_saml_attr_mapping_nickname"
 		  value= "'.esc_attr($value).'" size="30">'.
 		  '<p class="description">'.__("If not provided, default  value is the user's username.");
-}
-
-function plugin_setting_string_onelogin_saml_attr_mapping_rememberme($network = false) {
-	$value = $network ? get_site_option('onelogin_saml_attr_mapping_rememberme') : get_option('onelogin_saml_attr_mapping_rememberme');
-	echo '<input type="text" name="onelogin_saml_attr_mapping_rememberme" id="onelogin_saml_attr_mapping_rememberme"
-		  value= "'.esc_html($value).'" size="30">';
 }
 
 function plugin_setting_string_onelogin_saml_attr_mapping_role($network = false) {
@@ -771,6 +772,10 @@ function get_onelogin_saml_settings_options() {
 			__('Multi Role Support', 'onelogin-saml-sso'),
 			'boolean'
 		),
+		'onelogin_saml_rememberme' =>  array(
+			__('Remember Me', 'onelogin-saml-sso'),
+			'boolean'
+		),
 		'onelogin_saml_trusted_url_domains' => array(
 			__('Trust URL domains on RelayState', 'onelogin-saml-sso'),
 			'textarea'
@@ -802,10 +807,6 @@ function get_onelogin_saml_settings_attribute_mapping() {
 		),
 		'onelogin_saml_attr_mapping_role' =>  array(
 			__('Role', 'onelogin-saml-sso'),
-			'string'
-		),
-		'onelogin_saml_attr_mapping_rememberme' =>  array(
-			__('Remember Me', 'onelogin-saml-sso'),
 			'string'
 		)
 	);
