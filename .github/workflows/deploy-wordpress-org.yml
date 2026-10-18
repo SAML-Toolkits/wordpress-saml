@@ -1,0 +1,60 @@
+name: Deploy to WordPress.org
+
+# Publishes onelogin-saml-sso/ to the WordPress.org plugin SVN repository
+# (trunk and tags/<version>) when a GitHub release is published.
+#
+# WordPress.org only builds versioned downloads
+# (https://downloads.wordpress.org/plugin/onelogin-saml-sso.<version>.zip)
+# from tags/<version>. Without them, Composer (wpackagist), `wp plugin install
+# --version` and other tools cannot pin a release.
+#
+# Required repository secrets: SVN_USERNAME and SVN_PASSWORD (a WordPress.org
+# account with commit access to the onelogin-saml-sso plugin).
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+    inputs:
+      dry-run:
+        description: Build and check without committing to SVN
+        type: boolean
+        default: true
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+
+      - name: Check that the release tag, plugin header and Stable tag agree
+        id: version
+        env:
+          TAG: ${{ github.event.release.tag_name || github.ref_name }}
+        run: |
+          set -euo pipefail
+          header="$(sed -n 's/^Version:[[:space:]]*//p' onelogin-saml-sso/onelogin_saml.php | head -n1 | tr -d '\r')"
+          stable="$(sed -n 's/^Stable tag:[[:space:]]*//p' onelogin-saml-sso/readme.txt | head -n1 | tr -d '\r')"
+          echo "plugin header: $header / readme Stable tag: $stable / git ref: $TAG"
+          [ "$header" = "$stable" ] || { echo "::error::Stable tag ($stable) must match the plugin Version header ($header)"; exit 1; }
+          if [ "${{ github.event_name }}" = "release" ]; then
+            [ "${TAG#v}" = "$header" ] || { echo "::error::Release tag ($TAG) must match the plugin Version header ($header)"; exit 1; }
+          fi
+          echo "version=$header" >> "$GITHUB_OUTPUT"
+
+      - name: Deploy onelogin-saml-sso/ to WordPress.org
+        uses: 10up/action-wordpress-plugin-deploy@54bd289b8525fd23a5c365ec369185f2966529c2 # 2.3.0
+        with:
+          dry-run: ${{ github.event_name == 'workflow_dispatch' && inputs.dry-run }}
+        env:
+          SVN_USERNAME: ${{ secrets.SVN_USERNAME }}
+          SVN_PASSWORD: ${{ secrets.SVN_PASSWORD }}
+          SLUG: onelogin-saml-sso
+          BUILD_DIR: onelogin-saml-sso
+          # Taken from the plugin header (checked above to equal the release tag),
+          # so a manual dry run from a branch also gets a real version.
+          VERSION: ${{ steps.version.outputs.version }}
