@@ -1,7 +1,7 @@
 <?php
 
 // Make sure we don't expose any info if called directly
-if ( !function_exists( 'add_action' ) ) {
+if (!function_exists('add_action')) {
     echo 'Hi there!  I\'m just a plugin, not much I can do when called directly.';
     exit;
 }
@@ -62,52 +62,52 @@ if ((is_array($requested_authncontext_values) && empty(array_filter($requested_a
 }
 
 $acs_endpoint = get_option('onelogin_saml_alternative_acs', false)
-    ? plugins_url( 'alternative_acs.php', dirname( __FILE__ ) )
-    : add_query_arg( [ 'saml_acs' => '' ], wp_login_url() );
+    ? plugins_url('alternative_acs.php', dirname(__FILE__))
+    : add_query_arg([ 'saml_acs' => '' ], wp_login_url());
 
-$settings = array (
+$settings = array(
 
-    'strict' => $opt['strict'] == 'on'? true : false,
-    'debug' => $opt['debug'] == 'on'? true : false,
+    'strict' => $opt['strict'] == 'on' ? true : false,
+    'debug' => $opt['debug'] == 'on' ? true : false,
 
-    'sp' => array (
-        'entityId' => (!empty($opt['sp_entity_id'])? $opt['sp_entity_id'] : 'php-saml'),
-        'assertionConsumerService' => array (
+    'sp' => array(
+        'entityId' => (!empty($opt['sp_entity_id']) ? $opt['sp_entity_id'] : 'php-saml'),
+        'assertionConsumerService' => array(
             'url' => $acs_endpoint
         ),
-        'singleLogoutService' => array (
-            'url' => add_query_arg( [ 'saml_sls' => '' ], wp_login_url() )
+        'singleLogoutService' => array(
+            'url' => add_query_arg([ 'saml_sls' => '' ], wp_login_url())
         ),
         'NameIDFormat' => $opt['NameIDFormat'],
         'x509cert' => get_option('onelogin_saml_advanced_settings_sp_x509cert'),
         'privateKey' => get_option('onelogin_saml_advanced_settings_sp_privatekey'),
     ),
 
-    'idp' => array (
+    'idp' => array(
         'entityId' => get_option('onelogin_saml_idp_entityid'),
-        'singleSignOnService' => array (
+        'singleSignOnService' => array(
             'url' => get_option('onelogin_saml_idp_sso'),
         ),
-        'singleLogoutService' => array (
+        'singleLogoutService' => array(
             'url' => get_option('onelogin_saml_idp_slo'),
         ),
         'x509cert' => get_option('onelogin_saml_idp_x509cert'),
     ),
 
-    'security' => array (
+    'security' => array(
         'signMetadata' => false,
-        'nameIdEncrypted' => $opt['nameIdEncrypted'] == 'on'? true: false,
-        'authnRequestsSigned' => $opt['authnRequestsSigned'] == 'on'? true: false,
-        'logoutRequestSigned' => $opt['logoutRequestSigned'] == 'on'? true: false,
-        'logoutResponseSigned' => $opt['logoutResponseSigned'] == 'on'? true: false,
-        'wantMessagesSigned' => $opt['wantMessagesSigned'] == 'on'? true: false,
-        'wantAssertionsSigned' => $opt['wantAssertionsSigned'] == 'on'? true: false,
-        'wantAssertionsEncrypted' => $opt['wantAssertionsEncrypted'] == 'on'? true: false,
+        'nameIdEncrypted' => $opt['nameIdEncrypted'] == 'on' ? true : false,
+        'authnRequestsSigned' => $opt['authnRequestsSigned'] == 'on' ? true : false,
+        'logoutRequestSigned' => $opt['logoutRequestSigned'] == 'on' ? true : false,
+        'logoutResponseSigned' => $opt['logoutResponseSigned'] == 'on' ? true : false,
+        'wantMessagesSigned' => $opt['wantMessagesSigned'] == 'on' ? true : false,
+        'wantAssertionsSigned' => $opt['wantAssertionsSigned'] == 'on' ? true : false,
+        'wantAssertionsEncrypted' => $opt['wantAssertionsEncrypted'] == 'on' ? true : false,
         'wantNameId' => false,
         'requestedAuthnContext' => $opt['requestedAuthnContext'],
         'relaxDestinationValidation' => true,
-        'allowRepeatAttributeName' => $opt['allowRepeatAttributeName'] == 'on'? true: false,
-        'lowercaseUrlencoding' => $opt['lowercaseUrlencoding'] == 'on'? true: false,
+        'allowRepeatAttributeName' => $opt['allowRepeatAttributeName'] == 'on' ? true : false,
+        'lowercaseUrlencoding' => $opt['lowercaseUrlencoding'] == 'on' ? true : false,
         'signatureAlgorithm' => get_option('onelogin_saml_advanced_signaturealgorithm', 'http://www.w3.org/2000/09/xmldsig#rsa-sha1'),
         'digestAlgorithm' => get_option('onelogin_saml_advanced_digestalgorithm', 'http://www.w3.org/2000/09/xmldsig#sha1'),
     )
@@ -116,4 +116,9 @@ $settings = array (
 $use_proxy_vars = get_option('onelogin_saml_advanced_settings_use_proxy_vars', false);
 if ($use_proxy_vars) {
     Utils::setProxyVars(true);
+}
+
+$set_base_url = get_option('onelogin_saml_advanced_settings_set_baseurl');
+if (!empty($set_base_url)) {
+    Utils::setBaseURL($set_base_url);
 }

@@ -32,6 +32,7 @@ To mitigate that bug, place the script at the root of wordpress and execute it (
 * Add a new setting to use the FriendlyName instead the Name
 * Add a new setting to allow multiple AttributeNames
 * Add a new setting to support setProxyVars, used to trust HTTP_X_FORWARDED_HOST, HTTP_X_FORWARDED_PROTO and HTTP_X_FORWARDED_PORT values
+* Add a new setting to allow define a BaseURL in case the SAML plugin resolves wrong the protocol, host, port or path.
 
 = 3.6.0 =
 * Update php-saml to 4.3.1 (PHP8 compatibility)
