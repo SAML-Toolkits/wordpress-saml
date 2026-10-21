@@ -24,7 +24,88 @@ function saml_checker() {
 		saml_metadata();
 	} else if (isset($_GET['saml_validate_config'])) {
 		saml_validate_config();
+	} else if (isset($_GET['saml_relay'])) {
+		saml_relay_login();
 	}
+}
+
+/**
+ * Network-wide ACS site (multisite). Returns the blog id of the site whose
+ * ACS endpoint is used by all sites, or 0 if not set / invalid.
+ */
+function saml_get_network_acs_site_id() {
+	if (!is_multisite()) {
+		return 0;
+	}
+	$blog_id = (int) get_site_option('onelogin_network_saml_acs_site', 0);
+	if ($blog_id && get_site($blog_id)) {
+		return $blog_id;
+	}
+	return 0;
+}
+
+function saml_uses_network_acs() {
+	$blog_id = saml_get_network_acs_site_id();
+	return $blog_id && $blog_id != get_current_blog_id();
+}
+
+function saml_get_acs_endpoint() {
+	if (saml_uses_network_acs()) {
+		switch_to_blog(saml_get_network_acs_site_id());
+		$endpoint = get_option('onelogin_saml_alternative_acs', false)
+			? plugins_url('alternative_acs.php', dirname(__FILE__))
+			: add_query_arg(['saml_acs' => ''], wp_login_url());
+		restore_current_blog();
+		return $endpoint;
+	}
+	return get_option('onelogin_saml_alternative_acs', false)
+		? plugins_url('alternative_acs.php', dirname(__FILE__))
+		: add_query_arg(['saml_acs' => ''], wp_login_url());
+}
+
+// Returns the network site (other than the current one) that owns the url, or null
+function saml_get_origin_site($url) {
+	if (empty($url) || saml_get_network_acs_site_id() != get_current_blog_id()) {
+		return null;
+	}
+	$parts = wp_parse_url($url);
+	if (empty($parts['host'])) {
+		return null;
+	}
+	$domain = $parts['host'] . (isset($parts['port']) ? ':' . $parts['port'] : '');
+	$path = isset($parts['path']) ? $parts['path'] : '/';
+	$site = get_site_by_path($domain, $path);
+	if (!$site || (int) $site->blog_id == get_current_blog_id()) {
+		return null;
+	}
+	return $site;
+}
+
+// Complete the login on the site that started it (the ACS site can't set its cookies)
+function saml_relay_login() {
+	$token = sanitize_key($_GET['saml_relay']);
+	$data = empty($token) ? false : get_site_transient('saml_relay_' . $token);
+	if (empty($token)) {
+		return;
+	}
+	delete_site_transient('saml_relay_' . $token);
+	if (empty($data) || $data['blog_id'] != get_current_blog_id() || !get_user_by('id', $data['user_id'])) {
+		wp_redirect(home_url());
+		exit();
+	}
+
+	$user_id = $data['user_id'];
+	if (is_multisite() && !is_user_member_of_blog($user_id, get_current_blog_id()) && !empty($data['roles'])) {
+		enroll_user_on_blogs(get_current_blog_id(), $user_id, $data['roles']);
+	}
+	wp_set_current_user($user_id);
+	wp_set_auth_cookie($user_id, $data['rememberme']);
+
+	$secure = is_ssl();
+	foreach ($data['cookies'] as $name => $value) {
+		setcookie($name, $value, time() + MONTH_IN_SECONDS, SITECOOKIEPATH, COOKIE_DOMAIN, $secure, true);
+	}
+	redirect_to_relaystate_if_trusted($data['target']);
 }
 
 function may_disable_saml() {
@@ -163,15 +244,23 @@ function saml_sso() {
 	}
 
 	if (isset($_GET["target"])) {
-		$auth->login($_GET["target"]);
+		$auth->login(saml_absolute_target($_GET["target"]));
 	} else if (isset($_GET['redirect_to'])) {
-		$auth->login($_GET['redirect_to']);
+		$auth->login(saml_absolute_target($_GET['redirect_to']));
 	} else if (isset($_SERVER['REQUEST_URI']) && !isset($_GET['saml_sso'])) {
-		$auth->login(sanitize_text_field( $_SERVER['REQUEST_URI']));
+		$auth->login(saml_absolute_target(sanitize_text_field( $_SERVER['REQUEST_URI'])));
 	} else {
 		$auth->login();
 	}
 	exit();
+}
+
+// With a network ACS site the RelayState must identify the originating site
+function saml_absolute_target($target) {
+	if (saml_uses_network_acs() && !empty($target) && $target[0] === '/') {
+		return WP_Http::make_absolute_url($target, home_url());
+	}
+	return $target;
 }
 
 function saml_slo() {
@@ -528,6 +617,39 @@ function saml_acs() {
 		if ( false !== $user ) {
 			do_action( 'wp_login', $user->user_login, $user );
 		}
+	}
+
+	$origin_site = isset($_REQUEST['RelayState']) ? saml_get_origin_site(esc_url_raw($_REQUEST['RelayState'], ['https','http'])) : null;
+	if ($origin_site && $user_id) {
+		$relayState = esc_url_raw($_REQUEST['RelayState'], ['https','http']);
+		if ((substr($relayState, -strlen('/wp-login.php')) === '/wp-login.php') || (substr($relayState, -strlen('/alternative_acs.php')) === '/alternative_acs.php')) {
+			$target = apply_filters('onelogin_saml_after_login_redirect_url', get_admin_url($origin_site->blog_id));
+		} else if (strpos($relayState, 'redirect_to') !== false) {
+			$query = wp_parse_url($relayState, PHP_URL_QUERY);
+			parse_str($query, $parameters);
+			$target = isset($parameters['redirect_to']) ? urldecode($parameters['redirect_to']) : $relayState;
+		} else {
+			$target = $relayState;
+		}
+
+		$token = wp_generate_password(32, false);
+		set_site_transient('saml_relay_' . $token, array(
+			'blog_id' => (int) $origin_site->blog_id,
+			'user_id' => $user_id,
+			'roles' => isset($roles) ? $roles : array(),
+			'rememberme' => $rememberme,
+			'target' => $target,
+			'cookies' => array(
+				SAML_LOGIN_COOKIE => 1,
+				SAML_NAMEID_COOKIE => $auth->getNameId(),
+				SAML_SESSIONINDEX_COOKIE => $auth->getSessionIndex(),
+				SAML_NAMEID_FORMAT_COOKIE => $auth->getNameIdFormat(),
+				SAML_NAMEID_NAME_QUALIFIER_COOKIE => $auth->getNameIdNameQualifier(),
+				SAML_NAMEID_SP_NAME_QUALIFIER_COOKIE => $auth->getNameIdSPNameQualifier(),
+			),
+		), 60);
+		wp_redirect(add_query_arg('saml_relay', $token, get_home_url($origin_site->blog_id, '/')));
+		exit();
 	}
 
 	if (isset($_REQUEST['RelayState'])) {

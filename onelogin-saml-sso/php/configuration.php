@@ -618,6 +618,7 @@ function onelogin_saml_global_configuration_multisite_save() {
 			$global_jit = false;
 		}
 		update_site_option("onelogin_network_saml_global_jit", $global_jit);
+		update_site_option("onelogin_network_saml_acs_site", isset($_POST['acs_site']) ? absint($_POST['acs_site']) : 0);
 	}
 
 	wp_redirect(add_query_arg( array(
