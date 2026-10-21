@@ -8,6 +8,7 @@ if ( !function_exists( 'add_action' ) ) {
 
 require_once "_toolkit_loader.php";
 use OneLogin\Saml2\Constants;
+use OneLogin\Saml2\Utils;
 
 $posible_nameidformat_values = array(
     'unspecified' => Constants::NAMEID_UNSPECIFIED,
@@ -41,6 +42,8 @@ $opt['logoutResponseSigned'] = get_option('onelogin_saml_advanced_settings_logou
 $opt['wantMessagesSigned'] = get_option('onelogin_saml_advanced_settings_want_message_signed', false);
 $opt['wantAssertionsSigned'] = get_option('onelogin_saml_advanced_settings_want_assertion_signed', false);
 $opt['wantAssertionsEncrypted'] = get_option('onelogin_saml_advanced_settings_want_assertion_encrypted', false);
+$opt['allowRepeatAttributeName'] = get_option('onelogin_saml_advanced_settings_allow_duplicated_attribute', false);
+$opt['lowercaseUrlencoding'] = get_option('onelogin_saml_advanced_idp_lowercase_url_encoding', false);
 
 $nameIDformat = get_option('onelogin_saml_advanced_nameidformat', 'unspecified');
 $opt['NameIDFormat'] = $posible_nameidformat_values[$nameIDformat];
@@ -103,9 +106,14 @@ $settings = array (
         'wantNameId' => false,
         'requestedAuthnContext' => $opt['requestedAuthnContext'],
         'relaxDestinationValidation' => true,
-        'lowercaseUrlencoding' => get_option('
-            onelogin_saml_advanced_idp_lowercase_url_encoding', false),
+        'allowRepeatAttributeName' => $opt['allowRepeatAttributeName'] == 'on'? true: false,
+        'lowercaseUrlencoding' => $opt['lowercaseUrlencoding'] == 'on'? true: false,
         'signatureAlgorithm' => get_option('onelogin_saml_advanced_signaturealgorithm', 'http://www.w3.org/2000/09/xmldsig#rsa-sha1'),
         'digestAlgorithm' => get_option('onelogin_saml_advanced_digestalgorithm', 'http://www.w3.org/2000/09/xmldsig#sha1'),
     )
 );
+
+$use_proxy_vars = get_option('onelogin_saml_advanced_settings_use_proxy_vars', false);
+if ($use_proxy_vars) {
+    Utils::setProxyVars(true);
+}

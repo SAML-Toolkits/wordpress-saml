@@ -441,6 +441,13 @@ function plugin_setting_boolean_onelogin_saml_advanced_settings_retrieve_paramet
 		  '<p class="description">'.__('Sometimes when the app is behind a firewall or proxy, the query parameters can be modified an this affects the signature validation process on HTTP-Redirectbinding. Active this if you are seeing signature validation failures. The plugin will try to extract the original query parameters.', 'onelogin-saml-sso').'</p>';
 }
 
+function plugin_setting_boolean_onelogin_saml_advanced_settings_use_proxy_vars($network = false) {
+	$value = $network ? get_site_option('onelogin_saml_advanced_settings_use_proxy_vars') : get_option('onelogin_saml_advanced_settings_use_proxy_vars');
+	echo '<input type="checkbox" name="onelogin_saml_advanced_settings_use_proxy_vars" id="onelogin_saml_advanced_settings_use_proxy_vars"
+		  '.($value ? 'checked="checked"': '').'>'.
+		  '<p class="description">'.__('If your Wordpress instance is under a proxy or load balancer and you received SAML validation errors becase the response was received at wrong destionation which included wrong protocol or port, enable this flag and Proxy vars HTTP_X_FORWARDED_HOST, HTTP_X_FORWARDED_PROTO and HTTP_X_FORWARDED_PORT will be read.', 'onelogin-saml-sso').'</p>';
+}
+
 function plugin_setting_boolean_onelogin_saml_advanced_settings_use_friendlyname($network = false) {
 	$value = $network ? get_site_option('onelogin_saml_advanced_settings_use_friendlyname') : get_option('onelogin_saml_advanced_settings_use_friendlyname');
 	echo '<input type="checkbox" name="onelogin_saml_advanced_settings_use_friendlyname" id="onelogin_saml_advanced_settings_use_friendlyname"
@@ -974,6 +981,10 @@ function get_onelogin_saml_settings_advanced() {
 			__('Retrieve Parameters From Server', 'onelogin-saml-sso'),
 			'boolean'
 		),
+		'onelogin_saml_advanced_settings_use_proxy_vars' =>  array(
+			__('Use Proxy Vars', 'onelogin-saml-sso'),
+			'boolean'
+		),		
 		'onelogin_saml_advanced_settings_use_friendlyname' =>  array(
 			__('Use FriendlyName', 'onelogin-saml-sso'),
 			'boolean'

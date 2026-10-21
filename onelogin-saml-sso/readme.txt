@@ -31,6 +31,7 @@ To mitigate that bug, place the script at the root of wordpress and execute it (
 * Add a new setting to prevent accents in emails. sanitize_email in WP versions older than 6.6 will stripe accents, what could be used maliciously to try to impersonate accounts when the email is the SAML identifier. In addition some DB are by default accent-insensitive and could treat accented and non-accented emails as equivalent. When this option is enabled, SAML Responses containing emails with accents will be rejected
 * Add a new setting to use the FriendlyName instead the Name
 * Add a new setting to allow multiple AttributeNames
+* Add a new setting to support setProxyVars, used to trust HTTP_X_FORWARDED_HOST, HTTP_X_FORWARDED_PROTO and HTTP_X_FORWARDED_PORT values
 
 = 3.6.0 =
 * Update php-saml to 4.3.1 (PHP8 compatibility)
