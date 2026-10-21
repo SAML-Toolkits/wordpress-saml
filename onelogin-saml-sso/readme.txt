@@ -23,6 +23,7 @@ To mitigate that bug, place the script at the root of wordpress and execute it (
 == Changelog ==
 
 = 3.7.0 =
+* Add a network-wide central ACS URL option for multisite installations, allowing sites to share one ACS endpoint while redirecting users back to the site where login started.
 * Add new "Preserve existing roles" option to the Role Mapping section. When enabled, roles resolved by the role mapping are only added to the user, preserving existing roles and per-user capabilities assigned in WordPress (e.g. via plugins like User Role Editor). Note that with this option enabled, roles revoked on the IdP side are not removed in WordPress.
 * Add onelogin_saml_show_no_user_error_response filter to allow customize user Provisioning error when user does not exists and Provisioning is disabled
   Add onelogin_saml_after_login_redirect_url filter to allow customize the redirect url after ACS.
