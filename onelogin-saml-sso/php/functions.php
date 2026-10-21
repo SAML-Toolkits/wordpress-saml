@@ -44,9 +44,15 @@ function saml_get_network_acs_site_id() {
 	return 0;
 }
 
-function saml_uses_network_acs() {
+// A central ACS site is set and it is not the current site
+function saml_has_central_acs() {
 	$blog_id = saml_get_network_acs_site_id();
 	return $blog_id && $blog_id != get_current_blog_id();
+}
+
+// The current site delegates the ACS to the central site (unless it overrides it)
+function saml_uses_network_acs() {
+	return saml_has_central_acs() && !get_option('onelogin_saml_override_central_acs', false);
 }
 
 function saml_get_acs_endpoint() {

@@ -188,9 +188,45 @@ function plugin_setting_boolean_onelogin_saml_multirole($network = false) {
 
 function plugin_setting_boolean_onelogin_saml_alternative_acs($network = false) {
 	$value = $network ? get_site_option('onelogin_saml_alternative_acs') : get_option('onelogin_saml_alternative_acs');
+	$central = !$network && saml_has_central_acs();
+	$disabled = $central && !get_option('onelogin_saml_override_central_acs', false);
+	if ($disabled) {
+		// A disabled checkbox is not submitted, keep the stored value
+		echo '<input type="hidden" name="onelogin_saml_alternative_acs" value="'.($value ? 'on' : '').'">';
+	}
 	echo '<input type="checkbox" name="onelogin_saml_alternative_acs" id="onelogin_saml_alternative_acs"
-		  '.($value ? 'checked="checked"': '').'>'.
+		  '.($value ? 'checked="checked"': '').($disabled ? ' disabled="disabled"' : '').'>'.
 		  '<p class="description">'.__('Enable if you want to use a different Assertion Consumer Endpoint than <code>/wp-login.php?saml_acs</code> (Required if using WPEngine or any similar hosting service that prevents POST on <code>wp-login.php</code>). You must update the IdP with the new value after enabling/disabling this setting.', 'onelogin-saml-sso').'</p>';
+	if ($central) {
+		echo '<p class="description" id="onelogin_saml_central_acs_hint"'.($disabled ? '' : ' style="display:none"').'><strong>'.
+			sprintf(__('This site uses the central ACS URL of %s, configured in the network settings. Check "Override central ACS" to use this site\'s own ACS URL.', 'onelogin-saml-sso'), esc_html(untrailingslashit(get_site(saml_get_network_acs_site_id())->domain . get_site(saml_get_network_acs_site_id())->path))).
+			'</strong></p>';
+	}
+}
+
+function plugin_setting_boolean_onelogin_saml_override_central_acs($network = false) {
+	if ($network || !saml_has_central_acs()) {
+		// Not applicable: keep the stored value on save
+		echo '<input type="hidden" name="onelogin_saml_override_central_acs" value="'.(get_option('onelogin_saml_override_central_acs', false) ? 'on' : '').'">';
+		if (!$network) {
+			echo '<p class="description">'.__('Only applicable when a central ACS site is set in the network settings and it is a different site.', 'onelogin-saml-sso').'</p>';
+		}
+		return;
+	}
+	$value = get_option('onelogin_saml_override_central_acs', false);
+	echo '<input type="checkbox" name="onelogin_saml_override_central_acs" id="onelogin_saml_override_central_acs"
+		  '.($value ? 'checked="checked"': '').'>'.
+		  '<p class="description">'.__('Ignore the central ACS URL and use this site\'s own ACS URL (e.g. for sites using another provider). You must register this site\'s ACS URL in the IdP.', 'onelogin-saml-sso').'</p>'.
+		  '<script>
+		  jQuery(function($) {
+			$("#onelogin_saml_override_central_acs").on("change", function() {
+				var override = this.checked;
+				$("#onelogin_saml_alternative_acs").prop("disabled", !override);
+				$("input[type=hidden][name=onelogin_saml_alternative_acs]").prop("disabled", override);
+				$("#onelogin_saml_central_acs_hint").toggle(!override);
+			});
+		  });
+		  </script>';
 }
 
 function plugin_setting_boolean_onelogin_saml_rememberme($network = false) {
@@ -788,6 +824,10 @@ function get_onelogin_saml_settings_options() {
 		),
 		'onelogin_saml_alternative_acs' => array(
 			__('Alternative ACS Endpoint', 'onelogin-saml-sso'),
+			'boolean'
+		),
+		'onelogin_saml_override_central_acs' => array(
+			__('Override central ACS', 'onelogin-saml-sso'),
 			'boolean'
 		),
 		'onelogin_saml_account_matcher' => array(
