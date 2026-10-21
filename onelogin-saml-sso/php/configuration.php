@@ -200,6 +200,13 @@ function plugin_setting_boolean_onelogin_saml_rememberme($network = false) {
 		  '<p class="description">'.__('Mark it to store the user_id in an auth cookie.', 'onelogin-saml-sso').'</p>';
 }
 
+function plugin_setting_boolean_onelogin_saml_prevent_accents($network = false) {
+	$value = $network ? get_site_option('onelogin_saml_prevent_accents') : get_option('onelogin_saml_prevent_accents');
+	echo '<input type="checkbox" name="onelogin_saml_prevent_accents" id="onelogin_saml_prevent_accents"
+		 '.($value ? 'checked="checked"': '').'>'.
+		  '<p class="description">'.__('Prevent accents in emails. sanitize_email in WP versions older than 6.6 will stripe accents, what could be used maliciously to try to impersonate accounts when the email is the SAML identifier. In addition some DB are by default accent-insensitive and could treat accented and non-accented emails as equivalent. When this option is enabled, SAML Responses containing emails with accents will be rejected', 'onelogin-saml-sso').'</p>';
+}
+
 function plugin_setting_textarea_onelogin_saml_trusted_url_domains($network = false) {
 	echo '<textarea name="onelogin_saml_trusted_url_domains" id="onelogin_saml_trusted_url_domains" style="width:600px; height:220px; font-size:12px; font-family:courier,arial,sans-serif;">';
 	echo esc_textarea($network ? get_site_option('onelogin_saml_trusted_url_domains') : get_option('onelogin_saml_trusted_url_domains'));
@@ -782,6 +789,10 @@ function get_onelogin_saml_settings_options() {
 		),
 		'onelogin_saml_rememberme' =>  array(
 			__('Remember Me', 'onelogin-saml-sso'),
+			'boolean'
+		),
+		'onelogin_saml_prevent_accents' =>  array(
+			__('Prevent Accents', 'onelogin-saml-sso'),
 			'boolean'
 		),
 		'onelogin_saml_trusted_url_domains' => array(
