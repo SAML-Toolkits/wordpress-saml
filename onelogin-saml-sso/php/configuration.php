@@ -448,6 +448,13 @@ function plugin_setting_boolean_onelogin_saml_advanced_settings_use_friendlyname
 		  '<p class="description">'.__('Retrieve Attributes using the FriendlyName instead of the Name. If enabled,  Adapt the Attribute maping to match the FriendlyName.', 'onelogin-saml-sso').'</p>';
 }
 
+function plugin_setting_boolean_onelogin_saml_advanced_settings_allow_duplicated_attribute($network = false) {
+	$value = $network ? get_site_option('onelogin_saml_advanced_settings_allow_duplicated_attribute') : get_option('onelogin_saml_advanced_settings_allow_duplicated_attribute');
+	echo '<input type="checkbox" name="onelogin_saml_advanced_settings_allow_duplicated_attribute" id="onelogin_saml_advanced_settings_allow_duplicated_attribute"
+		  '.($value ? 'checked="checked"': '').'>'.
+		  '<p class="description">'.__('Allow duplicated attributes from the IdP.', 'onelogin-saml-sso').'</p>';
+}
+
 function plugin_setting_select_onelogin_saml_advanced_nameidformat($network = false) {
 	$nameidformat_value = $network ? get_site_option('onelogin_saml_advanced_nameidformat') : get_option('onelogin_saml_advanced_nameidformat');
 	$posible_nameidformat_values = array(
@@ -969,6 +976,10 @@ function get_onelogin_saml_settings_advanced() {
 		),
 		'onelogin_saml_advanced_settings_use_friendlyname' =>  array(
 			__('Use FriendlyName', 'onelogin-saml-sso'),
+			'boolean'
+		),
+		'onelogin_saml_advanced_settings_allow_duplicated_attribute' =>  array(
+			__('Allow Duplicated Attribute', 'onelogin-saml-sso'),
 			'boolean'
 		),
 		'onelogin_saml_advanced_nameidformat' =>  array(
