@@ -291,7 +291,12 @@ function saml_acs() {
 		exit();
 	}
 
-	$attrs = $auth->getAttributes();
+	$useFriendlyName = get_option('onelogin_saml_advanced_settings_use_friendlyname', false);
+	if ($useFriendlyName) {
+		$attrs = $auth->getAttributesWithFriendlyName();
+	} else {
+		$attrs = $auth->getAttributes();
+	}
 
 	$username = $email = '';
 	if (empty($attrs)) {

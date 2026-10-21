@@ -441,6 +441,13 @@ function plugin_setting_boolean_onelogin_saml_advanced_settings_retrieve_paramet
 		  '<p class="description">'.__('Sometimes when the app is behind a firewall or proxy, the query parameters can be modified an this affects the signature validation process on HTTP-Redirectbinding. Active this if you are seeing signature validation failures. The plugin will try to extract the original query parameters.', 'onelogin-saml-sso').'</p>';
 }
 
+function plugin_setting_boolean_onelogin_saml_advanced_settings_use_friendlyname($network = false) {
+	$value = $network ? get_site_option('onelogin_saml_advanced_settings_use_friendlyname') : get_option('onelogin_saml_advanced_settings_use_friendlyname');
+	echo '<input type="checkbox" name="onelogin_saml_advanced_settings_use_friendlyname" id="onelogin_saml_advanced_settings_use_friendlyname"
+		  '.($value ? 'checked="checked"': '').'>'.
+		  '<p class="description">'.__('Retrieve Attributes using the FriendlyName instead of the Name. If enabled,  Adapt the Attribute maping to match the FriendlyName.', 'onelogin-saml-sso').'</p>';
+}
+
 function plugin_setting_select_onelogin_saml_advanced_nameidformat($network = false) {
 	$nameidformat_value = $network ? get_site_option('onelogin_saml_advanced_nameidformat') : get_option('onelogin_saml_advanced_nameidformat');
 	$posible_nameidformat_values = array(
@@ -958,6 +965,10 @@ function get_onelogin_saml_settings_advanced() {
 		),
 		'onelogin_saml_advanced_settings_retrieve_parameters_from_server' =>  array(
 			__('Retrieve Parameters From Server', 'onelogin-saml-sso'),
+			'boolean'
+		),
+		'onelogin_saml_advanced_settings_use_friendlyname' =>  array(
+			__('Use FriendlyName', 'onelogin-saml-sso'),
 			'boolean'
 		),
 		'onelogin_saml_advanced_nameidformat' =>  array(

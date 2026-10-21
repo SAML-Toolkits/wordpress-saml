@@ -29,6 +29,7 @@ To mitigate that bug, place the script at the root of wordpress and execute it (
   Add onelogin_saml_attrs hook after user creation/update, before storing data on session.
 * Make RememberMe option a checkbox, rather than an input text field (field was renamed as well, so this setting needs to be updated after the upgrade, if you had it enabled).
 * Add a new setting to prevent accents in emails. sanitize_email in WP versions older than 6.6 will stripe accents, what could be used maliciously to try to impersonate accounts when the email is the SAML identifier. In addition some DB are by default accent-insensitive and could treat accented and non-accented emails as equivalent. When this option is enabled, SAML Responses containing emails with accents will be rejected
+* Add a new setting to use the FriendlyName instead the Name
 
 = 3.6.0 =
 * Update php-saml to 4.3.1 (PHP8 compatibility)
