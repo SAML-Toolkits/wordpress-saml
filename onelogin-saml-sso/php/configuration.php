@@ -918,10 +918,6 @@ function get_onelogin_saml_settings_options()
         'onelogin_saml_trusted_url_domains' => array(
             __('Trust URL domains on RelayState', 'onelogin-saml-sso'),
             'textarea'
-        ),
-        'onelogin_saml_base_url' => array(
-            __('Set BaseURL', 'onelogin-saml-sso'),
-            'textarea'
         )
     );
 }
@@ -1092,6 +1088,10 @@ function get_onelogin_saml_settings_advanced()
         'onelogin_saml_advanced_settings_use_proxy_vars' =>  array(
             __('Use Proxy Vars', 'onelogin-saml-sso'),
             'boolean'
+        ),
+        'onelogin_saml_advanced_settings_set_baseurl' =>  array(
+            __('Set Base URL', 'onelogin-saml-sso'),
+            'string'
         ),
         'onelogin_saml_advanced_settings_use_friendlyname' =>  array(
             __('Use FriendlyName', 'onelogin-saml-sso'),
