@@ -2,8 +2,8 @@
 Contributors: onelogin
 Tags: sso, saml, single sign on, password, active directory, ldap, identity, onelogin, yubico, yubikey, vip access, otp
 Requires at least: 2.1.2
-Tested up to: 5.9
-Stable tag: 3.6.0
+Tested up to: 7.1.3
+Stable tag: 3.7.0
 
 This plugin provides single sign-on via SAML and gives users one-click access to their WordPress accounts from identity providers like OneLogin.
 
@@ -24,6 +24,15 @@ To mitigate that bug, place the script at the root of wordpress and execute it (
 
 = 3.7.0 =
 * Add new "Preserve existing roles" option to the Role Mapping section. When enabled, roles resolved by the role mapping are only added to the user, preserving existing roles and per-user capabilities assigned in WordPress (e.g. via plugins like User Role Editor). Note that with this option enabled, roles revoked on the IdP side are not removed in WordPress.
+* Add onelogin_saml_show_no_user_error_response filter to allow customize user Provisioning error when user does not exists and Provisioning is disabled
+  Add onelogin_saml_after_login_redirect_url filter to allow customize the redirect url after ACS.
+  Add onelogin_saml_attrs hook after user creation/update, before storing data on session.
+* Make RememberMe option a checkbox, rather than an input text field (field was renamed as well, so this setting needs to be updated after the upgrade, if you had it enabled).
+* Add a new setting to prevent accents in emails. sanitize_email in WP versions older than 6.6 will stripe accents, what could be used maliciously to try to impersonate accounts when the email is the SAML identifier. In addition some DB are by default accent-insensitive and could treat accented and non-accented emails as equivalent. When this option is enabled, SAML Responses containing emails with accents will be rejected
+* Add a new setting to use the FriendlyName instead the Name
+* Add a new setting to allow multiple AttributeNames
+* Add a new setting to support setProxyVars, used to trust HTTP_X_FORWARDED_HOST, HTTP_X_FORWARDED_PROTO and HTTP_X_FORWARDED_PORT values
+* Add a new setting to allow define a BaseURL in case the SAML plugin resolves wrong the protocol, host, port or path.
 
 = 3.6.0 =
 * Update php-saml to 4.3.1 (PHP8 compatibility)

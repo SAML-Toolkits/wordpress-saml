@@ -167,7 +167,7 @@ function saml_sso() {
 	} else if (isset($_GET['redirect_to'])) {
 		$auth->login($_GET['redirect_to']);
 	} else if (isset($_SERVER['REQUEST_URI']) && !isset($_GET['saml_sso'])) {
-		$auth->login($_SERVER['REQUEST_URI']);
+		$auth->login(sanitize_text_field( $_SERVER['REQUEST_URI']));
 	} else {
 		$auth->login();
 	}
@@ -291,27 +291,45 @@ function saml_acs() {
 		exit();
 	}
 
-	$attrs = $auth->getAttributes();
+	$useFriendlyName = get_option('onelogin_saml_advanced_settings_use_friendlyname', false);
+	if ($useFriendlyName) {
+		$attrs = $auth->getAttributesWithFriendlyName();
+	} else {
+		$attrs = $auth->getAttributes();
+	}
 
+	$username = $email = '';
 	if (empty($attrs)) {
 		$nameid = $auth->getNameId();
 		if (empty($nameid)) {
 			echo __("The SAMLResponse may contain NameID or AttributeStatement");
 			exit();
 		}
-		$username = sanitize_user($nameid);
-		$email = sanitize_email($nameid);
+		$username = $nameid;
+		$email = $nameid;
 	} else {
 		$usernameMapping = get_option('onelogin_saml_attr_mapping_username');
 		$mailMapping =  get_option('onelogin_saml_attr_mapping_mail'); 
 
 		if (!empty($usernameMapping) && isset($attrs[$usernameMapping]) && !empty($attrs[$usernameMapping][0])){
-			$username = sanitize_user($attrs[$usernameMapping][0]);
+			$username = $attrs[$usernameMapping][0];
 		}
 		if (!empty($mailMapping) && isset($attrs[$mailMapping])  && !empty($attrs[$mailMapping][0])){
-			$email = sanitize_email($attrs[$mailMapping][0]);
+			$email = $attrs[$mailMapping][0];
 		}
 	}
+
+	$preventAccents = get_option('onelogin_saml_prevent_accents', false);
+	if ($preventAccents) {
+		$email_without_accents = remove_accents($email);
+		if ($email_without_accents !== $email) {
+			echo __("Emails with accents are not allowed");
+			exit();
+		}
+	}
+
+	$username = sanitize_user($username);
+	$email = sanitize_email($email);
 
 	if (empty($username)) {
 		echo __("The username could not be retrieved from the IdP and is required");
@@ -325,8 +343,9 @@ function saml_acs() {
 		exit();
 	} else {
 		$userdata = array();
-		$userdata['user_login'] = wp_slash($username);
-		$userdata['user_email'] = wp_slash($email);
+
+		$userdata['user_login'] = wp_unslash($username);
+		$userdata['user_email'] = wp_unslash($email);
 	}
 
 	if (!empty($attrs)) {
