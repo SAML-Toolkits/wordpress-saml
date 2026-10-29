@@ -1,6 +1,6 @@
 === OneLogin SAML SSO ===
 Contributors: onelogin
-Tags: sso, saml, single sign on, password, active directory, ldap, identity, onelogin, yubico, yubikey, vip access, otp
+Tags: sso, saml, single sign on, onelogin, okta, adfs, azure
 Requires at least: 2.1.2
 Tested up to: 7.1.3
 Stable tag: 3.7.0
