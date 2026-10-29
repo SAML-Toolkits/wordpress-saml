@@ -7,6 +7,6 @@
         "app":      "wordpress",
         "name":     "onelogin-saml-sso",
         "version":  "3.7.0",
-        "released": "10/10/2026"
+        "released": "30/10/2026"
     }
 }
