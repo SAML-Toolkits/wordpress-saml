@@ -147,12 +147,9 @@ function saml_sso() {
 	}
 
 	if (is_user_logged_in()) {
-		if (isset($_GET["target"])) {
-			wp_redirect($_GET["target"]);
-			exit();
-		} else if (isset($_GET['redirect_to'])) {
-			wp_redirect($_GET['redirect_to']);
-			exit();
+		$target = $_GET["target"] ?? $_GET['redirect_to'] ?? '';
+		if (!empty($target)) {
+			redirect_to_relaystate_if_trusted($target);
 		}
 		return true;
 	}
