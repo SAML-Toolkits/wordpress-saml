@@ -19,6 +19,12 @@ function saml_checker() {
 		}
 		saml_acs();
 	} else if (isset($_GET['saml_sls'])) {
+		if (empty($_GET['SAMLRequest']) && empty($_GET['SAMLResponse'])) {
+			/* processSLO() throws an uncaught OneLogin\Saml2\Error when neither message is present. */
+			status_header(400);
+			echo "That SLS endpoint expects a SAMLRequest or SAMLResponse value sent using HTTP-Redirect binding. Nothing was found";
+			exit();
+		}
 		saml_sls();
 	} else if (isset($_GET['saml_metadata'])) {
 		saml_metadata();
